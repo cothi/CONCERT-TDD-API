@@ -3,6 +3,7 @@ import { PointService } from "./point.service";
 import { UserPointTable } from "../database/userpoint.table";
 import { PointHistoryTable } from "../database/pointhistory.table";
 import { PointHistory, TransactionType, UserPoint } from "./point.model";
+import { PointBody } from "./point.dto";
 
 describe("PointService", () => {
   let service: PointService;
@@ -17,11 +18,13 @@ describe("PointService", () => {
           provide: UserPointTable,
           useValue: {
             selectById: jest.fn(),
+            insertOrUpdate: jest.fn(),
           },
         },
         {
           provide: PointHistoryTable,
           useValue: {
+            insert: jest.fn(),
             selectAllByUserId: jest.fn(),
           },
         },
@@ -66,5 +69,28 @@ describe("PointService", () => {
 
     expect(pointHistoryDB.selectAllByUserId).toHaveBeenCalledWith(userId);
     expect(result).toEqual([pointHistory]);
+  });
+
+  it("should charge the user point", async () => {
+    const userId = 1;
+
+    // 충전 요청 포인트
+    const pointDto: PointBody = {
+      amount: 100,
+    };
+
+    // 현재 포인트
+    const userPoint: UserPoint = {
+      id: userId,
+      point: 0,
+      updateMillis: Date.now(),
+    };
+
+    userDB.selectById.mockResolvedValue(userPoint);
+    userPoint.point += pointDto.amount;
+    userPoint.updateMillis = Date.now();
+    userDB.insertOrUpdate.mockResolvedValue(userPoint);
+
+    const result = await service.chargePoint(userId, pointDto);
   });
 });

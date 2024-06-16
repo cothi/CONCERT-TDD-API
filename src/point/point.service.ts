@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { UserPointTable } from "../database/userpoint.table";
 import { PointHistoryTable } from "../database/pointhistory.table";
-import { UserPoint } from "./point.model";
+import { PointHistory, UserPoint } from "./point.model";
 
 @Injectable()
 export class PointService {
@@ -14,7 +14,7 @@ export class PointService {
     return await this.userDb.selectById(userId);
   }
 
-  async getPointHistoryByUserId(userId: number) {
+  async getPointHistoryByUserId(userId: number): Promise<PointHistory[]> {
     return await this.historyDb.selectAllByUserId(userId);
   }
 }
