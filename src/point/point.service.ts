@@ -13,4 +13,8 @@ export class PointService {
   async getPointByUserId(userId: number): Promise<UserPoint> {
     return await this.userDb.selectById(userId);
   }
+
+  async getPointHistoryByUserId(userId: number) {
+    return await this.historyDb.selectAllByUserId(userId);
+  }
 }

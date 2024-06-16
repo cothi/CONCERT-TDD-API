@@ -3,7 +3,6 @@ import { PointService } from "./point.service";
 import { UserPointTable } from "../database/userpoint.table";
 import { PointHistoryTable } from "../database/pointhistory.table";
 import { PointHistory, TransactionType, UserPoint } from "./point.model";
-import { PointHistory } from "../../dist/point/point.model";
 
 describe("PointService", () => {
   let service: PointService;
@@ -22,7 +21,9 @@ describe("PointService", () => {
         },
         {
           provide: PointHistoryTable,
-          useValue: {},
+          useValue: {
+            selectAllByUserId: jest.fn(),
+          },
         },
       ],
     }).compile();
