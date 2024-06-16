@@ -10,7 +10,7 @@ export class PointService {
     private readonly historyDb: PointHistoryTable
   ) {}
 
-  getPointByUserId(userId: number): Promise<UserPoint> {
-    return this.userDb.selectById(userId);
+  async getPointByUserId(userId: number): Promise<UserPoint> {
+    return await this.userDb.selectById(userId);
   }
 }

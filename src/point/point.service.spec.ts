@@ -2,7 +2,8 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { PointService } from "./point.service";
 import { UserPointTable } from "../database/userpoint.table";
 import { PointHistoryTable } from "../database/pointhistory.table";
-import { UserPoint } from "./point.model";
+import { PointHistory, TransactionType, UserPoint } from "./point.model";
+import { PointHistory } from "../../dist/point/point.model";
 
 describe("PointService", () => {
   let service: PointService;
@@ -48,5 +49,21 @@ describe("PointService", () => {
 
     expect(userDB.selectById).toHaveBeenCalledWith(userId);
     expect(result).toEqual(userPoint);
+  });
+
+  it("should return point history", async () => {
+    const userId = 1;
+    const pointHistory: PointHistory = {
+      id: 1,
+      userId: userId,
+      type: TransactionType.CHARGE,
+      amount: 100,
+      timeMillis: Date.now(),
+    };
+    pointHistoryDB.selectAllByUserId.mockResolvedValue([pointHistory]);
+    const result = await service.getPointHistoryByUserId(userId);
+
+    expect(pointHistoryDB.selectAllByUserId).toHaveBeenCalledWith(userId);
+    expect(result).toEqual([pointHistory]);
   });
 });
