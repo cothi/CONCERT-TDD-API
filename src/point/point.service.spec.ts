@@ -110,7 +110,7 @@ describe("PointService", () => {
     userPoint.point -= pointDto.amount;
 
     // 포인트 사용
-    const result = service.usePoint(userId, pointDto);
+    const result = await service.usePoint(userId, pointDto);
 
     expect(userDB.selectById).toHaveBeenCalledWith(userId);
     expect(result.point).toEqual(userPoint.point);

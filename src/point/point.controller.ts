@@ -57,10 +57,8 @@ export class PointController {
     @Param("id") id,
     @Body(ValidationPipe) pointDto: PointBody
   ): Promise<UserPoint> {
-    // console.log(pointDto);
     const userId = Number.parseInt(id);
     return await this.pointService.chargePoint(userId, pointDto);
-    // return { id: userId, point: amount, updateMillis: Date.now() };
   }
 
   /**
@@ -78,7 +76,7 @@ export class PointController {
     @Body(ValidationPipe) pointDto: PointDto
   ): Promise<UserPoint> {
     const userId = Number.parseInt(id);
-    const amount = pointDto.amount;
-    return { id: userId, point: amount, updateMillis: Date.now() };
+    // const amount = pointDto.amount;
+    return await this.pointService.usePoint(userId, pointDto);
   }
 }
