@@ -11,15 +11,30 @@ export class PointService {
     private readonly historyDb: PointHistoryTable
   ) {}
 
+  /**
+   * @param userId
+   * @returns UserPoint
+   * 포인트 조회
+   */
   async getPointByUserId(userId: number): Promise<UserPoint> {
     return await this.userDb.selectById(userId);
   }
 
+  /**
+   * @param userId
+   * @returns PointHistory[]
+   * 포인트 사용/충전 내역 조회
+   */
   async getPointHistoryByUserId(userId: number): Promise<PointHistory[]> {
     return await this.historyDb.selectAllByUserId(userId);
   }
 
-  // 포인트를 충전하는 기능
+  /**
+   * @param userId
+   * @param pointDto
+   * @returns UserPoint
+   * 포인트 충전 기능
+   */
   async chargePoint(userId: number, pointDto: PointBody): Promise<UserPoint> {
     const userPoint = await this.userDb.selectById(userId);
     const newPoint = userPoint.point + pointDto.amount;
@@ -33,7 +48,12 @@ export class PointService {
 
     return await this.userDb.selectById(userId);
   }
-
+  /**
+   * @param userId
+   * @param pointDto
+   * @returns UserPoint
+   * 포인트 사용 기능
+   */
   async usePoint(userId: number, pointDto: PointBody): Promise<UserPoint> {
     const userPoint = await this.userDb.selectById(userId);
     if (userPoint.point < pointDto.amount) {
