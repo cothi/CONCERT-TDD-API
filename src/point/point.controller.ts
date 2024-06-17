@@ -7,7 +7,7 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { PointHistory, TransactionType, UserPoint } from "./point.model";
-import { PointBody as PointDto } from "./point.dto";
+import { PointBody, PointBody as PointDto } from "./point.dto";
 import { PointService } from "./point.service";
 
 @Controller("/point")
@@ -55,11 +55,12 @@ export class PointController {
   @Patch(":id/charge")
   async charge(
     @Param("id") id,
-    @Body(ValidationPipe) pointDto: PointDto
+    @Body(ValidationPipe) pointDto: PointBody
   ): Promise<UserPoint> {
+    // console.log(pointDto);
     const userId = Number.parseInt(id);
-    const amount = pointDto.amount;
-    return { id: userId, point: amount, updateMillis: Date.now() };
+    return await this.pointService.chargePoint(userId, pointDto);
+    // return { id: userId, point: amount, updateMillis: Date.now() };
   }
 
   /**

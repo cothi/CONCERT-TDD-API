@@ -19,10 +19,12 @@ export class PointService {
     return await this.historyDb.selectAllByUserId(userId);
   }
 
+  // 포인트를 충전하는 기능
   async chargePoint(userId: number, pointDto: PointBody): Promise<UserPoint> {
     const userPoint = await this.userDb.selectById(userId);
     const newPoint = userPoint.point + pointDto.amount;
     await this.userDb.insertOrUpdate(userId, newPoint);
+    console.log("new point", newPoint);
     await this.historyDb.insert(
       userId,
       pointDto.amount,
