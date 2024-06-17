@@ -24,7 +24,6 @@ export class PointService {
     const userPoint = await this.userDb.selectById(userId);
     const newPoint = userPoint.point + pointDto.amount;
     await this.userDb.insertOrUpdate(userId, newPoint);
-    console.log("new point", newPoint);
     await this.historyDb.insert(
       userId,
       pointDto.amount,

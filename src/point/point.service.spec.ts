@@ -92,5 +92,27 @@ describe("PointService", () => {
     userDB.insertOrUpdate.mockResolvedValue(userPoint);
 
     const result = await service.chargePoint(userId, pointDto);
+    expect(result.point).toEqual(userPoint.point);
+  });
+
+  it("should use the user point", async () => {
+    const userId = 1;
+    const pointDto: PointBody = {
+      amount: 10,
+    };
+    const userPoint: UserPoint = {
+      id: 1,
+      point: 1000,
+      updateMillis: Date.now(),
+    };
+
+    userDB.selectById.mockResolvedValue(userPoint);
+    userPoint.point -= pointDto.amount;
+
+    // 포인트 사용
+    const result = service.usePoint(userId, pointDto);
+
+    expect(userDB.selectById).toHaveBeenCalledWith(userId);
+    expect(result.point).toEqual(userPoint.point);
   });
 });
