@@ -1,4 +1,4 @@
-import { UserPointTable } from "src/database/userpoint.table";
+import { UserPointTable } from "../database/userpoint.table";
 import { PointProcessor } from "./point.processor";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Job } from "bull";
@@ -40,8 +40,8 @@ describe("PointProcessor", () => {
       userPoint.point += job.data.amount;
       userDB.insertOrUpdate.mockResolvedValue(userPoint);
 
-      const res = await pointProcessor.handleCharge(job);
-      expect(res).toEqual(userPoint);
+      const result = await pointProcessor.handleCharge(job);
+      expect(result).toEqual(userPoint);
     });
   });
 });

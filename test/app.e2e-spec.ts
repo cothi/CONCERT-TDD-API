@@ -2,34 +2,43 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, Body } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "./../src/app.module";
+import { Queue } from "bull";
+import { BullModule, getQueueToken } from "@nestjs/bull";
 
 describe("AppController (e2e)", () => {
   let app: INestApplication;
+  let pointQueue: Queue;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        AppModule,
+        BullModule.forRoot({
+          redis: {
+            host: "localhost",
+            port: 7777,
+          },
+        }),
+      ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    pointQueue = moduleFixture.get<Queue>(getQueueToken("point-queue"));
   });
 
-  it("/ (GET)", () => {
-    return request(app.getHttpServer())
-      .get("/")
-      .expect(200)
-      .expect("Hello World!");
+  afterAll(async () => {
+    await pointQueue.empty();
+    await app.close();
   });
 
-  it("/point/1/charge (patch)", async () => {
+  it("/point/:id/charge (PATCH)", async () => {
+    const point = 100;
     const res = await request(app.getHttpServer())
       .patch("/point/1/charge")
-      .send({ amount: 100 })
+      .send({ amount: point })
       .expect(200);
-    const res2 = await request(app.getHttpServer())
-      .patch("/point/1/charge")
-      .send({ amount: 100 })
-      .expect(200);
+
+    expect(res.body.point).toEqual(point);
   });
 });

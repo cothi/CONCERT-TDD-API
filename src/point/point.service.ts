@@ -3,12 +3,15 @@ import { UserPointTable } from "../database/userpoint.table";
 import { PointHistoryTable } from "../database/pointhistory.table";
 import { PointHistory, TransactionType, UserPoint } from "./point.model";
 import { PointBody } from "./point.dto";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from "bull";
 
 @Injectable()
 export class PointService {
   constructor(
     private readonly userDb: UserPointTable,
-    private readonly historyDb: PointHistoryTable
+    private readonly historyDb: PointHistoryTable,
+    @InjectQueue("point-queue") private readonly pointQueue: Queue
   ) {}
 
   /**
@@ -36,17 +39,13 @@ export class PointService {
    * 포인트 충전 기능
    */
   async chargePoint(userId: number, pointDto: PointBody): Promise<UserPoint> {
-    const userPoint = await this.userDb.selectById(userId);
-    const newPoint = userPoint.point + pointDto.amount;
-    await this.userDb.insertOrUpdate(userId, newPoint);
-    await this.historyDb.insert(
-      userId,
-      pointDto.amount,
-      TransactionType.CHARGE,
-      Date.now()
-    );
-
-    return await this.userDb.selectById(userId);
+    const amount = pointDto.amount;
+    const job = await this.pointQueue.add("charge", {
+      id: userId,
+      amount: amount,
+    });
+    const res = await job.finished();
+    return res;
   }
   /**
    * @param userId

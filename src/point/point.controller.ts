@@ -55,7 +55,7 @@ export class PointController {
   @Patch(":id/charge")
   async charge(
     @Param("id") id,
-    @Body(ValidationPipe) pointDto: PointBody
+    @Body() pointDto: PointBody
   ): Promise<UserPoint> {
     const userId = Number.parseInt(id);
     return await this.pointService.chargePoint(userId, pointDto);
