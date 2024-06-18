@@ -1,6 +1,4 @@
 import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { PointModule } from "./point/point.module";
 import { BullModule } from "@nestjs/bull";
 
@@ -10,12 +8,12 @@ import { BullModule } from "@nestjs/bull";
     BullModule.forRoot({
       redis: {
         host: "localhost",
-        port: 6379,
+        port: 6380,
       },
     }),
   ],
 
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

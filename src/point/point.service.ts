@@ -54,20 +54,11 @@ export class PointService {
    * 포인트 사용 기능
    */
   async usePoint(userId: number, pointDto: PointBody): Promise<UserPoint> {
-    const userPoint = await this.userDb.selectById(userId);
-    if (userPoint.point < pointDto.amount) {
-      throw new Error("포인트가 부족합니다.");
-    }
-
-    const newPoint = userPoint.point - pointDto.amount;
-    await this.userDb.insertOrUpdate(userId, newPoint);
-    await this.historyDb.insert(
-      userId,
-      pointDto.amount,
-      TransactionType.USE,
-      Date.now()
-    );
-
-    return await this.userDb.selectById(userId);
+    const job = await this.pointQueue.add("use", {
+      id: userId,
+      amount: pointDto.amount,
+    });
+    const res = await job.finished();
+    return res;
   }
 }

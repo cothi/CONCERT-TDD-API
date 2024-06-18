@@ -1,0 +1,21 @@
+version: "1"
+services:
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+    command: ["pnpm", "start:dev"]
+
+  redis:
+    build:
+      context: .
+      dockerfile: Dockerfile.redis
+    ports:
+      - "6380:6379"
