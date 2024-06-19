@@ -45,7 +45,7 @@ export class PointController {
   @Get(":id/histories")
   async history(
     @Param("id", ParseIntPipe) id: number
-  ): Promise<PointHistory[]> {
+  ): Promise<PointHistory[]|PointHistory> {
     return await this.pointService.getPointHistoryByUserId(id);
   }
 

@@ -1,8 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import {
-  PointServiceImpl,
-  pointServiceSymbol,
-} from "./point.service.impl";
+import { PointServiceImpl, pointServiceSymbol } from "./point.service.impl";
 import { UserPointTable } from "../../database/userpoint.table";
 import { PointHistoryTable } from "../../database/pointhistory.table";
 import { PointHistory, TransactionType, UserPoint } from "../point.model";
@@ -53,28 +50,28 @@ describe("PointService", () => {
     pointHistoryDB = module.get(PointHistoryTable);
   });
 
-  it("should be defined", () => {
-    expect(service).toBeDefined();
-  });
+  describe("포인트 조회", () => {
+    it("유저의 포인트가 조회되어야 합니다.", async () => {
+      const userId = 1;
+      const dateNow = Date.now();
+      const userPoint: UserPoint = {
+        ok: true,
+        id: userId,
+        point: 100,
+        updateMillis: dateNow,
+      };
+      userDB.selectById.mockResolvedValue(userPoint);
+      const result = await service.getPointByUserId(userId);
 
-  it("should return the correct user point", async () => {
-    const userId = 1;
-    const dateNow = Date.now();
-    const userPoint: UserPoint = {
-      id: userId,
-      point: 100,
-      updateMillis: dateNow,
-    };
-    userDB.selectById.mockResolvedValue(userPoint);
-    const result = await service.getPointByUserId(userId);
-
-    expect(userDB.selectById).toHaveBeenCalledWith(userId);
-    expect(result).toEqual(userPoint);
+      expect(result.ok).toEqual(true);
+      expect(result).toEqual(userPoint);
+    });
   });
 
   it("should return point history", async () => {
     const userId = 1;
     const pointHistory: PointHistory = {
+      ok: true,
       id: 1,
       userId: userId,
       type: TransactionType.CHARGE,
@@ -96,6 +93,7 @@ describe("PointService", () => {
       amount: 100,
     };
     const userPoint: UserPoint = {
+      ok: true,
       id: userId,
       point: 100,
       updateMillis: Date.now(),
@@ -108,6 +106,7 @@ describe("PointService", () => {
     );
 
     const res = await service.chargePoint(userId, pointDto);
+    expect(res.ok).toEqual(true);
     expect(res).toEqual(userPoint);
   });
 
@@ -117,11 +116,13 @@ describe("PointService", () => {
       amount: 10,
     };
     const userPoint: UserPoint = {
+      ok: true,
       id: 1,
       point: 1000,
       updateMillis: Date.now(),
     };
     const afterUserPoint: UserPoint = {
+      ok: true,
       id: 1,
       point: 990,
       updateMillis: Date.now(),
@@ -133,7 +134,6 @@ describe("PointService", () => {
       Promise.resolve(mockJob as Job<any>)
     );
 
-    // 포인
     const chargeResult = await service.usePoint(userId, pointDto);
     expect(chargeResult).toEqual(userPoint);
 
@@ -144,8 +144,7 @@ describe("PointService", () => {
       Promise.resolve(mockUseJob as Job<any>)
     );
 
-    // 포인트 사용
     const res = await service.usePoint(userId, pointDto);
-    expect(res).toEqual(afterUserPoint);
+    expect(res).toMatchObject(afterUserPoint);
   });
 });

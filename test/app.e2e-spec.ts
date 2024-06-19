@@ -57,7 +57,7 @@ describe("PointController (e2e)", () => {
   });
 
   describe("포인트 충전", () => {
-    it("/point/:id/charge (PATCH) -  유저 포인트 충전이 가능해야 합니다.", async () => {
+    it("/point/:id/charge (PATCH) - 유저 포인트 충전이 가능해야 합니다.", async () => {
       const point = 100;
       const userId = 1;
       const res = await request(app.getHttpServer())

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from "@nestjs/common";
 import { UserPointTable } from "../../database/userpoint.table";
 import { PointHistoryTable } from "../../database/pointhistory.table";
 import { PointHistory, TransactionType, UserPoint } from "../point.model";
@@ -25,7 +29,12 @@ export class PointServiceImpl implements PointService {
    */
   async getPointByUserId(userId: number): Promise<UserPoint> {
     this.isValidId(userId);
-    return await this.userDb.selectById(userId);
+    try {
+      const res = await this.userDb.selectById(userId);
+      return { ...res, ok: true };
+    } catch (e) {
+      return { ok: false, error: "조회할 수 없습니다." };
+    }
   }
 
   /**
@@ -33,9 +42,17 @@ export class PointServiceImpl implements PointService {
    * @param userId
    * @returns PointHistory[]
    */
-  async getPointHistoryByUserId(userId: number): Promise<PointHistory[]> {
+  async getPointHistoryByUserId(
+    userId: number
+  ): Promise<PointHistory[] | PointHistory> {
     this.isValidId(userId);
-    return await this.historyDb.selectAllByUserId(userId);
+
+    try {
+      const res = await this.historyDb.selectAllByUserId(userId);
+      return res;
+    } catch (e) {
+      return { ok: false, error: "조회할 수 없습니다" };
+    }
   }
 
   /**
@@ -46,13 +63,18 @@ export class PointServiceImpl implements PointService {
    */
   async chargePoint(userId: number, pointDto: PointBody): Promise<UserPoint> {
     this.isValidId(userId);
-    const amount = pointDto.amount;
-    const job = await this.pointQueue.add("charge", {
-      id: userId,
-      amount: amount,
-    });
-    const res = await job.finished();
-    return res;
+
+    try {
+      const amount = pointDto.amount;
+      const job = await this.pointQueue.add("charge", {
+        id: userId,
+        amount: amount,
+      });
+      const res = await job.finished();
+      return { ...res, ok: true };
+    } catch (e) {
+      return { ok: false, error: "충전할 수 없습니다." };
+    }
   }
   /**
    * 포인트 사용 기능
@@ -62,12 +84,16 @@ export class PointServiceImpl implements PointService {
    */
   async usePoint(userId: number, pointDto: PointBody): Promise<UserPoint> {
     this.isValidId(userId);
-    const job = await this.pointQueue.add("use", {
-      id: userId,
-      amount: pointDto.amount,
-    });
-    const res = await job.finished();
-    return res;
+    try {
+      const job = await this.pointQueue.add("use", {
+        id: userId,
+        amount: pointDto.amount,
+      });
+      const res = await job.finished();
+      return res;
+    } catch (e) {
+      return {ok: false, error: "포인트를 사용할 수 없습니다."};
+    }
   }
 
   // 유효한 id인지 확인
