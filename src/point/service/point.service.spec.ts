@@ -68,83 +68,90 @@ describe("PointService", () => {
     });
   });
 
-  it("should return point history", async () => {
-    const userId = 1;
-    const pointHistory: PointHistory = {
-      ok: true,
-      id: 1,
-      userId: userId,
-      type: TransactionType.CHARGE,
-      amount: 100,
-      timeMillis: Date.now(),
-    };
-    pointHistoryDB.selectAllByUserId.mockResolvedValue([pointHistory]);
-    const result = await service.getPointHistoryByUserId(userId);
+  describe("포인트 내역 조회", () => {
+    it("포인트 내역을 조회합니다.", async () => {
+      const userId = 1;
+      const pointHistory: PointHistory = {
+        ok: true,
+        id: 1,
+        userId: userId,
+        type: TransactionType.CHARGE,
+        amount: 100,
+        timeMillis: Date.now(),
+      };
+      pointHistoryDB.selectAllByUserId.mockResolvedValue([pointHistory]);
+      const result = await service.getPointHistoryByUserId(userId);
 
-    expect(pointHistoryDB.selectAllByUserId).toHaveBeenCalledWith(userId);
-    expect(result).toEqual([pointHistory]);
+      expect(pointHistoryDB.selectAllByUserId).toHaveBeenCalledWith(userId);
+      expect(result).toEqual([pointHistory]);
+    });
   });
 
-  it("should charge the user point", async () => {
-    const userId = 1;
+  describe("포인트 충전", () => {
+    it("포인트 충전를 합니다.", async () => {
+      const userId = 1;
 
-    // 충전 요청 포인트
-    const pointDto: PointBody = {
-      amount: 100,
-    };
-    const userPoint: UserPoint = {
-      ok: true,
-      id: userId,
-      point: 100,
-      updateMillis: Date.now(),
-    };
-    const mockJob: Partial<Job<any>> = {
-      finished: jest.fn().mockResolvedValue(userPoint),
-    };
-    pointQueue.add.mockImplementation(() =>
-      Promise.resolve(mockJob as Job<any>)
-    );
+      // 충전 요청 포인트
+      const pointDto: PointBody = {
+        amount: 100,
+      };
+      const userPoint: UserPoint = {
+        ok: true,
+        id: userId,
+        point: 100,
+        updateMillis: Date.now(),
+      };
+      const mockJob: Partial<Job<any>> = {
+        finished: jest.fn().mockResolvedValue(userPoint),
+      };
+      pointQueue.add.mockImplementation(() =>
+        Promise.resolve(mockJob as Job<any>)
+      );
 
-    const res = await service.chargePoint(userId, pointDto);
-    expect(res.ok).toEqual(true);
-    expect(res).toEqual(userPoint);
+      const res = await service.chargePoint(userId, pointDto);
+      expect(res.ok).toEqual(true);
+      expect(res).toEqual(userPoint);
+    });
   });
 
-  it("should use the user point", async () => {
-    const userId = 1;
-    const pointDto: PointBody = {
-      amount: 10,
-    };
-    const userPoint: UserPoint = {
-      ok: true,
-      id: 1,
-      point: 1000,
-      updateMillis: Date.now(),
-    };
-    const afterUserPoint: UserPoint = {
-      ok: true,
-      id: 1,
-      point: 990,
-      updateMillis: Date.now(),
-    };
-    const mockJob: Partial<Job<any>> = {
-      finished: jest.fn().mockResolvedValue(userPoint),
-    };
-    pointQueue.add.mockImplementation(() =>
-      Promise.resolve(mockJob as Job<any>)
-    );
+  describe("포인트 사용", () => {
+    it("포인트를 사용합니다.", async () => {
+      const userId = 1;
 
-    const chargeResult = await service.usePoint(userId, pointDto);
-    expect(chargeResult).toEqual(userPoint);
+      const pointDto: PointBody = {
+        amount: 10,
+      };
+      const userPoint: UserPoint = {
+        ok: true,
+        id: 1,
+        point: 1000,
+        updateMillis: Date.now(),
+      };
+      const afterUserPoint: UserPoint = {
+        ok: true,
+        id: 1,
+        point: 990,
+        updateMillis: Date.now(),
+      };
+      const mockJob: Partial<Job<any>> = {
+        finished: jest.fn().mockResolvedValue(userPoint),
+      };
+      pointQueue.add.mockImplementation(() =>
+        Promise.resolve(mockJob as Job<any>)
+      );
 
-    const mockUseJob: Partial<Job<any>> = {
-      finished: jest.fn().mockResolvedValue(afterUserPoint),
-    };
-    pointQueue.add.mockImplementation(() =>
-      Promise.resolve(mockUseJob as Job<any>)
-    );
+      const chargeResult = await service.usePoint(userId, pointDto);
+      expect(chargeResult).toEqual(userPoint);
 
-    const res = await service.usePoint(userId, pointDto);
-    expect(res).toMatchObject(afterUserPoint);
+      const mockUseJob: Partial<Job<any>> = {
+        finished: jest.fn().mockResolvedValue(afterUserPoint),
+      };
+      pointQueue.add.mockImplementation(() =>
+        Promise.resolve(mockUseJob as Job<any>)
+      );
+
+      const res = await service.usePoint(userId, pointDto);
+      expect(res).toMatchObject(afterUserPoint);
+    });
   });
 });

@@ -12,6 +12,12 @@ export class PointProcessorImpl implements PointProcessor {
     private readonly UserPointTable: UserPointTable,
     private readonly historyDb: PointHistoryTable
   ) {}
+
+  /**
+   * 순차적으로 포인트를 충전하는 함수
+   * @param job
+   * @returns Promise<UserPoint>
+   */
   @Process("charge")
   async handleCharge(job: Job) {
     const { id, amount } = job.data;
@@ -20,6 +26,11 @@ export class PointProcessorImpl implements PointProcessor {
     return await this.UserPointTable.insertOrUpdate(id, newAmount);
   }
 
+  /**
+   * 순차적으로 포인트를 사용하는 함포
+   * @param job
+   * @returns Promise<UserPoint>
+   */
   @Process("use")
   async handleUse(job: Job) {
     const { id, amount } = job.data;
@@ -31,6 +42,4 @@ export class PointProcessorImpl implements PointProcessor {
     await this.historyDb.insert(id, amount, TransactionType.USE, Date.now());
     return await this.UserPointTable.insertOrUpdate(id, newAmount);
   }
-
-
 }
