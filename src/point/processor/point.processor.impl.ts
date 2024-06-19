@@ -23,6 +23,7 @@ export class PointProcessorImpl implements PointProcessor {
     const { id, amount } = job.data;
     const userPoint = await this.UserPointTable.selectById(id);
     const newAmount = userPoint.point + amount;
+    await this.historyDb.insert(id, amount, TransactionType.CHARGE, Date.now());
     return await this.UserPointTable.insertOrUpdate(id, newAmount);
   }
 

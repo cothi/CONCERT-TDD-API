@@ -4,6 +4,7 @@ import * as request from "supertest";
 import { AppModule } from "./../src/app.module";
 import { Queue } from "bull";
 import { BullModule, getQueueToken } from "@nestjs/bull";
+import { PointHistory } from "src/point/model/point.model";
 
 describe("PointController (e2e)", () => {
   let app: INestApplication;
@@ -40,24 +41,37 @@ describe("PointController (e2e)", () => {
       expect(res.body.point).toEqual(0);
     });
 
-    it("/point/:id (GET) - 올바르지 않은 유저 ID로 조회 시 400 에러를 반환해야 합니다.", async () => {
+    it("/point/:id (GET) - 올바르지 않은 유저 ID로 조회 시 Bad Request를 발생합니다.", async () => {
       const userId = -1;
       await request(app.getHttpServer()).get(`/point/${userId}`).expect(400);
     });
   });
 
   describe("포인트 충전/사용 내역", () => {
-    it("/point/:id/histories (GET) - 유저 포인트 사용/충전 내역이 조회할 수 있어야 합니다.", async () => {
+    it("/point/:id/histories (GET) - 유저 포인트 충전 내역이 없다면 빈 배열을 반환합니다.", async () => {
       const userId = 1;
       const res = await request(app.getHttpServer())
         .get(`/point/${userId}/histories`)
         .expect(200);
       expect(res.body).toEqual([]);
     });
+    it("/point/:id/histories (GET) - 유저 포인트 충전/사용 내역이 있다면 내역을 반환합니다.", async () => {
+      const userId = 1;
+
+      await request(app.getHttpServer())
+        .patch(`/point/${userId}/charge`)
+        .send({ amount: 100 })
+        .expect(200);
+
+      const res = await request(app.getHttpServer())
+        .get(`/point/${userId}/histories`)
+        .expect(200);
+      expect(res.body[0].amount).toEqual(100);
+    });
   });
 
   describe("포인트 충전", () => {
-    it("/point/:id/charge (PATCH) - 유저 포인트 충전이 가능해야 합니다.", async () => {
+    it("/point/:id/charge (PATCH) - 유저 포인트 충전을 진행합니다.", async () => {
       const point = 100;
       const userId = 1;
       const res = await request(app.getHttpServer())
@@ -70,7 +84,7 @@ describe("PointController (e2e)", () => {
   });
 
   describe("포인트 사용", () => {
-    it("/point/:id/use (PATCH) - 유저 포인트가 충전 후 사용이 가능해야 합니다.", async () => {
+    it("/point/:id/use (PATCH) - 유저 포인트가 충전 후 사용합니다.", async () => {
       const point = 1000;
       const usePoint = 90;
       const userId = 1;
@@ -83,13 +97,23 @@ describe("PointController (e2e)", () => {
         .patch(`/point/${userId}/use`)
         .send({ amount: usePoint })
         .expect(200);
-      console.log(res.body);
       expect(res.body.point).toEqual(point - usePoint);
+    });
+
+    it("/point/:id/use (PATCH) - 유저 포인트가 없으면 사용이 불가능해야 합니다.", async () => {
+      const usePoint = 100;
+      const userId = 1;
+      const res = await request(app.getHttpServer())
+        .patch(`/point/${userId}/use`)
+        .send({ amount: usePoint })
+        .expect(200);
+
+      expect(res.body.ok).toEqual(false);
     });
   });
 
   describe("동시성 테스트", () => {
-    it("포인트 충전이 동시에 발생할 경우, 충전이 올바르게 작동되어야 합니다.", async () => {
+    it("포인트 충전이 동시에 발생할 경우, 충전이 올바르게 들어온 순서대로 작동되어야 합니다.", async () => {
       const point = 100;
       const userId = 1;
       const work1 = async () => {
@@ -114,7 +138,7 @@ describe("PointController (e2e)", () => {
       expect(res[2].body.point).toEqual(point * 3);
     });
 
-    it("포인트를 충전 후 동시에 사용할 경우, 충전과 사용이 올바르게 작동되어야 합니다.", async () => {
+    it("포인트를 충전 후 동시에 사용할 경우, 충전과 사용이 올바르게 순서대로 작동되어야 합니다.", async () => {
       const point = 100;
       const usePoint = 10;
       const userId = 1;
@@ -131,7 +155,7 @@ describe("PointController (e2e)", () => {
       const work3 = async () => {
         return await request(app.getHttpServer())
           .patch(`/point/${userId}/use`)
-          .send({ amount: usePoint });
+          .send({ amount: usePoint + 10 });
       };
       const work4 = async () => {
         return await request(app.getHttpServer())
@@ -142,8 +166,8 @@ describe("PointController (e2e)", () => {
       const res = await Promise.all([work1(), work2(), work3(), work4()]);
       expect(res[0].body.point).toEqual(point);
       expect(res[1].body.point).toEqual(point - 10);
-      expect(res[2].body.point).toEqual(point - 20);
-      expect(res[3].body.point).toEqual(point - 30);
+      expect(res[2].body.point).toEqual(point - 30);
+      expect(res[3].body.point).toEqual(point - 40);
     });
   });
 });
