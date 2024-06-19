@@ -6,10 +6,6 @@ export class UserPoint extends CommonDto {
   updateMillis?: number;
 }
 
-export type CommonModel = {
-  ok: boolean;
-  error: string;
-};
 
 /**
  * 포인트 트랜잭션 종류

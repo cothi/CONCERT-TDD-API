@@ -83,7 +83,61 @@ describe("PointController (e2e)", () => {
         .patch(`/point/${userId}/use`)
         .send({ amount: usePoint })
         .expect(200);
+      console.log(res.body);
       expect(res.body.point).toEqual(point - usePoint);
+    });
+  });
+
+  describe("동시성 테스트", () => {
+    it("포인트 충전이 동시에 발생할 경우, 충전이 올바르게 작동되어야 합니다.", async () => {
+      const point = 100;
+      const userId = 1;
+      const work1 = async () => {
+        return await request(app.getHttpServer())
+          .patch(`/point/${userId}/charge`)
+          .send({ amount: point });
+      };
+      const work2 = async () => {
+        return await request(app.getHttpServer())
+          .patch(`/point/${userId}/charge`)
+          .send({ amount: point });
+      };
+      const work3 = async () => {
+        return await request(app.getHttpServer())
+          .patch(`/point/${userId}/charge`)
+          .send({ amount: point });
+      };
+      const res = await Promise.all([work1(), work2(), work3()]);
+
+      expect(res[0].body.point).toEqual(point);
+      expect(res[1].body.point).toEqual(point * 2);
+      expect(res[2].body.point).toEqual(point * 3);
+    });
+
+    it("포인트를 충전 후 동시에 사용할 경우, 충전과 사용이 올바르게 작동되어야 합니다.", async () => {
+      const point = 100;
+      const usePoint = 10;
+      const userId = 1;
+      const work1 = async () => {
+        return await request(app.getHttpServer())
+          .patch(`/point/${userId}/charge`)
+          .send({ amount: point });
+      };
+      const work2 = async () => {
+        return await request(app.getHttpServer())
+          .patch(`/point/${userId}/use`)
+          .send({ amount: usePoint });
+      };
+      const work3 = async () => {
+        return await request(app.getHttpServer())
+          .patch(`/point/${userId}/use`)
+          .send({ amount: usePoint });
+      };
+
+      const res = await Promise.all([work1(), work2(), work3()]);
+      expect(res[0].body.point).toEqual(point);
+      expect(res[1].body.point).toEqual(point - 10);
+      expect(res[2].body.point).toEqual(point - 20);
     });
   });
 });

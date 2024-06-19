@@ -18,7 +18,7 @@ export class PointProcessorImpl implements PointProcessor {
    * @param job
    * @returns Promise<UserPoint>
    */
-  @Process("charge")
+  @Process({ name: "charge", concurrency: 0 })
   async handleCharge(job: Job) {
     const { id, amount } = job.data;
     const userPoint = await this.UserPointTable.selectById(id);
@@ -31,7 +31,7 @@ export class PointProcessorImpl implements PointProcessor {
    * @param job
    * @returns Promise<UserPoint>
    */
-  @Process("use")
+  @Process({ name: "use", concurrency: 1 })
   async handleUse(job: Job) {
     const { id, amount } = job.data;
     const userPoint = await this.UserPointTable.selectById(id);

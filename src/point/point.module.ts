@@ -4,7 +4,7 @@ import { DatabaseModule } from "../database/database.module";
 import {
   PointProcessorImpl,
   pointProcessorSymbol,
-} from "./processor/point.processor.impl"
+} from "./processor/point.processor.impl";
 import {
   PointServiceImpl,
   pointServiceSymbol,
@@ -18,6 +18,7 @@ import { PointHistoryTable } from "../database/pointhistory.table";
     DatabaseModule,
     BullModule.registerQueue({
       name: "point-queue",
+
     }),
   ],
   controllers: [PointController],

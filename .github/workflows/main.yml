@@ -34,7 +34,7 @@ jobs:
       - name: 노드 설치
         uses: actions/setup-node@v2
         with:
-          node-version: "18"
+          node-version: "20"
 
       - name: 의존성(라이브러리) 설치
         run: npm ci

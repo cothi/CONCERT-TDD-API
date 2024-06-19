@@ -54,8 +54,8 @@ describe("PointProcessor", () => {
     pointDB = module.get(PointHistoryTable);
   });
 
-  describe("handleChargeJob", () => {
-    it("should process charge job correctly", async () => {
+  describe("포인트 충전", () => {
+    it("포인트 충전이 올바르게 작동되어야 한다.", async () => {
       const job: Job = {
         data: { id: 1, amount: 100 },
       } as Job;
@@ -73,4 +73,32 @@ describe("PointProcessor", () => {
       expect(result).toEqual(userPoint);
     });
   });
-});
+  describe("포인트 사용", () => {
+
+  })
+
+  describe("동시성 테스트", () => {
+    it("포인트 충전이 동시에 발생할 경우, 충전이 올바르게 작동되어야 한다.", async () => {
+      const job: Job = {
+        data: { id: 1, amount: 100 },
+      } as Job;
+      let userPoint: UserPoint = {
+        ok: true,
+        id: 1,
+        point: 100,
+        updateMillis: Date.now(),
+      };
+
+      userDB.selectById.mockResolvedValue(userPoint);
+      userPoint.point += job.data.amount;
+      userDB.insertOrUpdate.mockResolvedValue(userPoint);
+
+      const result = await Promise.all([
+        pointProcessor.handleCharge(job),
+        pointProcessor.handleCharge(job),
+        pointProcessor.handleCharge(job),
+      ]);
+      expect(result).toEqual([userPoint, userPoint, userPoint]);
+    });
+  })
+})
