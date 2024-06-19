@@ -1,11 +1,15 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { PointService } from "./point.service";
-import { UserPointTable } from "../database/userpoint.table";
-import { PointHistoryTable } from "../database/pointhistory.table";
-import { PointHistory, TransactionType, UserPoint } from "./point.model";
-import { PointBody } from "./point.dto";
-import { BullModule, getQueueToken } from "@nestjs/bull";
+import {
+  PointServiceImpl,
+  pointServiceSymbol,
+} from "./point.service.impl";
+import { UserPointTable } from "../../database/userpoint.table";
+import { PointHistoryTable } from "../../database/pointhistory.table";
+import { PointHistory, TransactionType, UserPoint } from "../point.model";
+import { PointBody } from "../point.dto";
+import { getQueueToken } from "@nestjs/bull";
 import { Job, Queue } from "bull";
+import { PointService } from "./point.service";
 
 describe("PointService", () => {
   let service: PointService;
@@ -16,7 +20,10 @@ describe("PointService", () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        PointService,
+        {
+          provide: pointServiceSymbol,
+          useClass: PointServiceImpl,
+        },
         {
           provide: UserPointTable,
           useValue: {
@@ -40,7 +47,7 @@ describe("PointService", () => {
       ],
     }).compile();
 
-    service = module.get<PointService>(PointService);
+    service = module.get<PointService>(pointServiceSymbol);
     pointQueue = module.get(getQueueToken("point-queue"));
     userDB = module.get(UserPointTable);
     pointHistoryDB = module.get(PointHistoryTable);

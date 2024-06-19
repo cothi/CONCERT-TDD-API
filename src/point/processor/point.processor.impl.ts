@@ -1,11 +1,13 @@
 import { Process, Processor } from "@nestjs/bull";
 import { Job } from "bull";
-import { UserPointTable } from "../database/userpoint.table";
-import { PointHistoryTable } from "../database/pointhistory.table";
-import { TransactionType } from "./point.model";
+import { UserPointTable } from "../../database/userpoint.table";
+import { PointHistoryTable } from "../../database/pointhistory.table";
+import { TransactionType } from "../point.model";
+import { PointProcessor } from "./point.processor";
 
+export const pointProcessorSymbol = Symbol("PointProcessor");
 @Processor("point-queue")
-export class PointProcessor {
+export class PointProcessorImpl implements PointProcessor {
   constructor(
     private readonly UserPointTable: UserPointTable,
     private readonly historyDb: PointHistoryTable
@@ -29,4 +31,6 @@ export class PointProcessor {
     await this.historyDb.insert(id, amount, TransactionType.USE, Date.now());
     return await this.UserPointTable.insertOrUpdate(id, newAmount);
   }
+
+
 }

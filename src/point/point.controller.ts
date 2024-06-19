@@ -2,17 +2,22 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Patch,
   ValidationPipe,
 } from "@nestjs/common";
 import { PointHistory, TransactionType, UserPoint } from "./point.model";
 import { PointBody, PointBody as PointDto } from "./point.dto";
-import { PointService } from "./point.service";
+import { pointServiceSymbol } from "./service/point.service.impl";
+import { PointService } from "./service/point.service";
 
 @Controller("/point")
 export class PointController {
-  constructor(private readonly pointService: PointService) {}
+  constructor(
+    @Inject(pointServiceSymbol)
+    private readonly pointService: PointService
+  ) {}
 
   /**
    * TODO - 특정 유저의 포인트를 조회하는 기능을 작성해주세요.

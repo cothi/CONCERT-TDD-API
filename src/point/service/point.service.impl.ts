@@ -1,13 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import { UserPointTable } from "../database/userpoint.table";
-import { PointHistoryTable } from "../database/pointhistory.table";
-import { PointHistory, TransactionType, UserPoint } from "./point.model";
-import { PointBody } from "./point.dto";
+import { UserPointTable } from "../../database/userpoint.table";
+import { PointHistoryTable } from "../../database/pointhistory.table";
+import { PointHistory, TransactionType, UserPoint } from "../point.model";
+import { PointBody } from "../point.dto";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
+import { PointService } from "./point.service";
+
+
+export const pointServiceSymbol = Symbol("PointService");
 
 @Injectable()
-export class PointService {
+export class PointServiceImpl implements PointService {
   constructor(
     private readonly userDb: UserPointTable,
     private readonly historyDb: PointHistoryTable,

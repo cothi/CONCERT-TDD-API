@@ -1,10 +1,14 @@
-import { UserPointTable } from "../database/userpoint.table";
-import { PointProcessor } from "./point.processor";
+import { UserPointTable } from "../../database/userpoint.table";
+import {
+  PointProcessorImpl,
+  pointProcessorSymbol,
+} from "./point.processor.impl";
+import { PointHistoryTable } from "../../database/pointhistory.table";
 import { Test, TestingModule } from "@nestjs/testing";
-import Bull, { Job } from "bull";
-import { UserPoint } from "../../dist/point/point.model";
 import { BullModule } from "@nestjs/bull";
-import { PointHistoryTable } from "../database/pointhistory.table";
+import { Job } from "bull";
+import { UserPoint } from "../point.model";
+import { PointProcessor } from "./point.processor";
 
 describe("PointProcessor", () => {
   let pointProcessor: PointProcessor;
@@ -25,7 +29,10 @@ describe("PointProcessor", () => {
         }),
       ],
       providers: [
-        PointProcessor,
+        {
+          provide: pointProcessorSymbol,
+          useClass: PointProcessorImpl,
+        },
         {
           provide: UserPointTable,
           useValue: {
@@ -42,7 +49,7 @@ describe("PointProcessor", () => {
         },
       ],
     }).compile();
-    pointProcessor = module.get<PointProcessor>(PointProcessor);
+    pointProcessor = module.get<PointProcessor>(pointProcessorSymbol);
     userDB = module.get(UserPointTable);
     pointDB = module.get(PointHistoryTable);
   });
