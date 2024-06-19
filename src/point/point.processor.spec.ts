@@ -1,15 +1,29 @@
 import { UserPointTable } from "../database/userpoint.table";
 import { PointProcessor } from "./point.processor";
 import { Test, TestingModule } from "@nestjs/testing";
-import { Job } from "bull";
+import Bull, { Job } from "bull";
 import { UserPoint } from "../../dist/point/point.model";
+import { BullModule } from "@nestjs/bull";
+import { PointHistoryTable } from "../database/pointhistory.table";
 
 describe("PointProcessor", () => {
   let pointProcessor: PointProcessor;
   let userDB: jest.Mocked<UserPointTable>;
+  let pointDB: jest.Mocked<PointHistoryTable>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        BullModule.forRoot({
+          redis: {
+            host: "localhost",
+            port: 6380,
+          },
+        }),
+        BullModule.registerQueue({
+          name: "point-queue",
+        }),
+      ],
       providers: [
         PointProcessor,
         {
@@ -19,10 +33,18 @@ describe("PointProcessor", () => {
             insertOrUpdate: jest.fn(),
           },
         },
+        {
+          provide: PointHistoryTable,
+          useValue: {
+            insert: jest.fn(),
+            selectAllByUserId: jest.fn(),
+          },
+        },
       ],
     }).compile();
     pointProcessor = module.get<PointProcessor>(PointProcessor);
     userDB = module.get(UserPointTable);
+    pointDB = module.get(PointHistoryTable);
   });
 
   describe("handleChargeJob", () => {

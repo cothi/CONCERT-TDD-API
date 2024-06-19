@@ -4,6 +4,8 @@ import { DatabaseModule } from "../database/database.module";
 import { PointService } from "./point.service";
 import { BullModule } from "@nestjs/bull";
 import { PointProcessor } from "./point.processor";
+import { UserPointTable } from "../database/userpoint.table";
+import { PointHistoryTable } from "../database/pointhistory.table";
 
 @Module({
   imports: [
@@ -13,6 +15,7 @@ import { PointProcessor } from "./point.processor";
     }),
   ],
   controllers: [PointController],
-  providers: [PointService, PointProcessor],
+  providers: [PointService, PointProcessor, UserPointTable, PointHistoryTable],
 })
+
 export class PointModule {}

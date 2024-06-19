@@ -11,7 +11,7 @@ export class PointProcessor {
     private readonly historyDb: PointHistoryTable
   ) {}
   @Process("charge")
-  async handleCharge(job: Job<any>) {
+  async handleCharge(job: Job) {
     const { id, amount } = job.data;
     const userPoint = await this.UserPointTable.selectById(id);
     const newAmount = userPoint.point + amount;

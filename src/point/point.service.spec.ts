@@ -4,9 +4,12 @@ import { UserPointTable } from "../database/userpoint.table";
 import { PointHistoryTable } from "../database/pointhistory.table";
 import { PointHistory, TransactionType, UserPoint } from "./point.model";
 import { PointBody } from "./point.dto";
+import { BullModule, getQueueToken } from "@nestjs/bull";
+import { Job, Queue } from "bull";
 
 describe("PointService", () => {
   let service: PointService;
+  let pointQueue: jest.Mocked<Queue>;
   let userDB: jest.Mocked<UserPointTable>;
   let pointHistoryDB: jest.Mocked<PointHistoryTable>;
 
@@ -28,10 +31,17 @@ describe("PointService", () => {
             selectAllByUserId: jest.fn(),
           },
         },
+        {
+          provide: getQueueToken("point-queue"),
+          useValue: {
+            add: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<PointService>(PointService);
+    pointQueue = module.get(getQueueToken("point-queue"));
     userDB = module.get(UserPointTable);
     pointHistoryDB = module.get(PointHistoryTable);
   });
@@ -78,21 +88,20 @@ describe("PointService", () => {
     const pointDto: PointBody = {
       amount: 100,
     };
-
-    // 현재 포인트
     const userPoint: UserPoint = {
       id: userId,
-      point: 0,
+      point: 100,
       updateMillis: Date.now(),
     };
+    const mockJob: Partial<Job<any>> = {
+      finished: jest.fn().mockResolvedValue(userPoint),
+    };
+    pointQueue.add.mockImplementation(() =>
+      Promise.resolve(mockJob as Job<any>)
+    );
 
-    userDB.selectById.mockResolvedValue(userPoint);
-    userPoint.point += pointDto.amount;
-    userPoint.updateMillis = Date.now();
-    userDB.insertOrUpdate.mockResolvedValue(userPoint);
-
-    const result = await service.chargePoint(userId, pointDto);
-    expect(result.point).toEqual(userPoint.point);
+    const res = await service.chargePoint(userId, pointDto);
+    expect(res).toEqual(userPoint);
   });
 
   it("should use the user point", async () => {
@@ -105,14 +114,31 @@ describe("PointService", () => {
       point: 1000,
       updateMillis: Date.now(),
     };
+    const afterUserPoint: UserPoint = {
+      id: 1,
+      point: 990,
+      updateMillis: Date.now(),
+    };
+    const mockJob: Partial<Job<any>> = {
+      finished: jest.fn().mockResolvedValue(userPoint),
+    };
+    pointQueue.add.mockImplementation(() =>
+      Promise.resolve(mockJob as Job<any>)
+    );
 
-    userDB.selectById.mockResolvedValue(userPoint);
-    userPoint.point -= pointDto.amount;
+    // 포인
+    const chargeResult = await service.usePoint(userId, pointDto);
+    expect(chargeResult).toEqual(userPoint);
+
+    const mockUseJob: Partial<Job<any>> = {
+      finished: jest.fn().mockResolvedValue(afterUserPoint),
+    };
+    pointQueue.add.mockImplementation(() =>
+      Promise.resolve(mockUseJob as Job<any>)
+    );
 
     // 포인트 사용
-    const result = await service.usePoint(userId, pointDto);
-
-    expect(userDB.selectById).toHaveBeenCalledWith(userId);
-    expect(result.point).toEqual(userPoint.point);
+    const res = await service.usePoint(userId, pointDto);
+    expect(res).toEqual(afterUserPoint);
   });
 });
