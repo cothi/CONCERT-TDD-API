@@ -1,0 +1,46 @@
+# Workflow의 이름
+name: "유저 포인트 기능들 테스트하기"
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+      - feat/week1-2
+
+jobs:
+  container-job:
+    runs-on: ubuntu-latest
+    services:
+      # Label used to access the service container
+      redis:
+        # Docker Hub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6380:6379
+
+    steps:
+      - name: Github Repository 가져오기
+        uses: actions/checkout@v4
+
+      - name: 노드 설치
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: 의존성(라이브러리) 설치
+        run: npm ci
+
+      - name: unit 테스트 실행
+        run: npm test
+
+      - name: e2e 테스트 실행
+        run: npm run test:e2e
