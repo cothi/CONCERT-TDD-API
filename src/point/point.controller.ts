@@ -4,6 +4,7 @@ import {
   Get,
   Inject,
   Param,
+  ParseIntPipe,
   Patch,
   ValidationPipe,
 } from "@nestjs/common";
@@ -28,10 +29,9 @@ export class PointController {
    * @returns 사용자의 포인트 정보
    */
   @Get(":id")
-  async point(@Param("id") id): Promise<UserPoint> {
-    const userId = Number.parseInt(id);
+  async point(@Param("id", ParseIntPipe) id: number): Promise<UserPoint> {
     //return { id: userId, point: 0, updateMillis: Date.now() };
-    return await this.pointService.getPointByUserId(userId);
+    return await this.pointService.getPointByUserId(id);
   }
 
   /**
@@ -43,9 +43,10 @@ export class PointController {
    * @returns
    */
   @Get(":id/histories")
-  async history(@Param("id") id): Promise<PointHistory[]> {
-    const userId = Number.parseInt(id);
-    return await this.pointService.getPointHistoryByUserId(userId);
+  async history(
+    @Param("id", ParseIntPipe) id: number
+  ): Promise<PointHistory[]> {
+    return await this.pointService.getPointHistoryByUserId(id);
   }
 
   /**
@@ -59,11 +60,10 @@ export class PointController {
    */
   @Patch(":id/charge")
   async charge(
-    @Param("id") id,
+    @Param("id", ParseIntPipe) id: number,
     @Body(ValidationPipe) pointDto: PointBody
   ): Promise<UserPoint> {
-    const userId = Number.parseInt(id);
-    return await this.pointService.chargePoint(userId, pointDto);
+    return await this.pointService.chargePoint(id, pointDto);
   }
 
   /**
@@ -77,11 +77,10 @@ export class PointController {
    */
   @Patch(":id/use")
   async use(
-    @Param("id") id,
+    @Param("id", ParseIntPipe) id: number,
     @Body(ValidationPipe) pointDto: PointDto
   ): Promise<UserPoint> {
-    const userId = Number.parseInt(id);
     // const amount = pointDto.amount;
-    return await this.pointService.usePoint(userId, pointDto);
+    return await this.pointService.usePoint(id, pointDto);
   }
 }
