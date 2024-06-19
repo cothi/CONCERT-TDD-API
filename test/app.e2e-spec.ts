@@ -133,11 +133,17 @@ describe("PointController (e2e)", () => {
           .patch(`/point/${userId}/use`)
           .send({ amount: usePoint });
       };
+      const work4 = async () => {
+        return await request(app.getHttpServer())
+          .patch(`/point/${userId}/use`)
+          .send({ amount: usePoint });
+      };
 
-      const res = await Promise.all([work1(), work2(), work3()]);
+      const res = await Promise.all([work1(), work2(), work3(), work4()]);
       expect(res[0].body.point).toEqual(point);
       expect(res[1].body.point).toEqual(point - 10);
       expect(res[2].body.point).toEqual(point - 20);
+      expect(res[3].body.point).toEqual(point - 30);
     });
   });
 });

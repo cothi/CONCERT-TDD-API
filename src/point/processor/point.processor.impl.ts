@@ -2,7 +2,7 @@ import { Process, Processor } from "@nestjs/bull";
 import { Job } from "bull";
 import { UserPointTable } from "../../database/userpoint.table";
 import { PointHistoryTable } from "../../database/pointhistory.table";
-import { TransactionType } from "../point.model";
+import { TransactionType } from "../model/point.model";
 import { PointProcessor } from "./point.processor";
 
 export const pointProcessorSymbol = Symbol("PointProcessor");

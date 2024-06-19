@@ -7,7 +7,7 @@ import { PointHistoryTable } from "../../database/pointhistory.table";
 import { Test, TestingModule } from "@nestjs/testing";
 import { BullModule } from "@nestjs/bull";
 import { Job } from "bull";
-import { UserPoint } from "../point.model";
+import { UserPoint } from "../model/point.model";
 import { PointProcessor } from "./point.processor";
 
 describe("PointProcessor", () => {
@@ -73,9 +73,7 @@ describe("PointProcessor", () => {
       expect(result).toEqual(userPoint);
     });
   });
-  describe("포인트 사용", () => {
-
-  })
+  describe("포인트 사용", () => {});
 
   describe("동시성 테스트", () => {
     it("포인트 충전이 동시에 발생할 경우, 충전이 올바르게 작동되어야 한다.", async () => {
@@ -100,5 +98,5 @@ describe("PointProcessor", () => {
       ]);
       expect(result).toEqual([userPoint, userPoint, userPoint]);
     });
-  })
-})
+  });
+});

@@ -9,7 +9,7 @@ import {
   PointServiceImpl,
   pointServiceSymbol,
 } from "./service/point.service.impl";
-import { PointController } from "./point.controller";
+import { PointController } from "./controller/point.controller";
 import { UserPointTable } from "../database/userpoint.table";
 import { PointHistoryTable } from "../database/pointhistory.table";
 
@@ -18,7 +18,6 @@ import { PointHistoryTable } from "../database/pointhistory.table";
     DatabaseModule,
     BullModule.registerQueue({
       name: "point-queue",
-
     }),
   ],
   controllers: [PointController],

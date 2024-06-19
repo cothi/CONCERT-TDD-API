@@ -5,8 +5,8 @@ import {
 } from "@nestjs/common";
 import { UserPointTable } from "../../database/userpoint.table";
 import { PointHistoryTable } from "../../database/pointhistory.table";
-import { PointHistory, TransactionType, UserPoint } from "../point.model";
-import { PointBody } from "../point.dto";
+import { PointHistory, TransactionType, UserPoint } from "../model/point.model";
+import { PointBody } from "../dto/point.dto";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
 import { PointService } from "./point.service";
@@ -92,7 +92,7 @@ export class PointServiceImpl implements PointService {
       const res = await job.finished();
       return res;
     } catch (e) {
-      return {ok: false, error: "포인트를 사용할 수 없습니다."};
+      return { ok: false, error: "포인트를 사용할 수 없습니다." };
     }
   }
 

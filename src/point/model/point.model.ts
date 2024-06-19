@@ -1,11 +1,10 @@
-import { CommonDto } from "../common/dto/common.dto";
+import { CommonModel } from "../../common/model/common.model";
 
-export class UserPoint extends CommonDto {
+export class UserPoint extends CommonModel {
   id?: number;
   point?: number;
   updateMillis?: number;
 }
-
 
 /**
  * 포인트 트랜잭션 종류
@@ -17,7 +16,7 @@ export enum TransactionType {
   USE,
 }
 
-export class PointHistory extends CommonDto {
+export class PointHistory extends CommonModel {
   id?: number;
   userId?: number;
   type?: TransactionType;

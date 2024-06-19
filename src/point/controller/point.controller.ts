@@ -8,10 +8,10 @@ import {
   Patch,
   ValidationPipe,
 } from "@nestjs/common";
-import { PointHistory, TransactionType, UserPoint } from "./point.model";
-import { PointBody, PointBody as PointDto } from "./point.dto";
-import { pointServiceSymbol } from "./service/point.service.impl";
-import { PointService } from "./service/point.service";
+import { PointHistory, TransactionType, UserPoint } from "../model/point.model";
+import { PointBody, PointBody as PointDto } from "../dto/point.dto";
+import { pointServiceSymbol } from "../service/point.service.impl";
+import { PointService } from "../service/point.service";
 
 @Controller("/point")
 export class PointController {
@@ -45,7 +45,7 @@ export class PointController {
   @Get(":id/histories")
   async history(
     @Param("id", ParseIntPipe) id: number
-  ): Promise<PointHistory[]|PointHistory> {
+  ): Promise<PointHistory[] | PointHistory> {
     return await this.pointService.getPointHistoryByUserId(id);
   }
 
