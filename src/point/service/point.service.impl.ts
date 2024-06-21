@@ -10,7 +10,6 @@ import { PointBody } from "../dto/point.dto";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
 import { PointService } from "./point.service";
-import { Http2ServerRequest } from "http2";
 
 export const pointServiceSymbol = Symbol("PointService");
 
@@ -47,16 +46,22 @@ export class PointServiceImpl implements PointService {
    * @param userId
    * @returns PointHistory[]
    */
-  async getPointHistoryByUserId(
-    userId: number
-  ): Promise<PointHistory[] | PointHistory> {
+  async getPointHistoryByUserId(userId: number): Promise<PointHistory[]> {
     this.isValidId(userId);
 
     try {
       const res = await this.historyDb.selectAllByUserId(userId);
       return res;
     } catch (e) {
-      return { ok: false, error: "조회할 수 없습니다" };
+      return [
+        {
+          userId: userId,
+          ok: false,
+          error: "조회할 수 없습니다",
+          id: userId,
+          timeMillis: Date.now(),
+        },
+      ];
     }
   }
 

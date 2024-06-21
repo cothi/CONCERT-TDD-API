@@ -18,8 +18,8 @@ export enum TransactionType {
 
 export class PointHistory extends CommonModel {
   id?: number;
-  userId?: number;
+  userId: number;
+  timeMillis: number;
   type?: TransactionType;
   amount?: number;
-  timeMillis?: number;
 }
