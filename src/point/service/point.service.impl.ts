@@ -33,7 +33,12 @@ export class PointServiceImpl implements PointService {
       const res = await this.userDb.selectById(userId);
       return { ...res, ok: true };
     } catch (e) {
-      return { ok: false, error: "조회할 수 없습니다." };
+      return {
+        ok: false,
+        id: userId,
+        error: "조회할 수 없습니다.",
+        updateMillis: Date.now(),
+      };
     }
   }
 
@@ -73,7 +78,12 @@ export class PointServiceImpl implements PointService {
       const res = await job.finished();
       return { ...res, ok: true };
     } catch (e) {
-      return { ok: false, error: "충전할 수 없습니다." };
+      return {
+        ok: false,
+        error: "충전할 수 없습니다.",
+        id: userId,
+        updateMillis: Date.now(),
+      };
     }
   }
   /**
@@ -92,7 +102,12 @@ export class PointServiceImpl implements PointService {
       const res = await job.finished();
       return res;
     } catch (e) {
-      return { ok: false, error: "포인트를 사용할 수 없습니다." };
+      return {
+        ok: false,
+        error: "포인트를 사용할 수 없습니다.",
+        id: userId,
+        updateMillis: Date.now(),
+      };
     }
   }
 

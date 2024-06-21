@@ -13,7 +13,14 @@ export class UserPointTable {
     this.isValidId(id);
     return new Promise((r) =>
       setTimeout(() => {
-        r(this.table.get(id) ?? { id: id, point: 0, updateMillis: Date.now() });
+        r(
+          this.table.get(id) ?? {
+            id: id,
+            ok: true,
+            point: 0,
+            updateMillis: Date.now(),
+          }
+        );
       }, randomInt(200))
     );
   }
@@ -23,7 +30,12 @@ export class UserPointTable {
     return new Promise((r) =>
       setTimeout(() => {
         console.log(`포인트 : ${amount}`);
-        const userPoint = { id: id, point: amount, updateMillis: Date.now() };
+        const userPoint = {
+          ok: true,
+          id: id,
+          point: amount,
+          updateMillis: Date.now(),
+        };
         this.table.set(id, userPoint);
         r(userPoint);
       }, randomInt(300))

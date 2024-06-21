@@ -1,4 +1,4 @@
 export class CommonModel {
-  ok?: boolean;
+  ok: boolean;
   error?: string;
 }

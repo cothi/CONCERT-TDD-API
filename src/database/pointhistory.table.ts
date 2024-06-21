@@ -19,6 +19,7 @@ export class PointHistoryTable {
     return new Promise((r) => {
       setTimeout(() => {
         const history: PointHistory = {
+          ok: true,
           id: this.cursor++,
           userId: userId,
           amount: amount,

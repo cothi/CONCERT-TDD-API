@@ -60,6 +60,7 @@ describe("PointProcessor", () => {
         data: { id: 1, amount: 100 },
       } as Job;
       let userPoint: UserPoint = {
+        ok: true,
         id: 1,
         point: 100,
         updateMillis: Date.now(),

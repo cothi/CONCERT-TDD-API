@@ -1,9 +1,9 @@
 import { CommonModel } from "../../common/model/common.model";
 
 export class UserPoint extends CommonModel {
-  id?: number;
+  id: number;
+  updateMillis: number;
   point?: number;
-  updateMillis?: number;
 }
 
 /**
