@@ -75,7 +75,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "testResultsProcessor": "jest-sonar-reporter"
+    "testResultsProcessor": "jest-sonar-reporter",
+    "verbose": true
   },
   "jestSonar": {
     "reportPath": "../coverage",
