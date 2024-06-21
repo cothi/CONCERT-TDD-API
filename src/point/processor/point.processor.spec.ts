@@ -100,4 +100,30 @@ describe("PointProcessor", () => {
       expect(result).toEqual([userPoint, userPoint, userPoint]);
     });
   });
+
+  describe("부하테스트", () => {
+    it("포인트 충전이 1000번 동시에 발생할 경우, 충전이 올바르게 작동되어야 한다.", async () => {
+      const job: Job = {
+        data: { id: 1, amount: 10 },
+      } as Job;
+
+      let userPoint: UserPoint = {
+        ok: true,
+        id: 1,
+        point: 100,
+        updateMillis: Date.now(),
+      };
+      userDB.selectById.mockResolvedValue(userPoint);
+      userDB.insertOrUpdate.mockResolvedValue(userPoint);
+      const jobCount = 1000;
+      const jobs = Array(jobCount).fill(job);
+      const result = await Promise.all(
+        jobs.map(() => pointProcessor.handleCharge(job))
+      );
+      expect(result.length).toEqual(jobCount);
+      result.forEach((res) => {
+        expect(res).toEqual(userPoint);
+      });
+    });
+  });
 });

@@ -8,8 +8,8 @@ import {
   Patch,
   ValidationPipe,
 } from "@nestjs/common";
-import { PointHistory, TransactionType, UserPoint } from "../model/point.model";
-import { PointBody, PointBody as PointDto } from "../dto/point.dto";
+import { PointHistory, TransactionType, UserPoint } from "../point.model";
+import { PointBody, PointBody as PointDto } from "../point.dto";
 import { pointServiceSymbol } from "../service/point.service.impl";
 import { PointService } from "../service/point.service";
 
