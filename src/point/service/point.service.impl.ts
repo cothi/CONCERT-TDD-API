@@ -75,10 +75,9 @@ export class PointServiceImpl implements PointService {
     this.isValidId(userId);
 
     try {
-      const amount = pointDto.amount;
       const job = await this.pointQueue.add("charge", {
         id: userId,
-        amount: amount,
+        amount: pointDto.amount,
       });
       const res = await job.finished();
       return { ...res, ok: true };

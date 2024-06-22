@@ -14,20 +14,6 @@ export class PointProcessorImpl implements PointProcessor {
   ) {}
 
   /**
-   * 순차적으로 포인트를 충전하는 함수
-   * @param job
-   * @returns Promise<UserPoint>
-   */
-  @Process({ name: "charge", concurrency: 0 })
-  async handleCharge(job: Job) {
-    const { id, amount } = job.data;
-    const userPoint = await this.UserPointTable.selectById(id);
-    const newAmount = userPoint.point + amount;
-    await this.historyDb.insert(id, amount, TransactionType.CHARGE, Date.now());
-    return await this.UserPointTable.insertOrUpdate(id, newAmount);
-  }
-
-  /**
    * 순차적으로 포인트를 사용하는 함포
    * @param job
    * @returns Promise<UserPoint>
@@ -41,6 +27,19 @@ export class PointProcessorImpl implements PointProcessor {
     }
     const newAmount = userPoint.point - amount;
     await this.historyDb.insert(id, amount, TransactionType.USE, Date.now());
+    return await this.UserPointTable.insertOrUpdate(id, newAmount);
+  }
+  /**
+   * 순차적으로 포인트를 충전하는 함수
+   * @param job
+   * @returns Promise<UserPoint>
+   */
+  @Process({ name: "charge", concurrency: 0 })
+  async handleCharge(job: Job) {
+    const { id, amount } = job.data;
+    const userPoint = await this.UserPointTable.selectById(id);
+    const newAmount = userPoint.point + amount;
+    await this.historyDb.insert(id, amount, TransactionType.CHARGE, Date.now());
     return await this.UserPointTable.insertOrUpdate(id, newAmount);
   }
 }

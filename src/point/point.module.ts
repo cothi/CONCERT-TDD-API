@@ -18,6 +18,7 @@ import { PointHistoryTable } from "../database/pointhistory.table";
     DatabaseModule,
     BullModule.registerQueue({
       name: "point-queue",
+   
     }),
   ],
   controllers: [PointController],
