@@ -16,5 +16,7 @@ export class UsersRepositoryImpl implements UsersRepository {
     // return await this.users.save(data);
   }
 
-  async getUser(data: string): Promise<User> {}
+  async getUser(email: string): Promise<User> {
+    return await this.users.findOne({ where: { email: email } });
+  }
 }

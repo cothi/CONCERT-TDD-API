@@ -32,4 +32,12 @@ export class UsersServiceImpl implements UsersService {
       user: user,
     };
   }
+  async getUser(email: string): Promise<UserOutputDto> {
+    const user = await this.usersRepository.getUser(email);
+
+    return {
+      user: user,
+      ok: true,
+    };
+  }
 }
