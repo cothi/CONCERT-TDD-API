@@ -9,6 +9,7 @@ import { User } from '../entities/user.entity';
 const mockUsersRepository = {
   createUser: jest.fn(),
   getUser: jest.fn(),
+  getAllUsers: jest.fn(),
 };
 
 describe('UsersService', () => {
@@ -80,6 +81,14 @@ describe('UsersService', () => {
 
       usersRepository.getUser.mockResolvedValue(user);
       const res = await service.getUser(findName);
+      expect(res.ok).toEqual(true);
+    });
+  });
+
+  describe('모든 유저 조회', () => {
+    it('유저가 없을 때는 모든 유저 조회 시에 빈 배열을 반환한다.', async () => {
+      usersRepository.getAllUsers.mockResolvedValue([]);
+      const res = await service.getAllUsers();
       expect(res.ok).toEqual(true);
     });
   });
