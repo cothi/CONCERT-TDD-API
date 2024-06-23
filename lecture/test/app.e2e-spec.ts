@@ -15,10 +15,17 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('/users/create (POST)', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/users/create')
+      .send({
+        name: 'test',
+        email: 'test1@gmail.ai',
+      })
+      .expect(201);
   });
 });

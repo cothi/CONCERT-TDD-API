@@ -12,7 +12,9 @@ export class UsersRepositoryImpl implements UsersRepository {
   ) {}
 
   async createUser(data: CreateUserDto): Promise<User> {
-    return await this.users.create(data);
+    return await this.users.save(data);
     // return await this.users.save(data);
   }
+
+  async getUser(data: string): Promise<User> {}
 }

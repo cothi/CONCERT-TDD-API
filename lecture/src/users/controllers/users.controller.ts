@@ -15,7 +15,9 @@ export class UsersController {
 
   // TODO 유저를 생성하는 API를 구현하세요
   @Post('create')
-  async postUser(@Body() CreateUserDto: CreateUserDto) {}
+  async postUser(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.createUser(createUserDto);
+  }
 
   // TODO 특정 유저를 가져오는 API를 구현하세요
   @Get(':id')

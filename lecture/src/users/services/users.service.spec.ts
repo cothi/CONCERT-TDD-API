@@ -3,15 +3,12 @@ import { UsersServiceImpl, UsersServiceSymbol } from './users.service.impl';
 import { UsersService } from './users.service';
 import { UserOutputDto } from '../dto/create-user.dto';
 import { UsersRepository } from '../repositories/users.repository';
-import {
-  UsersRepositoryImpl,
-  UsersRepositorySymbol,
-} from '../repositories/users.repository.impl';
+import { UsersRepositorySymbol } from '../repositories/users.repository.impl';
 import { User } from '../entities/user.entity';
-import { create } from 'domain';
 
 const mockUsersRepository = {
   createUser: jest.fn(),
+  getUser: jest.fn(),
 };
 
 describe('UsersService', () => {
@@ -67,6 +64,23 @@ describe('UsersService', () => {
       });
 
       expect(user.ok).toEqual(false);
+    });
+  });
+
+  describe('유저 조회', () => {
+    it('유저를 조회하면 해당 유저를 반환한다', async () => {
+      const findName = 'test';
+      const user: User = {
+        id: 'qwer',
+        name: 'test',
+        email: 'test1@gmail.ai',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      usersRepository.getUser.mockResolvedValue(user);
+      const res = await service.getUser(findName);
+      expect(res.ok).toEqual(true);
     });
   });
 });
