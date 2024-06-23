@@ -20,7 +20,7 @@ describe('AppController (e2e)', () => {
   });
 
   describe('/users 유저 관련', () => {
-    it('/users/create (POST) ', async () => {
+    it('/users/create (POST) - 유저를 생성합니다.', async () => {
       const res = await request(app.getHttpServer())
         .post('/users/create')
         .send({
@@ -30,13 +30,15 @@ describe('AppController (e2e)', () => {
         .expect(201);
     });
 
-    it('/users/get (POST)', async () => {
+    it('/users/get (POST) - 유저를 조회합니다.', async () => {
       const res = await request(app.getHttpServer()).post('/users/get').send({
         email: 'test1@gmail.ai',
       });
-      console.log(res.body);
       expect(res.body.ok).toEqual(true);
     });
-
+    it('/users (GET) - 모든 유저를 조회합니다.', async () => {
+      const res = await request(app.getHttpServer()).get('/users');
+      expect(res.body.ok).toEqual(true);
+    });
   });
 });
