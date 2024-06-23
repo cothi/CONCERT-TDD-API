@@ -19,13 +19,23 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 
-  it('/users/create (POST)', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/users/create')
-      .send({
-        name: 'test',
+  describe('/users 유저 관련', () => {
+    it('/users/create (POST) ', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/users/create')
+        .send({
+          name: 'test',
+          email: 'test1@gmail.ai',
+        })
+        .expect(201);
+    });
+
+    it('/users/get (POST)', async () => {
+      const res = await request(app.getHttpServer()).post('/users/get').send({
         email: 'test1@gmail.ai',
-      })
-      .expect(201);
+      });
+      console.log(res.body);
+      expect(res.body.ok).toEqual(true);
+    });
   });
 });

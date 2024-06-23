@@ -20,6 +20,9 @@ export class UsersController {
   }
 
   // TODO 특정 유저를 가져오는 API를 구현하세요
-  @Get(':id')
-  async getUser(@Param('id') id: string) {}
+  @Post('get')
+  async getUser(@Body('email') email: string) {
+    console.log(email);
+    return await this.usersService.getUser(email);
+  }
 }
