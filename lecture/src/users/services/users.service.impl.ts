@@ -40,4 +40,12 @@ export class UsersServiceImpl implements UsersService {
       ok: true,
     };
   }
+  async getAllUsers(): Promise<UserOutputDto> {
+    const users = await this.usersRepository.getAllUsers();
+    return {
+      users: users,
+      ok: true,
+    }
+    
+  }
 }

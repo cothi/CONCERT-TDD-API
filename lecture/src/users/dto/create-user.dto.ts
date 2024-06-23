@@ -12,4 +12,5 @@ export class CreateUserDto {
 
 export class UserOutputDto extends CommonDto {
   user?: User;
+  users?: User[];
 }

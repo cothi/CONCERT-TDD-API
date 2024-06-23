@@ -19,4 +19,9 @@ export class UsersRepositoryImpl implements UsersRepository {
   async getUser(email: string): Promise<User> {
     return await this.users.findOne({ where: { email: email } });
   }
+
+  async getAllUsers(): Promise<User[]> {
+    // 모든 유저를 가져온다.
+    return await this.users.find();
+  }
 }
