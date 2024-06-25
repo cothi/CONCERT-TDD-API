@@ -29,14 +29,14 @@ export class UsersServiceImpl implements UsersService {
     const user = await this.usersRepository.createUser(data);
     return {
       ok: true,
-      user: user,
+      users: user,
     };
   }
   async getUser(email: string): Promise<UserOutputDto> {
     const user = await this.usersRepository.getUser(email);
 
     return {
-      user: user,
+      users: user,
       ok: true,
     };
   }

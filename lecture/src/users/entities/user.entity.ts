@@ -1,5 +1,6 @@
 import { CommonEntity } from 'src/common/entity/common.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Application } from 'src/special-lecture/entities/application.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User extends CommonEntity {
@@ -11,4 +12,7 @@ export class User extends CommonEntity {
 
   @Column({ unique: true })
   email: string;
+
+  @OneToMany(() => Application, application => application.user)
+  applications: Application[];
 }

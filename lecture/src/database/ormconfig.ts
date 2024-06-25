@@ -1,4 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { Lecture } from 'src/lecture/entities/lecture.entity';
+import { Application } from 'src/special-lecture/entities/application.entity';
+import { LectureCount } from 'src/special-lecture/entities/lecture-count.entity';
 import { User } from 'src/users/entities/user.entity';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
@@ -8,6 +11,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   username: 'postgres',
   password: 'postgres',
   database: 'postgres',
-  entities: [User],
+  entities: [Lecture, User, LectureCount, Application],
   synchronize: true,
 };

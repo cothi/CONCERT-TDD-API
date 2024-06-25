@@ -12,12 +12,22 @@ import {
 import { Lecture } from '../entities/lecture.entity';
 import { CreateLectureDto } from '../dto/create-lecture.dto';
 import { title } from 'process';
+import { create } from 'domain';
 
 const mockLectureRepository = {
   createLecture: jest.fn(),
   getLecture: jest.fn(),
   getAllLectures: jest.fn(),
   cancelLecture: jest.fn(),
+};
+const lecture: Lecture = {
+  id: 'test',
+  title: 'test',
+  maxApplicants: 30,
+  updatedAt: new Date(),
+  createdAt: new Date(),
+  applications: [],
+  lectureCount: undefined,
 };
 describe('LectureService', () => {
   let service: LectureService;
@@ -43,11 +53,6 @@ describe('LectureService', () => {
 
   describe('강의 생성', () => {
     it('강의를 생성하면 해당 강의를 반환한다', async () => {
-      const lecture: Lecture = {
-        id: 'qwer',
-        title: 'test',
-        MaxApplicants: 30,
-      };
       lectureRepository.createLecture.mockResolvedValue(lecture);
 
       const res = await service.createLecture(lecture);
@@ -58,11 +63,6 @@ describe('LectureService', () => {
 
   describe('강의 조회', () => {
     it('강의를 조회하면 해당 강의를 반환한다.', async () => {
-      const lecture: Lecture = {
-        id: 'test',
-        title: 'test',
-        MaxApplicants: 30,
-      };
       lectureRepository.getLecture.mockResolvedValue(lecture);
       const res = await service.getLecture('test');
 
@@ -73,11 +73,6 @@ describe('LectureService', () => {
 
   describe('모든 강의 조회', () => {
     it('모든 강의를 조회하면 모든 강의를 반환한다.', async () => {
-      const lecture: Lecture = {
-        id: 'test',
-        title: 'test',
-        MaxApplicants: 30,
-      };
       const lectures: Lecture[] = [lecture, lecture, lecture];
 
       lectureRepository.getAllLectures.mockResolvedValue(lectures);
@@ -89,11 +84,6 @@ describe('LectureService', () => {
 
   describe('강의 취소', () => {
     it('강의 취소시 해당 강의를 취소한다.', async () => {
-      const lecture: Lecture = {
-        id: 'test',
-        title: 'test',
-        MaxApplicants: 30,
-      };
       lectureRepository.cancelLecture.mockResolvedValue(lecture);
       const res = await service.cancelLecture('test');
       expect(res.ok).toEqual(true);

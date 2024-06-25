@@ -11,6 +11,14 @@ const mockUsersRepository = {
   getUser: jest.fn(),
   getAllUsers: jest.fn(),
 };
+const user: User = {
+  id: 'qwer',
+  name: 'test',
+  email: 'test1@gmail.ai',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  applications: [],
+};
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -40,13 +48,7 @@ describe('UsersService', () => {
 
   describe('유저 생성', () => {
     it('유저를 생성하면 해당 유저를 반환한다', async () => {
-      const user: User = {
-        id: 'qwer',
-        name: 'test',
-        email: 'test1@gmail.ai',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+   
 
       usersRepository.createUser.mockResolvedValue(user);
 
@@ -71,13 +73,6 @@ describe('UsersService', () => {
   describe('유저 조회', () => {
     it('유저를 조회하면 해당 유저를 반환한다', async () => {
       const findName = 'test';
-      const user: User = {
-        id: 'qwer',
-        name: 'test',
-        email: 'test1@gmail.ai',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
 
       usersRepository.getUser.mockResolvedValue(user);
       const res = await service.getUser(findName);

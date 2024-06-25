@@ -6,7 +6,12 @@ import {
   LectureServiceImpl,
   LectureServiceSymbol,
 } from './services/lecture.service.impl';
-import { LectureRepositoriesSymbol, LectrueRepositoriesImpl } from './repositories/lecture.repositories.impl';
+import {
+  LectureRepositoriesSymbol,
+  LectrueRepositoriesImpl,
+} from './repositories/lecture.repositories.impl';
+import { Application } from 'src/special-lecture/entities/application.entity';
+import { LectureCount } from 'src/special-lecture/entities/lecture-count.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Lecture])],
@@ -18,7 +23,7 @@ import { LectureRepositoriesSymbol, LectrueRepositoriesImpl } from './repositori
     },
     {
       provide: LectureRepositoriesSymbol,
-      useClass: LectrueRepositoriesImpl
+      useClass: LectrueRepositoriesImpl,
     },
   ],
 })

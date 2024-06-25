@@ -20,9 +20,13 @@ export class LectureController {
     private readonly lectureService: LectureService,
   ) {}
 
-  @Get('cancel/:id')
-  async cancelLecture(@Param('id') id: string) {
-    return await this.lectureService.cancelLecture(id);
+  @Get('gets')
+  async getAllLectures() {
+    return await this.lectureService.getAllLectures();
+  }
+  @Get('cancel/:title')
+  async cancelLecture(@Param('title') title: string) {
+    return await this.lectureService.cancelLecture(title);
   }
 
   @Post('create')
@@ -30,13 +34,8 @@ export class LectureController {
     return await this.lectureService.createLecture(createLectureDto);
   }
 
-  @Get('get/:title')
+  @Get(':title')
   async getLecture(@Param('title') title: string) {
     return await this.lectureService.getLecture(title);
-  }
-
-  @Get('gets')
-  async getAllLectures() {
-    return await this.lectureService.getAllLectures();
   }
 }

@@ -29,7 +29,7 @@ export class LectureServiceImpl implements LectureService {
     }
   }
 
-  async getLecture(ttile: string): Promise<LectureOutputDto> {
+  async getLecture(title: string): Promise<LectureOutputDto> {
     try {
       if (!title) {
         return {
@@ -37,7 +37,7 @@ export class LectureServiceImpl implements LectureService {
           message: '강의 제목을 입력해주세요',
         };
       }
-      const lecture = await this.lectureRepositories.getLecture(ttile);
+      const lecture = await this.lectureRepositories.getLecture(title);
       return {
         lectures: lecture,
         ok: true,
