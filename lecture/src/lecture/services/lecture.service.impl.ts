@@ -68,9 +68,25 @@ export class LectureServiceImpl implements LectureService {
   }
 
   async cancelLecture(title: string): Promise<LectureOutputDto> {
-    return {
-      ok: true,
-      message: '강의가 취소되었습니다',
-    };
+    try {
+      if (!title) {
+        return {
+          ok: false,
+          message: '강의 제목을 입력해주세요',
+        };
+      }
+      const lecture = await this.lectureRepositories.cancelLecture(title);
+
+      return {
+        lectures: lecture,
+        ok: true,
+        message: '강의가 취소되었습니다',
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        message: '강의 취소에 실패했습니다',
+      };
+    }
   }
 }

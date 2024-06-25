@@ -15,18 +15,26 @@ export class LectrueRepositoriesImpl implements LectrueRepositories {
   async createLecture(data: Lecture): Promise<Lecture> {
     const lecture = this.lectureRepository.create(data);
     return await this.lectureRepository.save(lecture);
-    
   }
 
   async getLecture(data: string): Promise<Lecture> {
-    return this.lectureRepository.findOne({ where: { title: data } });
+    const lecture = this.lectureRepository.findOne({ where: { title: data } });
+    if (!lecture) {
+      throw new Error('강의가 존재하지 않습니다');
+    }
+    return lecture;
   }
 
   async getAllLectures(): Promise<Lecture[]> {
     return this.lectureRepository.find();
   }
-  async cancelLecture(data: string): Promise<Lecture> {
-    const lecture = await this.lectureRepository.findOne({ where: { title: data } });
+  async cancelLecture(title: string): Promise<Lecture> {
+    const lecture = await this.lectureRepository.findOne({
+      where: { title: title },
+    });
+    if (!lecture) {
+      throw new Error('강의가 존재하지 않습니다');
+    }
     return await this.lectureRepository.remove(lecture);
   }
 }
