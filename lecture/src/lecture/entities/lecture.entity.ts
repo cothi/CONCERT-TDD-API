@@ -1,13 +1,13 @@
-import { Column, Entity, PrimaryColumn } from "typeorm"
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm"
 
 Entity()
 export class Lecture {
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   title: string;
 
   @Column()
-  MaxxApplicants: number;
+  MaxApplicants: number;
 }

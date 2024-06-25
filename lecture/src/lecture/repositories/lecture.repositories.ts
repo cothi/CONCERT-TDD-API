@@ -5,4 +5,5 @@ export interface LectrueRepositories {
   createLecture(data: CreateLectureDto): Promise<Lecture>;
   getLecture(data: string): Promise<Lecture>;
   getAllLectures(): Promise<Lecture[]>;
+  cancelLecture(data: string): Promise<Lecture>;
 }

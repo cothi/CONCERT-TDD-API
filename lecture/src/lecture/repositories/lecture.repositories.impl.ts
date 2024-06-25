@@ -4,7 +4,7 @@ import { Lecture } from '../entities/lecture.entity';
 import { LectrueRepositories } from './lecture.repositories';
 import { Repository } from 'typeorm';
 
-export const LectureLepositoriesSymbol = Symbol('LectureLepositories');
+export const LectureRepositoriesSymbol = Symbol('LectureRepositories');
 
 export class LectrueRepositoriesImpl implements LectrueRepositories {
   constructor(
@@ -12,8 +12,10 @@ export class LectrueRepositoriesImpl implements LectrueRepositories {
     private readonly lectureRepository: Repository<Lecture>,
   ) {}
 
-  async createLecture(data: CreateLectureDto): Promise<Lecture> {
-    return this.lectureRepository.save(data);
+  async createLecture(data: Lecture): Promise<Lecture> {
+    const lecture = this.lectureRepository.create(data);
+    return await this.lectureRepository.save(lecture);
+    
   }
 
   async getLecture(data: string): Promise<Lecture> {
@@ -22,5 +24,9 @@ export class LectrueRepositoriesImpl implements LectrueRepositories {
 
   async getAllLectures(): Promise<Lecture[]> {
     return this.lectureRepository.find();
+  }
+  async cancelLecture(data: string): Promise<Lecture> {
+    const lecture = await this.lectureRepository.findOne({ where: { title: data } });
+    return await this.lectureRepository.remove(lecture);
   }
 }

@@ -1,18 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateLectureDto, LectureOutputDto } from '../dto/create-lecture.dto';
 import { UpdateLectureDto } from '../dto/update-lecture.dto';
+import { LectureService } from './lecture.serivce';
+import { LectrueRepositories } from '../repositories/lecture.repositories';
+import { LectureRepositoriesSymbol } from '../repositories/lecture.repositories.impl';
 
 export const LectureServiceSymbol = Symbol('LectureService');
 @Injectable()
-export class LectureServiceImpl {
+export class LectureServiceImpl implements LectureService {
+  constructor(
+    @Inject(LectureRepositoriesSymbol)
+    private readonly lectureRepositories: LectrueRepositories,
+  ) {}
   async createLecture(data: CreateLectureDto): Promise<LectureOutputDto> {
-    return {
-      ok: true,
-      message: '강의가 생성되었습니다',
-    };
+    try {
+      const lecture = await this.lectureRepositories.createLecture(data);
+      return {
+        ok: true,
+        message: '강의가 생성되었습니다',
+        lectures: lecture,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        message: '강의 생성에 실패했습니다',
+      };
+    }
   }
 
-  async getLecture(data: string): Promise<LectureOutputDto> {
+  async getLecture(ttile: string): Promise<LectureOutputDto> {
     return {
       ok: true,
       message: '강의가 조회되었습니다',
@@ -23,6 +39,13 @@ export class LectureServiceImpl {
     return {
       ok: true,
       message: '모든 강의가 조회되었습니다',
+    };
+  }
+
+  async cancelLecture(title: string): Promise<LectureOutputDto> {
+    return {
+      ok: true,
+      message: '강의가 취소되었습니다',
     };
   }
 }
