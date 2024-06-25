@@ -17,7 +17,8 @@ import { LectureService } from '../services/lecture.serivce';
 export class LectureController {
   constructor(
     @Inject(LectureServiceSymbol)
-    private readonly lectureService: LectureService) { }
+    private readonly lectureService: LectureService,
+  ) {}
 
   @Get('cancel/:id')
   async cancelLecture(@Param('id') id: string) {
@@ -29,9 +30,9 @@ export class LectureController {
     return await this.lectureService.createLecture(createLectureDto);
   }
 
-  @Get('get/:id')
-  async getLecture(@Param('id') id: number) {
-    return await this.lectureService.getLecture(id);
+  @Get('get/:title')
+  async getLecture(@Param('title') title: string) {
+    return await this.lectureService.getLecture(title);
   }
 
   @Get('gets')

@@ -16,6 +16,7 @@ import { title } from 'process';
 const mockLectureRepository = {
   createLecture: jest.fn(),
   getLecture: jest.fn(),
+  getAllLectures: jest.fn()
 };
 describe('LectureService', () => {
   let service: LectureService;
@@ -70,6 +71,18 @@ describe('LectureService', () => {
   });
 
   describe('모든 강의 조회', () => {
-    
-  })
+    it('모든 강의를 조회하면 모든 강의를 반환한다.', async () => {
+      const lecture: Lecture = {
+        id: 'test',
+        title: 'test',
+        MaxApplicants: 30,
+      };
+      const lectures: Lecture[] = [lecture, lecture, lecture];
+
+      lectureRepository.getAllLectures.mockResolvedValue(lectures);
+      const res = await service.getAllLectures();
+      expect(res.lectures).toMatchObject(lectures);
+      expect(res.ok).toEqual(true);
+    });
+  });
 });

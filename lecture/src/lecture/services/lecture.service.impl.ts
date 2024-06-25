@@ -52,10 +52,19 @@ export class LectureServiceImpl implements LectureService {
   }
 
   async getAllLectures(): Promise<LectureOutputDto> {
-    return {
-      ok: true,
-      message: '모든 강의가 조회되었습니다',
-    };
+    try {
+      const lectrues = await this.lectureRepositories.getAllLectures();
+      return {
+        lectures: lectrues,
+        ok: true,
+        message: '모든 강의가 조회되었습니다',
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        message: '모든 강의 조회에 실패했습니다',
+      };
+    }
   }
 
   async cancelLecture(title: string): Promise<LectureOutputDto> {
