@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LectureController } from './lecture.controller';
-import { LectureService } from './lecture.service';
+import { LectureService } from '../services/lecture.service';
 
 describe('LectureController', () => {
   let controller: LectureController;
@@ -13,6 +13,4 @@ describe('LectureController', () => {
 
     controller = module.get<LectureController>(LectureController);
   });
-
-
 });
