@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { LectureService } from '../services/lecture.service';
+import { LectureService } from '../services/lecture.service.impl';
 import { CreateLectureDto } from '../dto/create-lecture.dto';
 import { UpdateLectureDto } from '../dto/update-lecture.dto';
 
