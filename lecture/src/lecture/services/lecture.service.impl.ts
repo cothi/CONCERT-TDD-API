@@ -4,6 +4,7 @@ import { UpdateLectureDto } from '../dto/update-lecture.dto';
 import { LectureService } from './lecture.serivce';
 import { LectrueRepositories } from '../repositories/lecture.repositories';
 import { LectureRepositoriesSymbol } from '../repositories/lecture.repositories.impl';
+import { title } from 'process';
 
 export const LectureServiceSymbol = Symbol('LectureService');
 @Injectable()
@@ -29,10 +30,25 @@ export class LectureServiceImpl implements LectureService {
   }
 
   async getLecture(ttile: string): Promise<LectureOutputDto> {
-    return {
-      ok: true,
-      message: '강의가 조회되었습니다',
-    };
+    try {
+      if (!title) {
+        return {
+          ok: false,
+          message: '강의 제목을 입력해주세요',
+        };
+      }
+      const lecture = await this.lectureRepositories.getLecture(ttile);
+      return {
+        lectures: lecture,
+        ok: true,
+        message: '강의가 조회되었습니다',
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        message: '강의 조회에 실패했습니다',
+      };
+    }
   }
 
   async getAllLectures(): Promise<LectureOutputDto> {

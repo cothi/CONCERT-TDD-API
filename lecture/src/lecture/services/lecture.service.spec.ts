@@ -11,6 +11,7 @@ import {
 } from './lecture.service.impl';
 import { Lecture } from '../entities/lecture.entity';
 import { CreateLectureDto } from '../dto/create-lecture.dto';
+import { title } from 'process';
 
 const mockLectureRepository = {
   createLecture: jest.fn(),
@@ -63,8 +64,12 @@ describe('LectureService', () => {
       lectureRepository.getLecture.mockResolvedValue(lecture);
       const res = await service.getLecture('test');
 
-      expect(res.title).toEqual('test');
+      expect(res.lectures).toMatchObject(lecture);
       expect(res.ok).toEqual(true);
     });
   });
+
+  describe('모든 강의 조회', () => {
+    
+  })
 });
