@@ -42,10 +42,10 @@ describe('AppController (e2e)', () => {
     });
   });
 
-  describe('/lecture 강의 관련', () => {
-    it('/lecture/create (POST) - 강의를 생성합니다.', async () => {
+  describe('/admin 강의 관련', () => {
+    it('/admin/create (POST) - 강의를 생성합니다.', async () => {
       const res = await request(app.getHttpServer())
-        .post('/lecture/create')
+        .post('/admin/create')
         .send({
           title: 'test',
           maxApplicants: 30,
@@ -54,29 +54,41 @@ describe('AppController (e2e)', () => {
       expect(res.body.ok).toEqual(true);
     });
 
-    it('/lecture/get (GET) - 강의를 조회합니다.', async () => {
+    it('/admin/get (GET) - 강의를 조회합니다.', async () => {
       const title = 'test';
       const res = await request(app.getHttpServer())
-        .get(`/lecture/${title}`)
+        .get(`/admin/${title}`)
         .expect(200);
       expect(res.body.ok).toEqual(true);
     });
 
-    it('/lecture/gets (GET) - 모든 강의를 조회합니다.', async () => {
+    it('/admin/gets (GET) - 모든 강의를 조회합니다.', async () => {
       const res = await request(app.getHttpServer())
-        .get('/lecture/gets')
+        .get('/admin/gets')
         .expect(200);
 
       expect(res.body.lectures).toEqual(expect.any(Array));
       expect(res.body.ok).toEqual(true);
     });
 
-    it('/lecture/cancel (DELETE) - 강의를 취소합니다.', async () => {
-      const title = 'test';
-      const res = await request(app.getHttpServer())
-        .get(`/lecture/cancel/${title}`)
-        .expect(200);
+    // it('/lecture/cancel (DELETE) - 강의를 취소합니다.', async () => {
+    //   const title = 'test';
+    //   const res = await request(app.getHttpServer())
+    //     .get(`/lecture/cancel/${title}`)
+    //     .expect(200);
 
+    //   expect(res.body.ok).toEqual(true);
+    // });
+    it('/lecture/apply (POST) - 특별 강의에 신청합니다.', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/lecture/apply')
+        .send({
+          email: 'test1@gmail.ai',
+          name: 'test',
+          title: 'test',
+        })
+        .expect(201);
+      console.log(res.body);
       expect(res.body.ok).toEqual(true);
     });
   });

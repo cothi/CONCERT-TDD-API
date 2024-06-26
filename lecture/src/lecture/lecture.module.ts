@@ -1,30 +1,30 @@
+import { Application } from './domain/entities/application.entity';
+import { LectureCount } from './domain/entities/lecture-count.entity';
 import { Module } from '@nestjs/common';
-import { Lecture } from 'src/lecture/entities/lecture.entity';
+import { SpecialLectureController } from './presentation/controllers/lecture.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LectureController } from './controller/lecture.controller';
 import {
   LectureServiceImpl,
   LectureServiceSymbol,
-} from './services/lecture.service.impl';
+} from './application/services/lecture.service.impl';
 import {
-  LectureRepositoriesSymbol,
-  LectrueRepositoriesImpl,
-} from './repositories/lecture.repositories.impl';
-import { Application } from 'src/special-lecture/entities/application.entity';
-import { LectureCount } from 'src/special-lecture/entities/lecture-count.entity';
+  LectureRepositoryImpl,
+  LectureRepositorySymbol,
+} from './infrastructure/persistence/repositories/lecture.repositories.impl';
+import { Lecture } from './domain/entities/lecture.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Lecture])],
-  controllers: [LectureController],
+  imports: [TypeOrmModule.forFeature([Application, Lecture, LectureCount])],
+  controllers: [SpecialLectureController],
   providers: [
     {
       provide: LectureServiceSymbol,
       useClass: LectureServiceImpl,
     },
     {
-      provide: LectureRepositoriesSymbol,
-      useClass: LectrueRepositoriesImpl,
+      provide: LectureRepositorySymbol,
+      useClass: LectureRepositoryImpl,
     },
   ],
 })
-export class LectureModule {}
+export class SpecialLectureModule {}

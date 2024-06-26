@@ -1,7 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Lecture } from 'src/lecture/entities/lecture.entity';
-import { Application } from 'src/special-lecture/entities/application.entity';
-import { LectureCount } from 'src/special-lecture/entities/lecture-count.entity';
+import { Application } from 'src/lecture/domain/entities/application.entity';
+import { LectureCount } from 'src/lecture/domain/entities/lecture-count.entity';
+import { Lecture } from 'src/lecture/domain/entities/lecture.entity';
 import { User } from 'src/users/entities/user.entity';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
