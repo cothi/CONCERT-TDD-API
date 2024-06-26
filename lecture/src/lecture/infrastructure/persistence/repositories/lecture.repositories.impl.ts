@@ -24,6 +24,12 @@ export class LectureRepositoryImpl implements LectureRepository {
     });
   }
 
+  async getAllLectures(): Promise<Lecture[]> {
+    return await this.executeInTransaction(async (queryRunner) => {
+      return queryRunner.manager.find(Lecture);
+    });
+  }
+
   private async findLecture(
     queryRunner: QueryRunner,
     title: string,

@@ -48,7 +48,7 @@ describe('SpecialLectureService', () => {
         updatedAt: new Date(),
       };
       await repository.applyLecture.mockResolvedValue(application);
-      const specialLecture = await service.applySpecialLecture({
+      const specialLecture = await service.applyLecture({
         title: 'test',
         name: 'test',
         email: 'test@gmail.ai',
@@ -72,10 +72,10 @@ describe('SpecialLectureService', () => {
         }
       ];
       await repository.getAllLectures.mockResolvedValue(lectures);
-      const specialLectures = await service.getLectures();
+      const specialLectures = await service.getAllLectures();
 
       expect(specialLectures.ok).toEqual(true);
-    }
+    });
   })
 
 
