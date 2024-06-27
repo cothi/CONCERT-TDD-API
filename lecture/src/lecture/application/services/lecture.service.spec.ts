@@ -16,6 +16,7 @@ const mockLectureRepository = {
   getAllLectures: jest.fn(),
   getLectureCount: jest.fn(),
   getLecture: jest.fn(),
+  getApplicationsByName: jest.fn(),
 };
 
 describe('SpecialLectureService', () => {
@@ -128,7 +129,7 @@ describe('SpecialLectureService', () => {
         },
       ];
       repository.getApplicationsByName.mockResolvedValue(applications);
-      const result = service.getApplicationsByName(name);
+      const result = await service.getApplicationsByName(name);
       expect(result.ok).toEqual(true);
       expect(result.applications).toEqual(applications);
     });

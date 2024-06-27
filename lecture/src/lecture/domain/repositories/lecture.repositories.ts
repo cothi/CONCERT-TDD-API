@@ -9,4 +9,5 @@ export interface LectureRepository {
   getAllLectures(): Promise<Lecture[]>;
   getLecture(title: string): Promise<Lecture>;
   getLectureCount(title: string): Promise<LectureCount>;
+  getApplicationsByName(name: string): Promise<Application[]>;
 }

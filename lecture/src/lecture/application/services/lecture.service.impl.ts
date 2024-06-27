@@ -7,6 +7,7 @@ import { LectureRepositorySymbol } from 'src/lecture/infrastructure/persistence/
 import { LectureRepository } from 'src/lecture/domain/repositories/lecture.repositories';
 import { ApplicationDomain } from 'src/lecture/infrastructure/persistence/model/application.domain';
 import { GetLectures } from 'src/lecture/presentation/dto/response/get-lectures.response.dto';
+import { GetApplicationsByNameResponseDto } from 'src/lecture/presentation/dto/response/get-applications-by-name.response.dto';
 
 export const LectureServiceSymbol = Symbol('LectureService');
 
@@ -63,6 +64,24 @@ export class LectureServiceImpl implements LectureService {
       return {
         ok: false,
         message: '특강 조회에 실패했습니다',
+      };
+    }
+  }
+  async getApplicationsByName(
+    name: string,
+  ): Promise<GetApplicationsByNameResponseDto> {
+    const applications =
+      await this.lectureRepository.getApplicationsByName(name);
+    try {
+      return {
+        applications: applications,
+        ok: true,
+        message: '특강 신청자 조회가 완료되었습니다',
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        message: '특강 신청자 조회에 실패했습니다',
       };
     }
   }

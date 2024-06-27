@@ -45,6 +45,14 @@ export class LectureRepositoryImpl implements LectureRepository {
       });
     });
   }
+  async getApplicationsByName(name: string): Promise<Application[]> {
+    return await this.executeInTransaction(async (queryRunner) => {
+      return await queryRunner.manager.find(Application, {
+        where: { user: { name } },
+        relations: ['user'],
+      });
+    });
+  }
 
   private async findLockLecture(
     queryRunner: QueryRunner,
@@ -75,7 +83,12 @@ export class LectureRepositoryImpl implements LectureRepository {
     queryRunner: QueryRunner,
     lecture: Lecture,
   ): Promise<void> {
-    await queryRunner.manager.increment(LectureCount, { title: lecture.title }, 'count', 1);
+    await queryRunner.manager.increment(
+      LectureCount,
+      { title: lecture.title },
+      'count',
+      1,
+    );
   }
 
   private async validateApplication(
@@ -91,7 +104,7 @@ export class LectureRepositoryImpl implements LectureRepository {
         where: { lecture: { title: data.title }, user: { email: data.email } },
       }),
     ]);
-    
+
     if (lectureCount.count >= lecture.maxApplicants) {
       throw new Error('강의 신청 인원을 더 이상 받지 않습니다.');
     }
@@ -99,7 +112,6 @@ export class LectureRepositoryImpl implements LectureRepository {
       throw new Error('이미 신청한 강의입니다.');
     }
   }
-
 
   private async executeInTransaction<T>(
     operation: (queryRunner: QueryRunner) => Promise<T>,
