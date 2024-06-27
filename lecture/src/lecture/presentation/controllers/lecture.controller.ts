@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import { ApplyLectureRequestDto } from '../dto/request/apply-lecture.request.dto';
 import { ApplyLectureResponseDto } from '../dto/response/apply-lecture.response.dto';
 import { LectureServiceSymbol } from 'src/lecture/application/services/lecture.service.impl';
@@ -19,7 +19,13 @@ export class SpecialLectureController {
   
   // TODO: 특강에 성공한 지원자 조회
 
-  // TODO: 특강에 신청한 단일 유저 조회
+  // TODO: 특강 몇명 남았는지 조회
+  @Get('count')
+  async getLectureCount(
+    @Param('title') title: string
+  ): Promise<number> {
+    return await this.lectureService.getLectureCount();
+  }
 
   @Post('apply')
   async applyLecture(

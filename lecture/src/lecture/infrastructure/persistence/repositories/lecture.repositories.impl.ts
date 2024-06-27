@@ -15,7 +15,6 @@ export class LectureRepositoryImpl implements LectureRepository {
   ) {}
 
   async applyLecture(data: ApplicationDomain): Promise<Application> {
-    console.log(data);
     return await this.executeInTransaction(async (queryRunner) => {
       const lecture = await this.findLecture(queryRunner, data.title);
       const user = await this.findUser(queryRunner, data.email);

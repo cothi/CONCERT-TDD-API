@@ -13,7 +13,7 @@ import { LectureCount } from 'src/lecture/domain/entities/lecture-count.entity';
 
 const mockLectureRepository = {
   applyLecture: jest.fn(),
-getAllLectures: jest.fn()
+  getAllLectures: jest.fn(),
 };
 
 describe('SpecialLectureService', () => {
@@ -69,14 +69,22 @@ describe('SpecialLectureService', () => {
           createdAt: new Date(),
           applications: new Array<Application>(),
           lectureCount: new LectureCount(),
-        }
+        },
       ];
       await repository.getAllLectures.mockResolvedValue(lectures);
       const specialLectures = await service.getAllLectures();
 
       expect(specialLectures.ok).toEqual(true);
     });
-  })
+  });
 
+  describe('특강 성공 여부 확인', () => {
+    it('특강에 몇명 남았는지 확인한다.', async () => {
+      const title = 'test';
 
+      const result = await service.getLectureCount(title);
+
+      expect(result.ok).toEqual(true);
+    });
+  });
 });
