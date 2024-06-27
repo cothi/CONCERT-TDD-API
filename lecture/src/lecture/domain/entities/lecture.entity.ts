@@ -18,7 +18,9 @@ export class Lecture extends CommonEntity {
   @Column({ unique: true })
   maxApplicants: number;
 
-  @OneToMany(() => Application, (application) => application.lecture)
+  @OneToMany(() => Application, (application) => application.lecture, {
+    onDelete: 'CASCADE',
+  })
   applications: Application[];
 
   @OneToOne(() => LectureCount, (lectureCount) => lectureCount.lecture)

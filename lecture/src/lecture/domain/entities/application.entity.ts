@@ -11,15 +11,11 @@ import { Lecture } from './lecture.entity';
 
 @Entity()
 export class Application extends CommonEntity {
-  @ManyToOne(() => User, (user) => user.applications, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => User, (user) => user.applications)
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToOne(() => Lecture, (lecture) => lecture.applications, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Lecture, (lecture) => lecture.applications)
   @JoinColumn({ name: 'lectureId' })
   lecture: Lecture;
 }

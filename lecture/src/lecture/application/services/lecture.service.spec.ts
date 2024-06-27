@@ -108,5 +108,29 @@ describe('SpecialLectureService', () => {
       expect(result.ok).toEqual(true);
       expect(result.count).toEqual(20);
     });
+    it('유저가 특강에 성공한 리스트를 받아올 수 있어야 한다.', async () => {
+      const name = 'test1';
+
+      const applications: Application[] = [
+        {
+          id: 'test',
+          user: new User(),
+          lecture: new Lecture(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'test2',
+          user: new User(),
+          lecture: new Lecture(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+      repository.getApplicationsByName.mockResolvedValue(applications);
+      const result = service.getApplicationsByName(name);
+      expect(result.ok).toEqual(true);
+      expect(result.applications).toEqual(applications);
+    });
   });
 });

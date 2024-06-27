@@ -43,7 +43,7 @@ describe('AppController (e2e)', () => {
     });
   });
 
-  describe('/admin 강의 관련', () => {
+  describe('/admin 관리자 관련 (e2e)', () => {
     it('/admin/create (POST) - 강의를 생성합니다.', async () => {
       const res = await request(app.getHttpServer())
         .post('/admin/create')
@@ -80,6 +80,9 @@ describe('AppController (e2e)', () => {
 
     //   expect(res.body.ok).toEqual(true);
     // });
+  });
+
+  describe('/lecture 강의 (e2e) ', () => {
     it('/lecture/apply (POST) - 특별 강의에 신청합니다.', async () => {
       const res = await request(app.getHttpServer())
         .post('/lecture/apply')
@@ -92,7 +95,7 @@ describe('AppController (e2e)', () => {
       expect(res.body.ok).toEqual(true);
     });
 
-    it('/lecture/count/:title Get - 특별 강의, 가능 신청 인원을 조회합니다.', async () => {
+    it('/lecture/count/:title (GET) - 특별 강의, 가능 신청 인원을 조회합니다.', async () => {
       const title = 'test';
       const res = await request(app.getHttpServer())
         .get(`/lecture/count/${title}`)
