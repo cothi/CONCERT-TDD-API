@@ -2,9 +2,22 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { create } from 'domain';
+import exp from 'constants';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+  const createUser = (name: string, email: string) =>
+    request(app.getHttpServer()).post('/users/create').send({ name, email });
+  const createLecture = (title: string, maxApplicants: number) =>
+    request(app.getHttpServer())
+      .post('/admin/create')
+      .send({ title, maxApplicants });
+
+  const applyLecture = (email: string, name: string, title: string) =>
+    request(app.getHttpServer())
+      .post('/lecture/apply')
+      .send({ email, name, title });
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -15,36 +28,19 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  describe('/users 유저 관련', () => {
+  describe('/users 유저 관련 테스트', () => {
     it('/users/create (POST) - 유저를 생성합니다.', async () => {
-      await request(app.getHttpServer())
-        .post('/users/create')
-        .send({
-          name: 'test1',
-          email: 'test1@gmail.ai',
-        })
-        .expect(201);
+      await createUser('test1', 'test1@gmail.ai').expect(201);
     });
 
     it('/users/get (POST) - 유저를 생성할 때, 입력을 제대로하지 않으면 생성하지 않습니다.', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/users/create')
-        .send({
-          name: undefined,
-          email: '',
-        });
-      expect(res.body.ok).toEqual(false);
+      const res = await createUser(undefined, '');
+      expect(res.body.ok).toBeFalsy();
     });
 
-    it('/users/create (POST) - 유저를 50명까지 생성합니다.', async () => {
+    it('/users/create (POST) - 유저를 100명까지 생성합니다.', async () => {
       for (let i = 2; i < 51; i++) {
-        await request(app.getHttpServer())
-          .post('/users/create')
-          .send({
-            name: `test${i}`,
-            email: `test${i}@gmail.ai`, // 이메일은 중복이 되지 않도록 설정
-          })
-          .expect(201);
+        await createUser(`test${i}`, `test${i}@gmail.ar`).expect(201);
       }
     });
 
@@ -52,7 +48,7 @@ describe('AppController (e2e)', () => {
       const res = await request(app.getHttpServer()).post('/users/get').send({
         email: 'test1@gmail.ai',
       });
-      expect(res.body.ok).toEqual(true);
+      expect(res.body.ok).toBeTruthy();
     });
     it('/users (GET) - 모든 유저를 조회합니다.', async () => {
       const res = await request(app.getHttpServer()).get('/users');
@@ -62,31 +58,15 @@ describe('AppController (e2e)', () => {
 
   describe('/admin 관리자 관련 (e2e)', () => {
     it('/admin/create (POST) - 강의를 생성합니다.', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/admin/create')
-        .send({
-          title: 'test',
-          maxApplicants: 30,
-        })
-        .expect(201);
-      await request(app.getHttpServer())
-        .post('/admin/create')
-        .send({
-          title: 'test2',
-          maxApplicants: 30,
-        })
-        .expect(201);
-
+      const res = await createLecture('test', 30).expect(201);
       expect(res.body.ok).toEqual(true);
+
+      const res2 = await createLecture('test2', 30).expect(201);
+      expect(res2.body.ok).toEqual(true);
     });
 
     it('/admin/create (POST) - 강의 생성 시, 입력을 제대로하지 않으면 생성하지 않습니다.', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/admin/create')
-        .send({
-          title: undefined,
-          maxApplicants: undefined,
-        });
+      const res = await createLecture(undefined, undefined);
       expect(res.body.ok).toEqual(false);
     });
 
@@ -138,45 +118,30 @@ describe('AppController (e2e)', () => {
     });
 
     it('/lecture/apply (POST) -  강의에 50명까지 수강 신청, 이후에 신청한 요청자는 수강에 실패합니다.', async () => {
-      const successNum = 50;
-      const failNum = 5;
+      const MAX_APPLICANTS = 50;
+      const EXTRA_APPLICANTS = 5;
+      const TOTAL_APPLICANTS = MAX_APPLICANTS + EXTRA_APPLICANTS;
       // 특강 생성
-      await request(app.getHttpServer())
-        .post('/admin/create')
-        .send({
-          title: 'special',
-          maxApplicants: successNum,
-        })
-        .expect(201);
+      await createLecture('special', MAX_APPLICANTS).expect(201);
 
-      // 성공 요청 만들기
-      const usePromise = [];
-      for (let i = 2; i < successNum + failNum + 2; i++) {
-        usePromise.push(
-          await request(app.getHttpServer())
-            .post('/lecture/apply')
-            .send({
-              email: `test${i}@gmail.ai`,
-              name: `test${i}`,
-              title: 'special',
-            }),
+      const applys = [];
+      for (let i = 1; i <= TOTAL_APPLICANTS; i++) {
+        const res = await applyLecture(
+          `test${i + 1}@gmail.ai`,
+          `test${i + 1}`,
+          'special',
         );
+        applys.push(res);
       }
 
-      const results = await Promise.all(usePromise);
-      // 성공한 요청은 50개
-      const requestSuccessNum = results.filter(
-        (res) => res.body.ok === true,
-      ).length;
-      const requestFailedNum = results.filter(
-        (res) => res.body.ok === false,
-      ).length;
+      const results = await Promise.all(applys);
+      const successApplicants = results.filter((res) => res.body.ok);
 
-      for (let i = 50; i < 55; i++) {
-        expect(results[i].body.ok).toEqual(false);
-      }
-      expect(requestSuccessNum).toEqual(successNum);
-      expect(requestFailedNum).toEqual(failNum);
+      expect(successApplicants.length).toEqual(MAX_APPLICANTS);
+
+      results.slice(MAX_APPLICANTS).forEach((res) => {
+        expect(res.body.ok).toBeFalsy();
+      });
     }, 30000);
 
     it('/lecture/count/:title (GET) - 특별 강의, 가능한 수강 신청 인원을 조회합니다.', async () => {
@@ -184,16 +149,15 @@ describe('AppController (e2e)', () => {
       const res = await request(app.getHttpServer())
         .get(`/lecture/count/${title}`)
         .expect(200);
-      expect(res.body.ok).toEqual(true);
+      expect(res.body.ok).toBeTruthy();
       expect(res.body.count).toEqual(expect.any(Number));
     });
 
     it('/lecture/:name (GET) - 유저가 수강할 특별 강의를 조회합니다.', async () => {
-      const name = 'test';
       const res = await request(app.getHttpServer())
-        .get(`/lecture/${name}`)
+        .get('/lecture/test')
         .expect(200);
-      expect(res.body.ok).toEqual(true);
+      expect(res.body.ok).toBeTruthy();
     });
   });
   afterAll(async () => {

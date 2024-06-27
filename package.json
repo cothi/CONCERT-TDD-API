@@ -67,6 +67,7 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "verbose": true,
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],

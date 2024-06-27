@@ -89,7 +89,6 @@ export class LectureRepositoryImpl implements LectureRepository {
     lecture: Lecture,
     data: ApplicationDomain,
   ) {
-    // console.log(data.email);
     const [lectureCount, existingApplication] = await Promise.all([
       queryRunner.manager.findOne(LectureCount, {
         where: { title: data.title },
