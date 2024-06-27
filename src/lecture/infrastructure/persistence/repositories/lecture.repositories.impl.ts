@@ -97,9 +97,7 @@ export class LectureRepositoryImpl implements LectureRepository {
       }),
     ]);
 
-    console.log(lectureCount.count, lecture.maxApplicants);
     if (lectureCount.count >= lecture.maxApplicants) {
-      console.log('강의 신청 인원을 더 이상 받지 않습니다.');
       throw new Error('강의 신청 인원을 더 이상 받지 않습니다.');
     }
     if (existingApplication) {
@@ -126,8 +124,8 @@ export class LectureRepositoryImpl implements LectureRepository {
       await queryRunner.commitTransaction();
       return res;
     } catch (e) {
-      console.log(e.message);
       await queryRunner.rollbackTransaction();
+      throw new e;
     } finally {
       await queryRunner.release();
     }

@@ -14,11 +14,23 @@ export class AdminLectureServiceImpl implements AdminLectureService {
   ) {}
   async createLecture(data: LectureDto): Promise<AdminLectureResponseDto> {
     try {
+      if (!data.title) {
+        return {
+          ok: false,
+          message: '강의 제목을 입력해주세요',
+        };
+      }
+      if (!data.maxApplicants) {
+        return {
+          ok: false,
+          message: '최대 신청자 수를 입력해주세요',
+        };
+      }
       const lecture = await this.lectureRepositories.createLecture(data);
       return {
         ok: true,
         message: '강의가 생성되었습니다',
-        lectures: lecture
+        lectures: lecture,
       };
     } catch (e) {
       return {
@@ -77,8 +89,8 @@ export class AdminLectureServiceImpl implements AdminLectureService {
       const lecture = await this.lectureRepositories.cancelLecture(title);
 
       return {
-        lectures: lecture,
         ok: true,
+        lectures: lecture,
         message: '강의가 취소되었습니다',
       };
     } catch (e) {

@@ -50,7 +50,7 @@ export class AdminLectureRepositoriesImpl implements AdminLectureRepositories {
     if (!lecture) {
       throw new Error('강의가 존재하지 않습니다');
     }
-    await this.lectureCountRepository.delete({ title: title });
+    // await this.lectureCountRepository.delete({ title: title });
     return await this.lectureRepository.remove(lecture);
   }
 }
