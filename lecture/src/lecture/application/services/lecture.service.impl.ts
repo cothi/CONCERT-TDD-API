@@ -1,4 +1,4 @@
-import { getLectureCountResponseDto } from './../../presentation/dto/response/get-lecture-count.response.dto';
+import { GetLectureCountResponseDto } from './../../presentation/dto/response/get-lecture-count.response.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { ApplyLectureDto } from '../dto/apply-lecture.dto';
 import { LectureService } from './lecture.service';
@@ -6,9 +6,7 @@ import { ApplyLectureResponseDto } from 'src/lecture/presentation/dto/response/a
 import { LectureRepositorySymbol } from 'src/lecture/infrastructure/persistence/repositories/lecture.repositories.impl';
 import { LectureRepository } from 'src/lecture/domain/repositories/lecture.repositories';
 import { ApplicationDomain } from 'src/lecture/infrastructure/persistence/model/application.domain';
-import { AdminLectureResponseDto } from 'src/admin/presentation/dto/response/admin-lecture.response.dto';
 import { GetLectures } from 'src/lecture/presentation/dto/response/get-lectures.response.dto';
-import { LectureCount } from 'src/lecture/domain/entities/lecture-count.entity';
 
 export const LectureServiceSymbol = Symbol('LectureService');
 
@@ -37,8 +35,8 @@ export class LectureServiceImpl implements LectureService {
   }
 
   async getAllLectures(): Promise<GetLectures> {
-    const lectures = await this.lectureRepository.getAllLectures();
     try {
+      const lectures = await this.lectureRepository.getAllLectures();
       return {
         lectures: lectures,
         ok: true,
@@ -51,11 +49,15 @@ export class LectureServiceImpl implements LectureService {
       };
     }
   }
-  async getLectureCount(): Promise<getLectureCountResponseDto> {
+  async getLectureCount(title: string): Promise<GetLectureCountResponseDto> {
     try {
+      const lecture = await this.lectureRepository.getLecture(title);
+
       return {
+        title: title,
+        count: lecture.maxApplicants - lecture.lectureCount.count,
         ok: true,
-        message: '특강 신청 인원이 조회되었습니다',
+        message: '특강 신청 가능 인원이 조회되었습니다',
       };
     } catch (e) {
       return {

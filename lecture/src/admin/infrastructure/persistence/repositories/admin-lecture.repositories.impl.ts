@@ -20,13 +20,13 @@ export class AdminLectureRepositoriesImpl implements AdminLectureRepositories {
   ) {}
 
   async createLecture(data: Lecture): Promise<Lecture> {
-    const lecture = await this.lectureRepository.create(data);
-
-    this.lectureCountRepository.save({
-      title: lecture.title,
+    const lecture = this.lectureRepository.create(data);
+    const lectureCount = this.lectureCountRepository.create({
+      ...data,
       count: 0,
     });
-
+    lecture.lectureCount = lectureCount;
+    await this.lectureCountRepository.save(lectureCount);
     return await this.lectureRepository.save(lecture);
   }
 

@@ -14,6 +14,8 @@ import { LectureCount } from 'src/lecture/domain/entities/lecture-count.entity';
 const mockLectureRepository = {
   applyLecture: jest.fn(),
   getAllLectures: jest.fn(),
+  getLectureCount: jest.fn(),
+  getLecture: jest.fn(),
 };
 
 describe('SpecialLectureService', () => {
@@ -81,10 +83,30 @@ describe('SpecialLectureService', () => {
   describe('특강 성공 여부 확인', () => {
     it('특강에 몇명 남았는지 확인한다.', async () => {
       const title = 'test';
+      const lectureCount: LectureCount = {
+        id: 'test',
+        title: 'test',
+        count: 10,
+        updatedAt: new Date(),
+        createdAt: new Date(),
+        lecture: new Lecture(),
+      };
+      const lecture: Lecture = {
+        id: 'test',
+        title: 'test',
+        maxApplicants: 30,
+        updatedAt: new Date(),
+        createdAt: new Date(),
+        applications: new Array<Application>(),
+        lectureCount: lectureCount,
+      };
+
+      repository.getLecture.mockResolvedValue(lecture);
 
       const result = await service.getLectureCount(title);
 
       expect(result.ok).toEqual(true);
+      expect(result.count).toEqual(20);
     });
   });
 });

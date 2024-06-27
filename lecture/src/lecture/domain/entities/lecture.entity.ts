@@ -4,6 +4,7 @@ import { LectureCount } from 'src/lecture/domain/entities/lecture-count.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -21,5 +22,6 @@ export class Lecture extends CommonEntity {
   applications: Application[];
 
   @OneToOne(() => LectureCount, (lectureCount) => lectureCount.lecture)
+  @JoinColumn()
   lectureCount: LectureCount;
 }

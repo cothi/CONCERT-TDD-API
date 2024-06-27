@@ -16,9 +16,10 @@ export class LectureRepositoryImpl implements LectureRepository {
 
   async applyLecture(data: ApplicationDomain): Promise<Application> {
     return await this.executeInTransaction(async (queryRunner) => {
-      const lecture = await this.findLecture(queryRunner, data.title);
+      const lecture = await this.findLockLecture(queryRunner, data.title);
       const user = await this.findUser(queryRunner, data.email);
       await this.validateApplication(queryRunner, lecture, data);
+      await this.incrementLectureCount(queryRunner, lecture);
       return queryRunner.manager.save(Application, { lecture, user });
     });
   }
@@ -28,13 +29,29 @@ export class LectureRepositoryImpl implements LectureRepository {
       return queryRunner.manager.find(Lecture);
     });
   }
+  async getLecture(title: string): Promise<Lecture> {
+    return await this.executeInTransaction(async (queryRunner) => {
+      const lecture = await queryRunner.manager.findOne(Lecture, {
+        where: { title },
+        relations: ['lectureCount'],
+      });
+      return lecture;
+    });
+  }
+  async getLectureCount(title: string): Promise<LectureCount> {
+    return await this.executeInTransaction(async (queryRunner) => {
+      return await queryRunner.manager.findOne(LectureCount, {
+        where: { title },
+      });
+    });
+  }
 
-  private async findLecture(
+  private async findLockLecture(
     queryRunner: QueryRunner,
     title: string,
   ): Promise<Lecture> {
     const lecture = await queryRunner.manager.findOne(Lecture, {
-      where: { title },
+      where: { title: title },
       lock: { mode: 'pessimistic_write' },
     });
     if (!lecture) {
@@ -54,6 +71,12 @@ export class LectureRepositoryImpl implements LectureRepository {
     if (!User) throw new Error('사용자를 찾을 수 없습니다.');
     return user;
   }
+  private async incrementLectureCount(
+    queryRunner: QueryRunner,
+    lecture: Lecture,
+  ): Promise<void> {
+    await queryRunner.manager.increment(LectureCount, { title: lecture.title }, 'count', 1);
+  }
 
   private async validateApplication(
     queryRunner: QueryRunner,
@@ -68,6 +91,7 @@ export class LectureRepositoryImpl implements LectureRepository {
         where: { lecture: { title: data.title }, user: { email: data.email } },
       }),
     ]);
+    
     if (lectureCount.count >= lecture.maxApplicants) {
       throw new Error('강의 신청 인원을 더 이상 받지 않습니다.');
     }
@@ -75,6 +99,7 @@ export class LectureRepositoryImpl implements LectureRepository {
       throw new Error('이미 신청한 강의입니다.');
     }
   }
+
 
   private async executeInTransaction<T>(
     operation: (queryRunner: QueryRunner) => Promise<T>,

@@ -16,9 +16,6 @@ export class LectureCount extends CommonEntity {
   @Column()
   title: string;
 
-  @OneToOne(() => Lecture, (lecture) => lecture.lectureCount, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'lectureId' })
+  @OneToOne(() => Lecture, (lecture) => lecture.lectureCount)
   lecture: Lecture;
 }

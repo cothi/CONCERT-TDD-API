@@ -1,3 +1,4 @@
+import { title } from 'process';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
@@ -88,8 +89,16 @@ describe('AppController (e2e)', () => {
           title: 'test',
         })
         .expect(201);
-      console.log(res.body);
       expect(res.body.ok).toEqual(true);
+    });
+
+    it('/lecture/count/:title Get - 특별 강의, 가능 신청 인원을 조회합니다.', async () => {
+      const title = 'test';
+      const res = await request(app.getHttpServer())
+        .get(`/lecture/count/${title}`)
+        .expect(200);
+      expect(res.body.ok).toEqual(true);
+      expect(res.body.count).toEqual(expect.any(Number));
     });
   });
 });
