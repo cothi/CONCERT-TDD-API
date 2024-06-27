@@ -14,7 +14,7 @@ export function Transactional() {
       await queryRunner.connect();
       await queryRunner.startTransaction();
       try {
-        const result = await originalMethod.apply(this, [queryRunner, ...args]);
+        const result = await originalMethod.apply(this, [...args, queryRunner]);
         await queryRunner.commitTransaction();
         return result;
       } catch (err) {

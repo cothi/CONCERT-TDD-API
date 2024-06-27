@@ -98,9 +98,9 @@ describe('AppController (e2e)', () => {
       expect(res.body.ok).toEqual(true);
     });
 
-    it('/admin/gets (GET) - 모든 강의를 조회합니다.', async () => {
+    it('/lecture/gets (GET) - 모든 강의를 조회합니다.', async () => {
       const res = await request(app.getHttpServer())
-        .get('/admin/gets')
+        .get('/lecture/gets')
         .expect(200);
 
       expect(res.body.lectures).toEqual(expect.any(Array));

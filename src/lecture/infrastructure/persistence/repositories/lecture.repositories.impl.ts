@@ -6,6 +6,8 @@ import { ApplicationDomain } from '../model/application.domain';
 import { LectureRepository } from 'src/lecture/domain/repositories/lecture.repositories';
 import { Lecture } from 'src/lecture/domain/entities/lecture.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { Transactional } from 'src/common/decorator/transaction.decorator';
+import { QueryError } from 'mysql2';
 
 export const LectureRepositorySymbol = Symbol('SpecialLectureRepository');
 export class LectureRepositoryImpl implements LectureRepository {
@@ -14,35 +16,34 @@ export class LectureRepositoryImpl implements LectureRepository {
     private dataSource: DataSource,
   ) {}
 
- 
-
-  async getAllLectures(): Promise<Lecture[]> {
-    return await this.executeInTransaction(async (queryRunner) => {
-      return queryRunner.manager.find(Lecture);
+  @Transactional()
+  async getAllLectures(queryRunner?: QueryRunner): Promise<Lecture[]> {
+    return queryRunner.manager.find(Lecture);
+  }
+  @Transactional()
+  async getLecture(title: string, queryRunner?: QueryRunner): Promise<Lecture> {
+    return await queryRunner.manager.findOne(Lecture, {
+      where: { title },
+      relations: ['lectureCount'],
     });
   }
-  async getLecture(title: string): Promise<Lecture> {
-    return await this.executeInTransaction(async (queryRunner) => {
-      const lecture = await queryRunner.manager.findOne(Lecture, {
-        where: { title },
-        relations: ['lectureCount'],
-      });
-      return lecture;
+  @Transactional()
+  async getLectureCount(
+    title: string,
+    queryRunner?: QueryRunner,
+  ): Promise<LectureCount> {
+    return await queryRunner.manager.findOne(LectureCount, {
+      where: { title },
     });
   }
-  async getLectureCount(title: string): Promise<LectureCount> {
-    return await this.executeInTransaction(async (queryRunner) => {
-      return await queryRunner.manager.findOne(LectureCount, {
-        where: { title },
-      });
-    });
-  }
-  async getApplicationsByName(name: string): Promise<Application[]> {
-    return await this.executeInTransaction(async (queryRunner) => {
-      return await queryRunner.manager.find(Application, {
-        where: { user: { name } },
-        relations: ['user'],
-      });
+  @Transactional()
+  async getApplicationsByName(
+    name: string,
+    queryRunner?: QueryRunner,
+  ): Promise<Application[]> {
+    return await queryRunner.manager.find(Application, {
+      where: { user: { name } },
+      relations: ['user'],
     });
   }
 
@@ -88,6 +89,7 @@ export class LectureRepositoryImpl implements LectureRepository {
     lecture: Lecture,
     data: ApplicationDomain,
   ) {
+    // console.log(data.email);
     const [lectureCount, existingApplication] = await Promise.all([
       queryRunner.manager.findOne(LectureCount, {
         where: { title: data.title },
@@ -104,30 +106,19 @@ export class LectureRepositoryImpl implements LectureRepository {
       throw new Error('이미 신청한 강의입니다.');
     }
   }
- async applyLecture(data: ApplicationDomain): Promise<Application> {
-    return await this.executeInTransaction(async (queryRunner) => {
-      const lecture = await this.findLockLecture(queryRunner, data.title);
-      const user = await this.findUser(queryRunner, data.email);
-      await this.validateApplication(queryRunner, lecture, data);
-      await this.incrementLectureCount(queryRunner, lecture);
-      return queryRunner.manager.save(Application, { lecture, user });
-    });
-  }
-  private async executeInTransaction<T>(
-    operation: (queryRunner: QueryRunner) => Promise<T>,
-  ): Promise<T> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const res = await operation(queryRunner);
-      await queryRunner.commitTransaction();
-      return res;
-    } catch (e) {
-      await queryRunner.rollbackTransaction();
-      throw new e;
-    } finally {
-      await queryRunner.release();
-    }
+  @Transactional()
+  async applyLecture(
+    data: ApplicationDomain,
+    queryRunner?: QueryRunner,
+  ): Promise<Application> {
+    const applicationDomain: ApplicationDomain = data;
+    const lecture = await this.findLockLecture(
+      queryRunner,
+      applicationDomain.title,
+    );
+    const user = await this.findUser(queryRunner, applicationDomain.email);
+    await this.validateApplication(queryRunner, lecture, applicationDomain);
+    await this.incrementLectureCount(queryRunner, lecture);
+    return queryRunner.manager.save(Application, { lecture, user });
   }
 }
