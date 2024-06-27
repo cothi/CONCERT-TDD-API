@@ -14,15 +14,7 @@ export class LectureRepositoryImpl implements LectureRepository {
     private dataSource: DataSource,
   ) {}
 
-  async applyLecture(data: ApplicationDomain): Promise<Application> {
-    return await this.executeInTransaction(async (queryRunner) => {
-      const lecture = await this.findLockLecture(queryRunner, data.title);
-      const user = await this.findUser(queryRunner, data.email);
-      await this.validateApplication(queryRunner, lecture, data);
-      await this.incrementLectureCount(queryRunner, lecture);
-      return queryRunner.manager.save(Application, { lecture, user });
-    });
-  }
+ 
 
   async getAllLectures(): Promise<Lecture[]> {
     return await this.executeInTransaction(async (queryRunner) => {
@@ -95,7 +87,7 @@ export class LectureRepositoryImpl implements LectureRepository {
     queryRunner: QueryRunner,
     lecture: Lecture,
     data: ApplicationDomain,
-  ): Promise<void> {
+  ) {
     const [lectureCount, existingApplication] = await Promise.all([
       queryRunner.manager.findOne(LectureCount, {
         where: { title: data.title },
@@ -105,14 +97,24 @@ export class LectureRepositoryImpl implements LectureRepository {
       }),
     ]);
 
+    console.log(lectureCount.count, lecture.maxApplicants);
     if (lectureCount.count >= lecture.maxApplicants) {
+      console.log('강의 신청 인원을 더 이상 받지 않습니다.');
       throw new Error('강의 신청 인원을 더 이상 받지 않습니다.');
     }
     if (existingApplication) {
       throw new Error('이미 신청한 강의입니다.');
     }
   }
-
+ async applyLecture(data: ApplicationDomain): Promise<Application> {
+    return await this.executeInTransaction(async (queryRunner) => {
+      const lecture = await this.findLockLecture(queryRunner, data.title);
+      const user = await this.findUser(queryRunner, data.email);
+      await this.validateApplication(queryRunner, lecture, data);
+      await this.incrementLectureCount(queryRunner, lecture);
+      return queryRunner.manager.save(Application, { lecture, user });
+    });
+  }
   private async executeInTransaction<T>(
     operation: (queryRunner: QueryRunner) => Promise<T>,
   ): Promise<T> {
@@ -124,8 +126,8 @@ export class LectureRepositoryImpl implements LectureRepository {
       await queryRunner.commitTransaction();
       return res;
     } catch (e) {
+      console.log(e.message);
       await queryRunner.rollbackTransaction();
-      throw e;
     } finally {
       await queryRunner.release();
     }

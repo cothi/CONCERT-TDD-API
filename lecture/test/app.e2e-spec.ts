@@ -1,4 +1,3 @@
-import { title } from 'process';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
@@ -25,10 +24,22 @@ describe('AppController (e2e)', () => {
       const res = await request(app.getHttpServer())
         .post('/users/create')
         .send({
-          name: 'test',
+          name: 'test1',
           email: 'test1@gmail.ai',
         })
         .expect(201);
+    });
+
+    it('/users/create (POST) - 유저를 50명까지 생성합니다.', async () => {
+      for (let i = 2; i < 51; i++) {
+        await request(app.getHttpServer())
+          .post('/users/create')
+          .send({
+            name: `test${i}`,
+            email: `test${i}@gmail.ai`, // 이메일은 중복이 되지 않도록 설정
+          })
+          .expect(201);
+      }
     });
 
     it('/users/get (POST) - 유저를 조회합니다.', async () => {
@@ -52,6 +63,7 @@ describe('AppController (e2e)', () => {
           maxApplicants: 30,
         })
         .expect(201);
+
       expect(res.body.ok).toEqual(true);
     });
 
@@ -95,6 +107,38 @@ describe('AppController (e2e)', () => {
       expect(res.body.ok).toEqual(true);
     });
 
+    it('/lecture/apply (POST) - 특별 강의에 50명까지 신청합니다', async () => {
+      const successNum = 50;
+      const failNum = 5;
+      // 특강 생성
+      const make = await request(app.getHttpServer())
+        .post('/admin/create')
+        .send({
+          title: 'special',
+          maxApplicants: successNum,
+        })
+        .expect(201);
+
+      const usePromise = [];
+
+      for (let i = 2; i < successNum + failNum + 2; i++) {
+        usePromise.push(
+          request(app.getHttpServer())
+            .post('/lecture/apply')
+            .send({
+              email: `test${i}@gmail.ai`,
+              name: `test${i}`,
+              title: 'special',
+            }),
+        );
+      }
+
+      const results = await Promise.all(usePromise);
+      for (let i = 0; i < successNum + failNum; i++) {
+        console.log(results[i].body.ok, results[i].body.message, i);
+      }
+    }, 6000);
+
     it('/lecture/count/:title (GET) - 특별 강의, 가능 신청 인원을 조회합니다.', async () => {
       const title = 'test';
       const res = await request(app.getHttpServer())
@@ -110,7 +154,6 @@ describe('AppController (e2e)', () => {
         .get(`/lecture/${name}`)
         .expect(200);
       expect(res.body.ok).toEqual(true);
-      console.log(res.body.applications);
     });
   });
 });

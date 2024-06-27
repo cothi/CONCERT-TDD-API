@@ -15,7 +15,7 @@ export class Lecture extends CommonEntity {
   @Column()
   title: string;
 
-  @Column({ unique: true })
+  @Column()
   maxApplicants: number;
 
   @OneToMany(() => Application, (application) => application.lecture, {

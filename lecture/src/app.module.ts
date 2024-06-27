@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from 'src/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from 'src/database/ormconfig';
 import { SpecialLectureModule } from './lecture/lecture.module';
 import { AdminLectureModule } from './admin/admin.module';
+import { typeOrmConfig } from './database/ormconfig';
 
 @Module({
   imports: [
