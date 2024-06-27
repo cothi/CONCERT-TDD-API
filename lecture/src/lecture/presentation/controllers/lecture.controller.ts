@@ -5,6 +5,7 @@ import { LectureServiceSymbol } from 'src/lecture/application/services/lecture.s
 import { LectureService } from 'src/lecture/application/services/lecture.service';
 import { GetLectures } from '../dto/response/get-lectures.response.dto';
 import { GetLectureCountResponseDto } from '../dto/response/get-lecture-count.response.dto';
+import { GetApplicationsByNameResponseDto } from '../dto/response/get-applications-by-name.response.dto';
 @Controller('lecture')
 export class SpecialLectureController {
   constructor(
@@ -16,6 +17,13 @@ export class SpecialLectureController {
   @Get('gets')
   async getAllLectures(): Promise<GetLectures> {
     return await this.lectureService.getAllLectures();
+  }
+
+  @Get(':name')
+  async getApplicationsByName(
+    @Param('name') name: string,
+  ): Promise<GetApplicationsByNameResponseDto> {
+    return await this.lectureService.getApplicationsByName(name);
   }
 
   // TODO: 특강에 성공한 지원자 조회

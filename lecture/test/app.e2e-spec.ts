@@ -103,5 +103,14 @@ describe('AppController (e2e)', () => {
       expect(res.body.ok).toEqual(true);
       expect(res.body.count).toEqual(expect.any(Number));
     });
+
+    it('/lecture/:name (GET) - 유저가 수강할 특별 강의를 조회합니다.', async () => {
+      const name = 'test';
+      const res = await request(app.getHttpServer())
+        .get(`/lecture/${name}`)
+        .expect(200);
+      expect(res.body.ok).toEqual(true);
+      console.log(res.body.applications);
+    });
   });
 });
