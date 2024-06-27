@@ -98,16 +98,7 @@ describe('AppController (e2e)', () => {
       expect(res.body.ok).toEqual(true);
     });
 
-    it('/lecture/gets (GET) - 모든 강의를 조회합니다.', async () => {
-      const res = await request(app.getHttpServer())
-        .get('/lecture/gets')
-        .expect(200);
-
-      expect(res.body.lectures).toEqual(expect.any(Array));
-      expect(res.body.ok).toEqual(true);
-    });
-
-    it('/lecture/cancel (DELETE) - 강의를 취소합니다.', async () => {
+    it('/admin/cancel (DELETE) - 강의를 취소합니다.', async () => {
       const title = 'test2';
       const res = await request(app.getHttpServer())
         .get(`/admin/cancel/${title}`)
@@ -118,6 +109,15 @@ describe('AppController (e2e)', () => {
   });
 
   describe('/lecture 강의 (e2e) ', () => {
+    it('/lecture/gets (GET) - 모든 강의를 조회합니다.', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/lecture/gets')
+        .expect(200);
+
+      expect(res.body.lectures).toEqual(expect.any(Array));
+      expect(res.body.ok).toEqual(true);
+    });
+
     it('/lecture/apply (POST) - 강의 수강 신청합니다.', async () => {
       await request(app.getHttpServer())
         .post('/admin/create')

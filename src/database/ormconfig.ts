@@ -3,7 +3,7 @@ import { connect } from 'http2';
 import { Application } from 'src/lecture/domain/entities/application.entity';
 import { LectureCount } from 'src/lecture/domain/entities/lecture-count.entity';
 import { Lecture } from 'src/lecture/domain/entities/lecture.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/users/domain/entities/user.entity';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
   type: 'postgres',
@@ -15,7 +15,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   entities: [Lecture, User, LectureCount, Application],
   synchronize: true,
   connectTimeoutMS: 6000,
-
 };
 // export const typeOrmConfig: TypeOrmModuleOptions = {
 //   type: 'mysql',

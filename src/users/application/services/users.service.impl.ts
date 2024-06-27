@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CreateUserDto, UserOutputDto } from '../dto/create-user.dto';
-import { UsersService } from './users.service';
-import { UsersRepository } from '../repositories/users.repository';
-import { UsersRepositorySymbol } from '../repositories/users.repository.impl';
+import { UsersRepositorySymbol } from '../../infrastructure/persistence/repositories/users.repository.impl';
+import { UsersService } from './user.service';
+import { UsersRepository } from 'src/users/domain/repositories/users.repository';
+import { CreateUserDto } from 'src/users/presentation/dto/request/create-user.request.dto';
+import { UserResponseDto } from '../../presentation/dto/response/user.response.dto';
 
 export const UsersServiceSymbol = Symbol('UsersService');
 
@@ -12,7 +13,7 @@ export class UsersServiceImpl implements UsersService {
     @Inject(UsersRepositorySymbol)
     private readonly usersRepository: UsersRepository,
   ) {}
-  async createUser(data: CreateUserDto): Promise<UserOutputDto> {
+  async createUser(data: CreateUserDto): Promise<UserResponseDto> {
     if (!data.name) {
       return {
         ok: false,
@@ -32,7 +33,7 @@ export class UsersServiceImpl implements UsersService {
       users: user,
     };
   }
-  async getUser(email: string): Promise<UserOutputDto> {
+  async getUser(email: string): Promise<UserResponseDto> {
     const user = await this.usersRepository.getUser(email);
 
     return {
@@ -40,12 +41,11 @@ export class UsersServiceImpl implements UsersService {
       ok: true,
     };
   }
-  async getAllUsers(): Promise<UserOutputDto> {
+  async getAllUsers(): Promise<UserResponseDto> {
     const users = await this.usersRepository.getAllUsers();
     return {
       users: users,
       ok: true,
-    }
-    
+    };
   }
 }

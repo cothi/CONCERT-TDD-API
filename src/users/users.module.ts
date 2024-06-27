@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import {
   UsersServiceImpl,
   UsersServiceSymbol,
-} from './services/users.service.impl';
-import { UsersController } from './controllers/users.controller';
+} from './application/services/users.service.impl';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { User } from './domain/entities/user.entity';
 import {
   UsersRepositoryImpl,
   UsersRepositorySymbol,
-} from './repositories/users.repository.impl';
+} from './infrastructure/persistence/repositories/users.repository.impl';
+import { UsersController } from './presentation/controllers/users.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],

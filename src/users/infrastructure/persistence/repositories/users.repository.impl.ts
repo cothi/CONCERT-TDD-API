@@ -1,8 +1,8 @@
 import { Repository } from 'typeorm';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UsersRepository } from './users.repository';
-import { User } from '../entities/user.entity';
+import { UsersRepository } from '../../../domain/repositories/users.repository';
+import { User } from '../../../domain/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateUserDto } from '../../../presentation/dto/request/create-user.request.dto';
 
 export const UsersRepositorySymbol = Symbol('UsersRepository');
 

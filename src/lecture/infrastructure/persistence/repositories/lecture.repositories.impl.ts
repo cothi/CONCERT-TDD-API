@@ -1,7 +1,7 @@
 import { Application } from '../../../domain/entities/application.entity';
 import { DataSource, QueryRunner } from 'typeorm';
 import { LectureCount } from '../../../domain/entities/lecture-count.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/users/domain/entities/user.entity';
 import { ApplicationDomain } from '../model/application.domain';
 import { LectureRepository } from 'src/lecture/domain/repositories/lecture.repositories';
 import { Lecture } from 'src/lecture/domain/entities/lecture.entity';

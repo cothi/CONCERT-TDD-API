@@ -7,7 +7,7 @@ import {
 import { LectureRepositorySymbol } from 'src/lecture/infrastructure/persistence/repositories/lecture.repositories.impl';
 import { LectureRepository } from 'src/lecture/domain/repositories/lecture.repositories';
 import { Application } from 'src/lecture/domain/entities/application.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/users/domain/entities/user.entity';
 import { Lecture } from 'src/lecture/domain/entities/lecture.entity';
 import { LectureCount } from 'src/lecture/domain/entities/lecture-count.entity';
 
