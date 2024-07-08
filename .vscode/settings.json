@@ -1,0 +1,115 @@
+{
+  "favorites.resources": [
+    {
+      "filePath": "docker-compose.yml",
+      "group": "test"
+    },
+    {
+      "filePath": "src/modules/auth.module.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/presentation/controller/auth/auth.controller.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/presentation/dto/request/auth/register.request.dto.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/presentation/dto/request/auth/user.request.dto.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/presentation/dto/request/auth/user-register.request.dto.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/application/auth/services/auth.service.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/domain/auth/model/user.model.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/auth/auth.repository.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/presentation/dto/response/auth/login.response.dto.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/domain/auth/entity/user.entity.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/common/modules/jwt/jwt.service.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/modules/jwt/jwt.module.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/modules/interfaces/token-service.interface.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/interfaces/jwt-token.interface.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/interfaces/token-service.interface.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/interfaces/token-verification-result.interface.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/interfaces/token-result.interface.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/application/auth/interfaces/auth-service.interface.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/application/auth/commands/login-user.command.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/application/auth/handlers/login-user.handler.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/application/auth/interfaces/auth-service.interface.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/application/auth/services/auth.service.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/presentation/controller/auth/auth.controller.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/domain/auth/interfaces/repositories/auth-repository.interface.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/auth/auth.repository.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/presentation/dto/auth/request/login.request.dto.ts",
+      "group": "auth/login"
+    }
+  ],
+  "favorites.groups": ["Default", "test", "main", "auth", "dev", "auth/login"],
+  "favorites.currentGroup": "auth/login",
+  "favorites.sortOrder": "DESC"
+}

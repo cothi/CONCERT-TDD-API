@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ReservationSeatRequestDto } from 'src/presentation/dto/request/reservation/reservation-seat.request.dto';
 import {
   mockAvailableDatesReservation,
   mockReservationSeat,
@@ -17,7 +16,6 @@ export class ReservationController {
    * @returns 예약 가능한 날짜 목록
    */
   @Get('available-date')
-
   async availableDates() {
     // TODO: 실제 예약 가능 날짜 조회 로직 구현
     // 현재는 목업 데이터를 반환합니다.
@@ -30,7 +28,6 @@ export class ReservationController {
    * @returns 예약 가능한 좌석 목록
    */
   @Get(':concertId/seats')
-
   async seats(@Param('concertId') concertId: string) {
     // TODO: 실제 좌석 조회 로직 구현
     // 현재는 목업 데이터를 반환합니다.
@@ -43,8 +40,7 @@ export class ReservationController {
    * @returns 예약 결과
    */
   @Post('seat')
-
-  async reserveSeat(@Body() seatRequest: ReservationSeatRequestDto) {
+  async reserveSeat(@Body() seatRequest: any) {
     // TODO: 실제 좌석 예약 로직 구현
     // 현재는 목업 데이터를 반환합니다.
     return mockReservationSeat;

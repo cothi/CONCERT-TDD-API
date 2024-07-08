@@ -14,7 +14,6 @@ export class ConcertsController {
    */
   @Get(':concertId/queue-entry')
   @HttpCode(HttpStatus.CREATED)
-
   async queueEntry(@Param('concertId') concertId: string) {
     // TODO: 실제 대기열 입장 로직 구현
     // 현재는 목업 데이터를 반환합니다.
@@ -27,7 +26,6 @@ export class ConcertsController {
    */
   @Get('queue')
   @HttpCode(HttpStatus.OK)
-
   async queue() {
     // TODO: 실제 대기열 상태 조회 로직 구현
     // 현재는 목업 데이터를 반환합니다.

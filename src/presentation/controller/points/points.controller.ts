@@ -24,7 +24,6 @@ export class PointsController {
    * @returns 충전 후 업데이트된 포인트 정보
    */
   @Patch('charge')
-
   async patchPoints(@Body() body: { amount: number }) {
     // TODO: 실제 포인트 충전 로직 구현
     // 현재는 목업 데이터를 반환합니다.

@@ -1,5 +1,4 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { PaymentRequestDto } from 'src/presentation/dto/request/payment/payment.request.dto';
 import { mockPay } from 'src/shared/mocked/payment.mock.data';
 
 /**
@@ -15,8 +14,7 @@ export class PaymentController {
    */
   @Post()
   @HttpCode(HttpStatus.OK)
-
-  async pay(@Body() paymentDto: PaymentRequestDto) {
+  async pay(@Body() paymentDto: any) {
     // TODO: 실제 결제 처리 로직 구현
     // 현재는 목업 데이터를 반환합니다.
     return mockPay;

@@ -1,4 +1,4 @@
-import { AuthResponseDto } from 'src/presentation/dto/response/auth/auth.response.dto';
+import { AuthResponseDto } from 'src/presentation/dto/auth/response/auth.response.dto';
 
 export const mockLoginResponse: AuthResponseDto = {
   accessToken: 'mock_access_token_example',

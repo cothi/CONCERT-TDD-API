@@ -1,0 +1,1 @@
+export const REGISTER_USER_USE_CASE = Symbol('REGISTER_USER_USE_CASE');
