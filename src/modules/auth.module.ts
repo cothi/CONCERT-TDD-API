@@ -9,6 +9,8 @@ import { AuthController } from '../presentation/controller/auth/auth.controller'
 import { AuthService } from './../application/auth/services/auth.service';
 import { REGISTER_USER_USE_CASE } from 'src/application/auth/symbol/register-user.use-case.symbol';
 import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.use-case';
+import { LOGIN_USER_USE_CASE } from 'src/application/auth/symbol/login-user.use-case.symbol';
+import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.use-case';
 
 @Module({
   imports: [DatabaseModule, JwtTokenModule, CqrsModule],
@@ -16,6 +18,10 @@ import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-use
     {
       provide: REGISTER_USER_USE_CASE,
       useClass: RegisterUserUseCase,
+    },
+    {
+      provide: LOGIN_USER_USE_CASE,
+      useClass: LoginUserUseCase,
     },
     {
       provide: AUTH_SERVICE,

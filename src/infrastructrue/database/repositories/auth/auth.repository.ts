@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { LoginUserEntity } from 'src/domain/auth/entity/login-user.entity';
 import { RegisterUserEntity } from 'src/domain/auth/entity/register-user.entity';
 import { IAuthRepository } from 'src/domain/auth/interfaces/repositories/auth-repository.interface';
 import { UserModel } from 'src/domain/auth/model/user.model';
@@ -16,6 +17,19 @@ export class AuthRepository implements IAuthRepository {
       },
     });
 
+    return UserModel.create(userPrisma.email, userPrisma.id);
+  }
+
+  async findUserByEmail(user: LoginUserEntity): Promise<UserModel | null> {
+    const userPrisma: User | null = await this.prismaService.user.findUnique({
+      where: {
+        email: user.email,
+      },
+    });
+
+    if (!userPrisma) {
+      return null;
+    }
     return UserModel.create(userPrisma.email, userPrisma.id);
   }
 }

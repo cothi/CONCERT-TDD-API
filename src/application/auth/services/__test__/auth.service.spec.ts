@@ -6,6 +6,7 @@ import { AUTH_REPOSITORY } from 'src/domain/auth/symbol/auth-repository.symbol';
 import { IAuthService } from '../../interfaces/auth-service.interface';
 import { AUTH_SERVICE } from '../../symbol/auth-service.symbol';
 import { AuthService } from '../auth.service';
+import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 
 describe('AuthService', () => {
   let authService: IAuthService;
@@ -14,6 +15,7 @@ describe('AuthService', () => {
   beforeEach(async () => {
     mockAuthRepository = {
       registerUser: jest.fn(),
+      findUserByEmail: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -37,6 +39,16 @@ describe('AuthService', () => {
       const expectedUserModel = UserModel.create('1', 'test@test.ai');
       mockAuthRepository.registerUser.mockResolvedValue(expectedUserModel);
       const result = await authService.registerUser(registerUserModel);
+      expect(result).toEqual(expectedUserModel);
+    });
+  });
+
+  describe('findUserByEmail', () => {
+    it('유저가 성공적으로 조회되어야 합니다.', async () => {
+      const loginUserModel = LoginUserModel.create('test@test.ai');
+      const expectedUserModel = UserModel.create('1', 'test@test.ai');
+      mockAuthRepository.findUserByEmail.mockResolvedValue(expectedUserModel);
+      const result = await authService.findUserByEmail(loginUserModel);
       expect(result).toEqual(expectedUserModel);
     });
   });

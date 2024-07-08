@@ -7,6 +7,8 @@ import { TokenRefreshDto } from 'src/presentation/dto/auth/request/refresh.reque
 import { RegisterUserDto } from 'src/presentation/dto/auth/request/register-user.dto';
 import { AuthResponseDto } from 'src/presentation/dto/auth/response/auth.response.dto';
 import { mockLoginResponse, mockRegisterResponse } from 'src/shared/mocked/auth.mock.data';
+import { LOGIN_USER_USE_CASE } from '../../../application/auth/symbol/login-user.use-case.symbol';
+import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 
 /**
  * 인증 관련 요청을 처리하는 컨트롤러
@@ -17,6 +19,9 @@ export class AuthController {
   constructor(
     @Inject(REGISTER_USER_USE_CASE)
     private readonly registerUserUseCase: IUseCase<RegisterUserModel, AuthResponseDto>,
+
+    @Inject(LOGIN_USER_USE_CASE)
+    private readonly loginUserUseCase: IUseCase<LoginUserModel, AuthResponseDto>,
   ) {}
 
   /**
@@ -29,8 +34,7 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
     // TODO: 실제 로그인 로직 구현
     // 현재는 목업 데이터를 반환합니다.
-
-    return mockLoginResponse;
+    return await this.loginUserUseCase.execute(loginDto.toLoginUserModel());
   }
 
   /**
@@ -41,7 +45,7 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() registerDto: RegisterUserDto): Promise<AuthResponseDto> {
-    return await this.registerUserUseCase.execute(RegisterUserModel.create(registerDto.email));
+    return await this.registerUserUseCase.execute(registerDto.toRegisterUserModel());
   }
 
   /**

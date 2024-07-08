@@ -107,6 +107,22 @@
     {
       "filePath": "src/presentation/dto/auth/request/login.request.dto.ts",
       "group": "auth/login"
+    },
+    {
+      "filePath": "src/application/auth/symbol/login-user.use-case.symbol.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/domain/auth/entity/login-user.entity.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/domain/auth/model/login-user.model.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/application/auth/use-cases/login-user.use-case.ts",
+      "group": "auth/login"
     }
   ],
   "favorites.groups": ["Default", "test", "main", "auth", "dev", "auth/login"],
