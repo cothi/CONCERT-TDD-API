@@ -32,4 +32,18 @@ export class AuthRepository implements IAuthRepository {
     }
     return UserModel.create(userPrisma.email, userPrisma.id);
   }
+
+  async findUserById(userId: string): Promise<UserModel | null> {
+    const userPrisma: User | null = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!userPrisma) {
+      return null;
+    }
+
+    return UserModel.create(userPrisma.email, userPrisma.id);
+  }
 }

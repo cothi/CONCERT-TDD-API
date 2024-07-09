@@ -16,6 +16,7 @@ describe('AuthService', () => {
     mockAuthRepository = {
       registerUser: jest.fn(),
       findUserByEmail: jest.fn(),
+      findUserById: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -49,6 +50,15 @@ describe('AuthService', () => {
       const expectedUserModel = UserModel.create('1', 'test@test.ai');
       mockAuthRepository.findUserByEmail.mockResolvedValue(expectedUserModel);
       const result = await authService.findUserByEmail(loginUserModel);
+      expect(result).toEqual(expectedUserModel);
+    });
+  });
+
+  describe('findUserById', () => {
+    it('유저가 성공적으로 조회되어야 합니다.', async () => {
+      const expectedUserModel = UserModel.create('1', 'test@test.ai');
+      mockAuthRepository.findUserById.mockResolvedValue(expectedUserModel);
+      const result = await authService.findUserById('1');
       expect(result).toEqual(expectedUserModel);
     });
   });

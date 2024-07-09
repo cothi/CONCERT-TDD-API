@@ -123,9 +123,53 @@
     {
       "filePath": "src/application/auth/use-cases/login-user.use-case.ts",
       "group": "auth/login"
+    },
+    {
+      "filePath": "src/presentation/controller/auth/auth.controller.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/presentation/dto/auth/request/refresh.request.dto.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/presentation/dto/auth/response/auth.response.dto.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/auth/auth.repository.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/application/auth/use-cases/refresh-token.use-case.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/domain/auth/interfaces/repositories/auth-repository.interface.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/application/auth/services/auth.service.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/modules/auth.module.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/domain/auth/model/refresh-token.model.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/presentation/dto/auth/request/refresh-token.request.dto.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/presentation/dto/auth/response/refresh-token.response.dto.ts",
+      "group": "auth/refresh"
     }
   ],
-  "favorites.groups": ["Default", "test", "main", "auth", "dev", "auth/login"],
-  "favorites.currentGroup": "auth/login",
+  "favorites.groups": ["Default", "test", "main", "auth", "dev", "auth/login", "auth/refresh"],
+  "favorites.currentGroup": "auth/refresh",
   "favorites.sortOrder": "DESC"
 }

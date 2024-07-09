@@ -11,10 +11,16 @@ import { REGISTER_USER_USE_CASE } from 'src/application/auth/symbol/register-use
 import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.use-case';
 import { LOGIN_USER_USE_CASE } from 'src/application/auth/symbol/login-user.use-case.symbol';
 import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.use-case';
+import { REFRESH_TOKEN_USE_CASE } from 'src/application/auth/symbol/refresh-token.symbol';
+import { RefreshTokenUseCase } from 'src/application/auth/use-cases/refresh-token.use-case';
 
 @Module({
   imports: [DatabaseModule, JwtTokenModule, CqrsModule],
   providers: [
+    {
+      provide: REFRESH_TOKEN_USE_CASE,
+      useClass: RefreshTokenUseCase,
+    },
     {
       provide: REGISTER_USER_USE_CASE,
       useClass: RegisterUserUseCase,

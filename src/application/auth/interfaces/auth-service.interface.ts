@@ -5,4 +5,5 @@ import { UserModel } from 'src/domain/auth/model/user.model';
 export interface IAuthService {
   registerUser(userModel: RegisterUserModel): Promise<UserModel>;
   findUserByEmail(userModel: LoginUserModel): Promise<UserModel | null>;
+  findUserById(userId: string): Promise<UserModel | null>;
 }

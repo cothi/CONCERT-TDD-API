@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IUseCase } from '../interfaces/use-case.interface';
+import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
 import { AuthResponseDto } from 'src/presentation/dto/auth/response/auth.response.dto';
 import { IAuthService } from '../interfaces/auth-service.interface';
+import { IUseCase } from '../interfaces/use-case.interface';
 import { AUTH_SERVICE } from '../symbol/auth-service.symbol';
-import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
 
 @Injectable()
 export class RegisterUserUseCase implements IUseCase<RegisterUserModel, AuthResponseDto> {
@@ -16,7 +16,7 @@ export class RegisterUserUseCase implements IUseCase<RegisterUserModel, AuthResp
   async execute(input: RegisterUserModel): Promise<AuthResponseDto> {
     const userModel = await this.authService.registerUser(input);
 
-    const accessToken = await this.jwtTokenService.generateAccessToekn({
+    const accessToken = await this.jwtTokenService.generateAccessToken({
       userId: userModel.id,
       email: userModel.email,
       type: 'access',

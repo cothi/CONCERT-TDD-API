@@ -1,11 +1,7 @@
 import { LoginUserEntity } from '../entity/login-user.entity';
 
 export class LoginUserModel {
-  private readonly _email: string;
-
-  constructor(email: string) {
-    this._email = email;
-  }
+  constructor(private readonly _email: string) {}
 
   public static create(email: string) {
     return new LoginUserModel(email);

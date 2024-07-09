@@ -1,18 +1,15 @@
 import { Inject } from '@nestjs/common';
+import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
 import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 import { AuthResponseDto } from 'src/presentation/dto/auth/response/auth.response.dto';
 import { IAuthService } from '../interfaces/auth-service.interface';
-import { AUTH_SERVICE } from '../symbol/auth-service.symbol';
 import { IUseCase } from '../interfaces/use-case.interface';
-import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
-import { JwtPayload } from '../../../../dist/common/interfaces/jwt-token.interface';
-import { LoginUserEntity } from 'src/domain/auth/entity/login-user.entity';
+import { AUTH_SERVICE } from '../symbol/auth-service.symbol';
 
 export class LoginUserUseCase implements IUseCase<LoginUserModel, AuthResponseDto> {
   constructor(
     @Inject(AUTH_SERVICE)
     private readonly authService: IAuthService,
-
     private readonly jwtTokenService: JwtTokenService,
   ) {}
 
@@ -22,7 +19,7 @@ export class LoginUserUseCase implements IUseCase<LoginUserModel, AuthResponseDt
       throw new Error('User not found');
     }
 
-    const accessToken = this.jwtTokenService.generateAccessToekn({
+    const accessToken = this.jwtTokenService.generateAccessToken({
       userId: userModel.id,
       email: userModel.email,
       type: 'access',

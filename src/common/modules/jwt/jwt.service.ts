@@ -11,7 +11,7 @@ import { IJwtTokenService } from '../../interfaces/token-service.interface';
 @Injectable()
 export class JwtTokenService implements IJwtTokenService {
   constructor(private readonly jwtService: JwtService) {}
-  generateAccessToekn(payload: JwtPayload): string {
+  generateAccessToken(payload: JwtPayload): string {
     return this.jwtService.sign(payload);
   }
   generateRefreshToken(payload: JwtPayload): string {
@@ -20,16 +20,16 @@ export class JwtTokenService implements IJwtTokenService {
     });
   }
 
-  verifyToknen(token: string): TokenResult {
+  verifyToken(token: string): TokenResult {
     try {
-      const payload = this.jwtService.verify(token);
+      const payload: JwtPayload = this.jwtService.verify(token);
       return {
-        isValud: true,
+        isValid: true,
         payload,
       };
     } catch (e) {
       return {
-        isValud: false,
+        isValid: false,
         payload: null,
         error: '유효한 토큰이 아닙니다.',
       };

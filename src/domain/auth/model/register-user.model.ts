@@ -1,11 +1,7 @@
 import { RegisterUserEntity } from '../entity/register-user.entity';
 
 export class RegisterUserModel {
-  private readonly _email: string;
-
-  constructor(email: string) {
-    this._email = email;
-  }
+  constructor(private readonly _email: string) {}
 
   public static create(email: string) {
     return new RegisterUserModel(email);

@@ -22,4 +22,8 @@ export class AuthService implements IAuthService {
   async findUserByEmail(loginUserModel: LoginUserModel): Promise<UserModel> {
     return await this.authRepository.findUserByEmail(loginUserModel.toEntity());
   }
+
+  async findUserById(userId: string): Promise<UserModel | null> {
+    return await this.authRepository.findUserById(userId);
+  }
 }
