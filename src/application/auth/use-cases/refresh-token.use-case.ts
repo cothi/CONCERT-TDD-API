@@ -6,7 +6,9 @@ import { IAuthService } from '../interfaces/auth-service.interface';
 import { RefreshTokenResponseDto } from 'src/presentation/dto/auth/response/refresh-token.response.dto';
 import { RefreshTokenModel } from 'src/domain/auth/model/refresh-token.model';
 
-export class RefreshTokenUseCase implements IUseCase<RefreshTokenModel, RefreshTokenResponseDto> {
+export class RefreshTokenUseCase
+  implements IUseCase<RefreshTokenModel, RefreshTokenResponseDto>
+{
   constructor(
     private readonly jwtTokenSerice: JwtTokenService,
     @Inject(AUTH_SERVICE)
@@ -18,7 +20,9 @@ export class RefreshTokenUseCase implements IUseCase<RefreshTokenModel, RefreshT
       throw new Error('Invalid token');
     }
 
-    const user = await this.authService.findUserById(tokenResult.payload.userId);
+    const user = await this.authService.findUserById(
+      tokenResult.payload.userId,
+    );
     if (!user) {
       throw new Error('User not found');
     }

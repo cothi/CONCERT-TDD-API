@@ -77,9 +77,6 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "prisma": {
-      "schema": "src/infrastructure/database/schema.prisma"
-    },
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/$1"
     }

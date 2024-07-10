@@ -8,7 +8,7 @@ import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
 import { AUTH_REPOSITORY } from 'src/domain/auth/symbol/auth-repository.symbol';
 import { IAuthRepository } from '../../../domain/auth/interfaces/repositories/auth-repository.interface';
-import { IAuthService } from '../interfaces/auth-service.interface';
+import { IAuthService } from 'src/application/auth/interfaces/auth-service.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {

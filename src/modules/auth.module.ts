@@ -6,13 +6,13 @@ import { AUTH_REPOSITORY } from 'src/domain/auth/symbol/auth-repository.symbol';
 import { DatabaseModule } from 'src/infrastructure/database/prisma.module';
 import { AuthRepository } from 'src/infrastructure/database/repositories/auth/auth.repository';
 import { AuthController } from '../presentation/controller/auth/auth.controller';
-import { AuthService } from './../application/auth/services/auth.service';
 import { REGISTER_USER_USE_CASE } from 'src/application/auth/symbol/register-user.use-case.symbol';
 import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.use-case';
 import { LOGIN_USER_USE_CASE } from 'src/application/auth/symbol/login-user.use-case.symbol';
 import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.use-case';
 import { REFRESH_TOKEN_USE_CASE } from 'src/application/auth/symbol/refresh-token.symbol';
 import { RefreshTokenUseCase } from 'src/application/auth/use-cases/refresh-token.use-case';
+import { AuthService } from 'src/domain/auth/services/auth.service';
 
 @Module({
   imports: [DatabaseModule, JwtTokenModule, CqrsModule],

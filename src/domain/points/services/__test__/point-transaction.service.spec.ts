@@ -1,10 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Payment } from '@prisma/client';
+import { Payment, PaymentType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PointTransactionRepository } from 'src/infrastructure/database/repositories/points/point-transaction.repository';
-import { RecordPaymentDto } from '../../dto/record-payment.dto';
-import { PaymentType } from '../../enums/payment-type.enum';
 import { PointTransactionService } from '../point-transaction.service';
+import { RecordPaymentModel } from '../../model/point.model';
 
 describe('PaymentHistoryService', () => {
   let service: PointTransactionService;
@@ -29,11 +28,10 @@ describe('PaymentHistoryService', () => {
   });
   describe('recordPaymentHistory', () => {
     it('포인트 관련 트랜잭션을 정상적으로 기록해야 한다', async () => {
-      const dto = RecordPaymentDto.create(
-        '1',
-        PaymentType.CHARGE,
-        new Decimal(111),
-      );
+      const dto = new RecordPaymentModel();
+      dto.userId = '1';
+      dto.type = PaymentType.CHARGE;
+      dto.amount = new Decimal(111);
       const expectedResult: Payment = {
         id: 'payment1',
         userId: '1',

@@ -1,12 +1,11 @@
 import { ChargePointResponseDto } from 'src/presentation/dto/points/response/charge-point.response.dto';
 import { IUseCase } from '../../auth/interfaces/use-case.interface';
 import { ChargePointCommand } from '../dto/charge-point.command.dto';
-import { PointWalletService } from '../services/point-wallet.service';
-import { ChargePointDto } from '../dto/charge-point.dto';
-import { RecordPaymentDto } from '../dto/record-payment.dto';
 import { PaymentType } from '../enums/payment-type.enum';
 import { Inject } from '@nestjs/common';
-import { PointTransactionService } from '../services/point-transaction.service';
+import { PointWalletService } from 'src/domain/points/services/point-wallet.service';
+import { PointTransactionService } from 'src/domain/points/services/point-transaction.service';
+import { ChargePointModel } from 'src/domain/points/model/point.model';
 
 export class ChargePointUseCase
   implements IUseCase<ChargePointCommand, ChargePointResponseDto>
@@ -21,19 +20,23 @@ export class ChargePointUseCase
   async execute(
     chargePointCommand: ChargePointCommand,
   ): Promise<ChargePointResponseDto> {
-    const chargePointDto = new ChargePointDto(
+    // 충전
+    const chargePointDto = new ChargePointModel(
       chargePointCommand.amount,
       chargePointCommand.userId,
     );
     const payment = await this.pointWalletService.chargePoints(chargePointDto);
+    // 충전 기록
+    await this.pointTransactionService.recordPaymentHistory({
+      userId: payment.userId,
+      type: PaymentType.CHARGE,
+      amount: chargePointCommand.amount,
+    });
 
-    const recordPaymentDto = RecordPaymentDto.create(
-      payment.userId,
-      PaymentType.CHARGE,
-      chargePointCommand.amount,
+    const chargePointResponseDto = ChargePointResponseDto.create(
+      payment.amount,
+      chargePointDto.amount,
     );
-    await this.pointTransactionService.recordPaymentHistory(recordPaymentDto);
-
-    return ChargePointResponseDto.create(payment.amount, chargePointDto.amount);
+    return chargePointResponseDto;
   }
 }

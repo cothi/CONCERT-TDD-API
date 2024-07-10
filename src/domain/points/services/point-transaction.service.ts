@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { RecordPaymentDto } from '../dto/record-payment.dto';
 import { RecordPaymentEntity } from 'src/domain/points/entity/record.payment.entity';
 import { PointTransactionRepository } from 'src/infrastructure/database/repositories/points/point-transaction.repository';
+import { RecordPaymentModel } from '../model/point.model';
 
 @Injectable()
 export class PointTransactionService {
@@ -10,11 +10,11 @@ export class PointTransactionService {
     private readonly pointTransactionRepository: PointTransactionRepository,
   ) {}
   async getPaymentHistory() {}
-  async recordPaymentHistory(recordPaymentDto: RecordPaymentDto) {
+  async recordPaymentHistory(recordPaymentModel: RecordPaymentModel) {
     const recordPaymentEntity = RecordPaymentEntity.create(
-      recordPaymentDto.userId,
-      recordPaymentDto.transactionType,
-      recordPaymentDto.amount,
+      recordPaymentModel.userId,
+      recordPaymentModel.type,
+      recordPaymentModel.amount,
     );
     return await this.pointTransactionRepository.recordPointHistory(
       recordPaymentEntity,

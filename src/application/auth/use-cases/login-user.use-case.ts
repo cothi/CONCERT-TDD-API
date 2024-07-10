@@ -6,7 +6,9 @@ import { IAuthService } from '../interfaces/auth-service.interface';
 import { IUseCase } from '../interfaces/use-case.interface';
 import { AUTH_SERVICE } from '../symbol/auth-service.symbol';
 
-export class LoginUserUseCase implements IUseCase<LoginUserModel, AuthResponseDto> {
+export class LoginUserUseCase
+  implements IUseCase<LoginUserModel, AuthResponseDto>
+{
   constructor(
     @Inject(AUTH_SERVICE)
     private readonly authService: IAuthService,

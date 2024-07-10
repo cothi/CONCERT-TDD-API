@@ -3,10 +3,10 @@ import { IAuthRepository } from 'src/domain/auth/interfaces/repositories/auth-re
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
 import { UserModel } from 'src/domain/auth/model/user.model';
 import { AUTH_REPOSITORY } from 'src/domain/auth/symbol/auth-repository.symbol';
-import { IAuthService } from '../../interfaces/auth-service.interface';
-import { AUTH_SERVICE } from '../../symbol/auth-service.symbol';
 import { AuthService } from '../auth.service';
 import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
+import { IAuthService } from 'src/application/auth/interfaces/auth-service.interface';
+import { AUTH_SERVICE } from 'src/application/auth/symbol/auth-service.symbol';
 
 describe('AuthService', () => {
   let authService: IAuthService;

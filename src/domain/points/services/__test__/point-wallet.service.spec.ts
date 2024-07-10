@@ -1,9 +1,9 @@
 import { PointWalletRepository } from 'src/infrastructure/database/repositories/points/point-wallet.repository';
 import { PointWalletService } from '../point-wallet.service';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChargePointDto } from '../../dto/charge-point.dto';
 import { Decimal } from '@prisma/client/runtime/library';
 import { UserPoint } from '@prisma/client';
+import { ChargePointModel } from '../../model/point.model';
 
 describe('PointWalletService', () => {
   let service: PointWalletService;
@@ -29,7 +29,10 @@ describe('PointWalletService', () => {
 
   describe('chargePoints', () => {
     it('포인트 충전을 요청하면 포인트 충전을 수행한다.', async () => {
-      const dto = ChargePointDto.create(new Decimal(111), '1');
+      const dto = new ChargePointModel();
+      dto.amount = new Decimal(111);
+      dto.userId = '1';
+
       const expectedResult: UserPoint = {
         id: '1',
         userId: '1',

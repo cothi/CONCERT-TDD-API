@@ -51,4 +51,47 @@ enum PaymentType {
     REFUND
 }
 
+model Concert {
+  id          String       @id @default(uuid())
+  name        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  concertDates ConcertDate[]
 
+  @@map("concerts")
+}
+
+model ConcertDate {
+  id                 String   @id @default(uuid())
+  concertId          String
+  date               DateTime
+  totalSeat          Int
+  availableSeatCount Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  concert            Concert  @relation(fields: [concertId], references: [id])
+  seats              Seat[]
+
+  @@index([concertId])
+  @@map("concert_dates")
+}
+
+model Seat {
+  id            String     @id @default(uuid())
+  seatNumber    Int
+  price         Decimal    @db.Decimal(10, 2)
+  status        SeatStatus
+  concertDateId String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  concertDate   ConcertDate @relation(fields: [concertDateId], references: [id])
+
+  @@index([concertDateId])
+  @@map("seats")
+}
+
+enum SeatStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+}

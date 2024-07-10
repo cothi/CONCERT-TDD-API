@@ -1,4 +1,5 @@
 // 도메인 유저 모델
+
 export class UserModel {
   constructor(
     private readonly _id: string,
