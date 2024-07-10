@@ -7,11 +7,48 @@ generator client {
     provider = "prisma-client-js"
 }
 
-model User{
-    id String @id @default(uuid())
-    email String @unique
-    createAt DateTime @default(now())
-    updateAt DateTime @updatedAt
+// model User{
+//     id String @id @default(uuid())
+//     email String @unique
+//     createAt DateTime @default(now())
+//     updateAt DateTime @updatedAt
+// }
+
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userPoint UserPoint?
+  payments  Payment[]
+}
+
+model UserPoint {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  amount    Decimal
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, createdAt])
+}
+
+model Payment {
+  id        String      @id @default(uuid())
+  userId    String
+  amount    Decimal
+  type      PaymentType
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, createdAt])
+}
+
+enum PaymentType {
+    CHARGE
+    TICKET_PURCHASE
+    REFUND
 }
 
 

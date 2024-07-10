@@ -4,7 +4,7 @@ import { LoginUserEntity } from 'src/domain/auth/entity/login-user.entity';
 import { RegisterUserEntity } from 'src/domain/auth/entity/register-user.entity';
 import { IAuthRepository } from 'src/domain/auth/interfaces/repositories/auth-repository.interface';
 import { UserModel } from 'src/domain/auth/model/user.model';
-import { PrismaService } from 'src/infrastructrue/database/prisma.service';
+import { PrismaService } from 'src/infrastructure/database/prisma.service';
 
 @Injectable()
 export class AuthRepository implements IAuthRepository {

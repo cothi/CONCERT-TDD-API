@@ -7,7 +7,9 @@ import { IUseCase } from '../interfaces/use-case.interface';
 import { AUTH_SERVICE } from '../symbol/auth-service.symbol';
 
 @Injectable()
-export class RegisterUserUseCase implements IUseCase<RegisterUserModel, AuthResponseDto> {
+export class RegisterUserUseCase
+  implements IUseCase<RegisterUserModel, AuthResponseDto>
+{
   constructor(
     @Inject(AUTH_SERVICE)
     private readonly authService: IAuthService,
@@ -15,6 +17,7 @@ export class RegisterUserUseCase implements IUseCase<RegisterUserModel, AuthResp
   ) {}
   async execute(input: RegisterUserModel): Promise<AuthResponseDto> {
     const userModel = await this.authService.registerUser(input);
+    console.log(userModel);
 
     const accessToken = await this.jwtTokenService.generateAccessToken({
       userId: userModel.id,

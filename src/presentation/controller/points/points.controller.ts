@@ -1,5 +1,13 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common';
-import { mockGetPoints, mockPatchPoints } from 'src/shared/mocked/points.mock.data';
+import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Decimal } from '@prisma/client/runtime/library';
+import { ChargePointCommand } from 'src/application/points/dto/charge-point.command.dto';
+import { ChargePointUseCase } from 'src/application/points/user-cases/charge-point.user-case';
+import { Payload } from 'src/common/decorators/token.decorator';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { JwtPayload } from 'src/common/interfaces/jwt-token.interface';
+import { ChargePointRequestDto } from 'src/presentation/dto/points/request/charge-point.request.dto';
+import { ChargePointResponseDto } from 'src/presentation/dto/points/response/charge-point.response.dto';
+import { mockGetPoints } from 'src/shared/mocked/points.mock.data';
 
 /**
  * 포인트 관련 요청을 처리하는 컨트롤러
@@ -7,11 +15,13 @@ import { mockGetPoints, mockPatchPoints } from 'src/shared/mocked/points.mock.da
  */
 @Controller('points')
 export class PointsController {
+  constructor(private readonly chargePointUseCase: ChargePointUseCase) {}
   /**
    * 현재 사용자의 포인트 잔액을 조회합니다.
    * @returns 포인트 잔액 정보
    */
   @Get()
+  @UseGuards(JwtAuthGuard)
   async getPoints() {
     // TODO: 실제 포인트 조회 로직 구현
     // 현재는 목업 데이터를 반환합니다.
@@ -24,9 +34,18 @@ export class PointsController {
    * @returns 충전 후 업데이트된 포인트 정보
    */
   @Patch('charge')
-  async patchPoints(@Body() body: { amount: number }) {
+  @UseGuards(JwtAuthGuard)
+  async patchPoints(
+    @Body() chargePointRequest: ChargePointRequestDto,
+    @Payload() payload: JwtPayload,
+  ): Promise<ChargePointResponseDto> {
     // TODO: 실제 포인트 충전 로직 구현
     // 현재는 목업 데이터를 반환합니다.
-    return mockPatchPoints;
+    const command = ChargePointCommand.create(
+      new Decimal(chargePointRequest.amount),
+      payload.userId,
+    );
+
+    return this.chargePointUseCase.execute(command);
   }
 }

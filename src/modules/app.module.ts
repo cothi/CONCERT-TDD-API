@@ -1,7 +1,7 @@
+import { PointsModule } from './points.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { JwtTokenModule } from 'src/common/modules/jwt/jwt.module';
 import { AuthModule } from './auth.module';
 
 @Module({
@@ -21,7 +21,7 @@ import { AuthModule } from './auth.module';
       },
     }),
     AuthModule,
-    JwtTokenModule,
+    PointsModule,
   ],
   controllers: [],
   providers: [],

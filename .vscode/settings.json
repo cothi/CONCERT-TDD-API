@@ -167,9 +167,71 @@
     {
       "filePath": "src/presentation/dto/auth/response/refresh-token.response.dto.ts",
       "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/presentation/controller/points/points.controller.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/points/point-wallet.repository.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/modules/points.module.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/services/point-wallet.service.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/user-cases/charge-point.user-case.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/presentation/dto/points/request/charge-point.request.dto.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/presentation/dto/points/response/charge-point.response.dto.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "prisma/schema.prisma",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/points/point-history.repository.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/services/point-history.service.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/points/payment-history.repository.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/services/payment-history.service.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/services/point-transaction.service.ts",
+      "group": "points/chage"
     }
   ],
-  "favorites.groups": ["Default", "test", "main", "auth", "dev", "auth/login", "auth/refresh"],
-  "favorites.currentGroup": "auth/refresh",
+  "favorites.groups": [
+    "Default",
+    "test",
+    "main",
+    "auth",
+    "dev",
+    "auth/login",
+    "auth/refresh",
+    "point",
+    "points/chage"
+  ],
+  "favorites.currentGroup": "points/chage",
   "favorites.sortOrder": "DESC"
 }

@@ -6,7 +6,7 @@ export class UserModel {
   ) {}
 
   public static create(email: string, id: string): UserModel {
-    return new UserModel(email, id);
+    return new UserModel(id, email);
   }
 
   get id(): string {

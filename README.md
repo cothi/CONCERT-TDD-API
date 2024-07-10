@@ -1,4 +1,3 @@
-
 # 대기열을 이용한 티켓팅 프로젝트
 
 ## 목차
@@ -31,21 +30,22 @@
 4. 인증 요구: 인증 API를 제외한 모든 API는 인증된 사용자만 접근 가능하며, `Authorization` 헤더에 Bearer 토큰이 필요합니다.
 
 ## 4. API 명세
-자세한 API는 [포스트 문서](https://documenter.getpostman.com/view/18574015/2sA3dxECMf)에서 확인해주세요.
 
+자세한 API는 [포스트 문서](https://documenter.getpostman.com/view/18574015/2sA3dxECMf)에서 확인해주세요.
 
 ### 4.1. Authentication
 
-| Method | Endpoint | Description |
-|:------:|----------|-------------|
-| `POST` | `/auth/register` | 새 계정 생성 |
-| `POST` | `/auth/login` | 기존 계정 로그인 |
-| `POST` | `/auth/refresh` | 액세스 토큰 갱신 |
+| Method | Endpoint         | Description      |
+| :----: | ---------------- | ---------------- |
+| `POST` | `/auth/register` | 새 계정 생성     |
+| `POST` | `/auth/login`    | 기존 계정 로그인 |
+| `POST` | `/auth/refresh`  | 액세스 토큰 갱신 |
 
 <details>
 <summary>상세 정보</summary>
 
 #### Register
+
 - **Body**: `{ "email": "user@example.com" }`
 - **Response**: `201 Created`
   ```json
@@ -57,10 +57,12 @@
   ```
 
 #### Login
+
 - **Body**: `{ "email": "user@example.com" }`
 - **Response**: `200 OK` (Register와 동일한 형식)
 
 #### Refresh
+
 - **Headers**: `Authorization: Bearer <refresh_token>`
 - **Response**: `200 OK`
   ```json
@@ -68,19 +70,20 @@
     "accessToken": "eyJhbG..."
   }
   ```
-</details>
+  </details>
 
 ### 4.2. Concerts
 
-| Method | Endpoint | Description |
-|:------:|----------|-------------|
-| `GET`  | `/concerts/{concertId}/queue-entry` | 콘서트 대기열 입장 |
-| `GET`  | `/concerts` | 콘서트 및 대기열 목록 조회 |
+| Method | Endpoint                            | Description                |
+| :----: | ----------------------------------- | -------------------------- |
+| `GET`  | `/concerts/{concertId}/queue-entry` | 콘서트 대기열 입장         |
+| `GET`  | `/concerts`                         | 콘서트 및 대기열 목록 조회 |
 
 <details>
 <summary>상세 정보</summary>
 
 #### Queue Entry
+
 - **Response**: `201 Created`
   ```json
   {
@@ -90,6 +93,7 @@
   ```
 
 #### List Concerts
+
 - **Response**: `200 OK`
   ```json
   {
@@ -103,19 +107,20 @@
     ]
   }
   ```
-</details>
+  </details>
 
 ### 4.3. Points
 
-| Method | Endpoint | Description |
-|:------:|----------|-------------|
-| `GET`  | `/points` | 포인트 잔액 조회 |
-| `PATCH`| `/points/charge` | 포인트 충전 |
+| Method  | Endpoint         | Description      |
+| :-----: | ---------------- | ---------------- |
+|  `GET`  | `/points`        | 포인트 잔액 조회 |
+| `PATCH` | `/points/charge` | 포인트 충전      |
 
 <details>
 <summary>상세 정보</summary>
 
 #### Check Balance
+
 - **Response**: `200 OK`
   ```json
   {
@@ -124,6 +129,7 @@
   ```
 
 #### Charge Points
+
 - **Body**: `{ "amount": 10000 }`
 - **Response**: `200 OK`
   ```json
@@ -132,21 +138,22 @@
     "chargeAmount": 10000
   }
   ```
-</details>
+  </details>
 
 ### 4.4. Reservations
 
-| Method | Endpoint | Description |
-|:------:|----------|-------------|
-| `GET`  | `/reservation/available-dates` | 예약 가능 날짜 조회 |
-| `GET`  | `/reservation/{concertId}/seats` | 좌석 정보 조회 |
-| `POST` | `/reservation/seat` | 좌석 예약 |
-| `GET`  | `/reservation` | 예약 목록 조회 |
+| Method | Endpoint                         | Description         |
+| :----: | -------------------------------- | ------------------- |
+| `GET`  | `/reservation/available-dates`   | 예약 가능 날짜 조회 |
+| `GET`  | `/reservation/{concertId}/seats` | 좌석 정보 조회      |
+| `POST` | `/reservation/seat`              | 좌석 예약           |
+| `GET`  | `/reservation`                   | 예약 목록 조회      |
 
 <details>
 <summary>상세 정보</summary>
 
 #### Available Dates
+
 - **Response**: `200 OK`
   ```json
   {
@@ -161,6 +168,7 @@
   ```
 
 #### Seat Information
+
 - **Response**: `200 OK`
   ```json
   {
@@ -178,6 +186,7 @@
   ```
 
 #### Reserve Seat
+
 - **Body**: `{ "concertId": "uuid", "seatIds": ["uuid1", "uuid2"] }`
 - **Response**: `201 Created`
   ```json
@@ -194,6 +203,7 @@
   ```
 
 #### List Reservations
+
 - **Response**: `200 OK`
   ```json
   {
@@ -209,18 +219,19 @@
     "pagination": { ... }
   }
   ```
-</details>
+  </details>
 
 ### 4.5. Payment
 
-| Method | Endpoint | Description |
-|:------:|----------|-------------|
+| Method | Endpoint   | Description    |
+| :----: | ---------- | -------------- |
 | `POST` | `/payment` | 예약 결제 처리 |
 
 <details>
 <summary>상세 정보</summary>
 
 #### Process Payment
+
 - **Body**: `{ "reservationIds": ["uuid1", "uuid2"] }`
 - **Response**: `200 OK`
   ```json
@@ -231,19 +242,19 @@
     "status": "COMPLETED"
   }
   ```
-</details>
+  </details>
 
 ### 4.6. Error Responses
 
-| Status | Description |
-|:------:|-------------|
-| `400`  | Bad Request - 잘못된 요청 |
-| `401`  | Unauthorized - 인증 실패 |
-| `403`  | Forbidden - 권한 없음 |
-| `404`  | Not Found - 리소스 없음 |
-| `409`  | Conflict - 리소스 충돌 |
+| Status | Description                  |
+| :----: | ---------------------------- |
+| `400`  | Bad Request - 잘못된 요청    |
+| `401`  | Unauthorized - 인증 실패     |
+| `403`  | Forbidden - 권한 없음        |
+| `404`  | Not Found - 리소스 없음      |
+| `409`  | Conflict - 리소스 충돌       |
 | `402`  | Payment Required - 결제 필요 |
-| `410`  | Gone - 리소스 만료 |
+| `410`  | Gone - 리소스 만료           |
 
 ## 5. ERD
 
