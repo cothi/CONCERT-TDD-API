@@ -16,7 +16,7 @@ export class PointTransactionRepository {
     return await this.prisma.payment.create({
       data: {
         userId: recordPaymentEntity.userId,
-        type: recordPaymentEntity.paymentType,
+        paymentType: recordPaymentEntity.paymentType,
         amount: recordPaymentEntity.amount,
       },
     });

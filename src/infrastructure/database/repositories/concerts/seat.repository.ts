@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { Prisma, Seat } from '@prisma/client';
+import { Prisma, Seat, SeatStatus } from '@prisma/client';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 
 @Injectable()
@@ -28,6 +28,22 @@ export class SeatRepository {
   ): Promise<Seat[]> {
     return (tx ?? this.prisma).seat.findMany({
       where: { concertDateId },
+    });
+  }
+
+  async findAndLockById(tx: PrismaTransaction, seatId: string): Promise<Seat> {
+    const [seat] = await (tx ?? this.prisma).$queryRaw<Seat[]>`
+    SELECT * FROM "Seat" WHERE id = ${seatId} FOR UPDATE`;
+    return seat || null;
+  }
+  async updateStatus(
+    seatId: string,
+    status: SeatStatus,
+    tx?: PrismaTransaction,
+  ) {
+    return (tx ?? this.prisma).seat.update({
+      where: { id: seatId },
+      data: { status },
     });
   }
 }

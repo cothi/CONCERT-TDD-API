@@ -3,6 +3,7 @@ import { CreateSeatsModel } from '../model/seat.model';
 import { Prisma, Seat, SeatStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { SeatRepository } from 'src/infrastructure/database/repositories/concerts/seat.repository';
+import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 
 @Injectable()
 export class SeatService {
@@ -17,6 +18,18 @@ export class SeatService {
       createSeatModel.status,
     );
     return await this.seatRepository.createMany(seats);
+  }
+
+  async findAndLockSeat(tx: PrismaTransaction, seatId: string) {
+    return this.seatRepository.findAndLockById(tx, seatId);
+  }
+
+  async updateSeatStatus(
+    seatId: string,
+    status: SeatStatus,
+    tx?: PrismaTransaction,
+  ) {
+    return this.seatRepository.updateStatus(seatId, status, tx);
   }
 
   async getSeatsByConcertDateId(concertDateId: string) {}
@@ -36,7 +49,7 @@ export class SeatService {
     return Array.from({ length: totalSeat }, (_, index) => ({
       concertDateId,
       seatNumber: index + 1,
-      status: SeatStatus.AVAILABLE,
+      status: seatStatus,
       price: price,
     }));
   }

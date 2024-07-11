@@ -1,12 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ReservationStatus } from '@prisma/client';
 
-export enum ReservationStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  CANCELLED = 'CANCELLED',
-}
-
-export class ReservationResponseDto {
+export class ReserveSeatResponseDto {
   @ApiProperty({
     example: '123e4567-e89b-12d3-a456-426614174000',
     description: '예약 ID',

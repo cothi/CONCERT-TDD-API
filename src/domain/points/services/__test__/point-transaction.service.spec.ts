@@ -35,7 +35,7 @@ describe('PaymentHistoryService', () => {
       const expectedResult: Payment = {
         id: 'payment1',
         userId: '1',
-        type: PaymentType.CHARGE,
+        paymentType: PaymentType.CHARGE,
         amount: new Decimal(111),
         createdAt: new Date(),
         updatedAt: new Date(),

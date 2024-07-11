@@ -21,10 +21,9 @@ export class ChargePointUseCase
     chargePointCommand: ChargePointCommand,
   ): Promise<ChargePointResponseDto> {
     // 충전
-    const chargePointDto = new ChargePointModel(
-      chargePointCommand.amount,
-      chargePointCommand.userId,
-    );
+    const chargePointDto = new ChargePointModel();
+    chargePointDto.amount = chargePointCommand.amount;
+    chargePointDto.userId = chargePointCommand.userId;
     const payment = await this.pointWalletService.chargePoints(chargePointDto);
     // 충전 기록
     await this.pointTransactionService.recordPaymentHistory({

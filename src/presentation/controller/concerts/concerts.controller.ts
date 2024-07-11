@@ -3,13 +3,18 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateConcertDateUseCase } from 'src/application/concerts/use-cases/create-concert-date.use-case';
 import { CreateConcertUseCase } from 'src/application/concerts/use-cases/create-concert.use-case';
 import { CreateSeatUseCase } from 'src/application/concerts/use-cases/create-seat.use-case';
+import { ReserveSeatUseCase } from 'src/application/concerts/use-cases/reserve-seat.user-case';
+import { Payload } from 'src/common/decorators/token.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { JwtPayload } from 'src/common/interfaces/jwt-token.interface';
 import { CreateConcertDateDto } from 'src/presentation/dto/concerts/dto/request/create-concert-date.dto';
 import { CreateConcertDto } from 'src/presentation/dto/concerts/dto/request/create-concert.dto';
 import { CreateSeatDto } from 'src/presentation/dto/concerts/dto/request/create-seat.dto';
+import { ReserveSeatDto } from 'src/presentation/dto/concerts/dto/request/reserve-seat.dto';
 import { ConcertDateResponseDto } from 'src/presentation/dto/concerts/dto/response/concert-date.response.dto';
 import { ConcertResponseDto } from 'src/presentation/dto/concerts/dto/response/concert.response.dto';
 import { CreateSeatResponseDto } from 'src/presentation/dto/concerts/dto/response/create-seat.response.dto';
+import { ReserveSeatResponseDto } from 'src/presentation/dto/concerts/dto/response/reserve-seat.response.dto';
 /**
  * 콘서트 관련 요청을 처리하는 컨트롤러
  * 콘서트 대기열 입장 및 대기열 상태 조회 기능을 제공합니다.
@@ -22,6 +27,7 @@ export class ConcertsController {
     private readonly createConcertDateUseCase: CreateConcertDateUseCase,
     private readonly createConcertUseCase: CreateConcertUseCase,
     private readonly createSeatUseCase: CreateSeatUseCase,
+    private readonly reserveSeatUseCase: ReserveSeatUseCase,
   ) {}
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -98,25 +104,27 @@ export class ConcertsController {
       seatNumber: createSeatDto.seatNumber,
       price: createSeatDto.price,
     });
-    // }
+  }
 
-    // @Post('seats/:seatId/reserve')
-    // @UseGuards(JwtAuthGuard)
-    // @ApiOperation({
-    //   summary: '콘서트 좌석 예약',
-    //   description: '특정 좌석을 예약합니다.',
-    // })
-    // @ApiBody({ type: ReserveSeatDto })
-    // @ApiResponse({
-    //   status: 201,
-    //   description: '예약된 좌석 정보',
-    //   type: ReservationResponseDto,
-    // })
-    // async reserveSeat(
-    //   @Param('seatId') seatId: string,
-    //   @Body() reserveSeatDto: ReserveSeatDto,
-    // ): Promise<ReservationResponseDto> {
-    //   return this.reserveSeatUseCase.execute(seatId, reserveSeatDto);
-    // }
+  @Post('seats/reserve')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: '콘서트 좌석 예약',
+    description: '특정 좌석을 예약합니다.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '예약된 좌석 정보',
+    type: ReserveSeatResponseDto,
+  })
+  async reserveSeat(
+    @Param('seatId') seatId: string,
+    @Body() reserveSeatDto: ReserveSeatDto,
+    @Payload() payload: JwtPayload,
+  ): Promise<ReserveSeatResponseDto> {
+    return this.reserveSeatUseCase.execute({
+      seatId: reserveSeatDto.seatId,
+      userId: payload.userId,
+    });
   }
 }

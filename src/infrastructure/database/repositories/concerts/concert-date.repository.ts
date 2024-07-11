@@ -2,13 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { ConcertDate } from '@prisma/client';
 import { CreateConcertDateModel } from 'src/domain/concerts/model/concert-date.model';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 
 @Injectable()
 export class ConcertDateRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateConcertDateModel): Promise<ConcertDate> {
-    return await this.prisma.concertDate.create({
+  async create(
+    data: CreateConcertDateModel,
+    tx?: PrismaTransaction,
+  ): Promise<ConcertDate> {
+    return await (tx ?? this.prisma).concertDate.create({
       data: {
         concertId: data.concertId,
         date: data.date,
@@ -18,13 +22,21 @@ export class ConcertDateRepository {
     });
   }
 
-  async findById(dateId: string): Promise<ConcertDate | null> {
-    return await this.prisma.concertDate.findUnique({
+  async findById(
+    dateId: string,
+    tx?: PrismaTransaction,
+  ): Promise<ConcertDate | null> {
+    return await (tx ?? this.prisma).concertDate.findUnique({
       where: { id: dateId },
     });
   }
 
-  async findByConcertId(concertId: string): Promise<ConcertDate[]> {
-    return this.prisma.concertDate.findMany({ where: { concertId } });
+  async findByConcertId(
+    concertId: string,
+    tx?: PrismaTransaction,
+  ): Promise<ConcertDate[]> {
+    return await (tx ?? this.prisma).concertDate.findMany({
+      where: { concertId },
+    });
   }
 }
