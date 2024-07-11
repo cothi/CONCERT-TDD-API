@@ -53,7 +53,7 @@ enum PaymentType {
 
 model Concert {
   id          String       @id @default(uuid())
-  name        String
+  name        String       @unique
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   concertDates ConcertDate[]

@@ -219,6 +219,46 @@
     {
       "filePath": "src/application/points/services/point-transaction.service.ts",
       "group": "points/chage"
+    },
+    {
+      "filePath": "src/presentation/controller/concerts/concerts.controller.ts",
+      "group": "concert/create"
+    },
+    {
+      "filePath": "src/application/concerts/dto/create-concert.use-case.dto.ts",
+      "group": "concert/create"
+    },
+    {
+      "filePath": "src/modules/concerts.module.ts",
+      "group": "concert/create"
+    },
+    {
+      "filePath": "src/domain/concerts/services/concert.service.ts",
+      "group": "concert/create"
+    },
+    {
+      "filePath": "src/application/concerts/use-cases/create-concert.use-case.ts",
+      "group": "concert/create"
+    },
+    {
+      "filePath": "src/presentation/controller/concerts/concerts.controller.ts",
+      "group": "concert/date"
+    },
+    {
+      "filePath": "src/modules/concerts.module.ts",
+      "group": "concert/date"
+    },
+    {
+      "filePath": "src/infrastructure/database/repositories/concerts/concert-date.repository.ts",
+      "group": "concert/date"
+    },
+    {
+      "filePath": "src/domain/concerts/services/concert-date.service.ts",
+      "group": "concert/date"
+    },
+    {
+      "filePath": "src/domain/concerts/model/concert-date.model.ts",
+      "group": "concert/date"
     }
   ],
   "favorites.groups": [
@@ -230,8 +270,10 @@
     "auth/login",
     "auth/refresh",
     "point",
-    "points/chage"
+    "points/chage",
+    "concert/create",
+    "concert/date"
   ],
-  "favorites.currentGroup": "points/chage",
+  "favorites.currentGroup": "concert/date",
   "favorites.sortOrder": "DESC"
 }

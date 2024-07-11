@@ -4,7 +4,7 @@ https://docs.nestjs.com/modules
 
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { ChargePointUseCase } from 'src/application/points/user-cases/charge-point.user-case';
+import { ChargePointUseCase } from 'src/application/points/user-cases/charge-point.use-case';
 import { QueryUserPointUseCase } from 'src/application/points/user-cases/query-user-point.user-case';
 import { PointTransactionService } from 'src/domain/points/services/point-transaction.service';
 import { PointWalletService } from 'src/domain/points/services/point-wallet.service';

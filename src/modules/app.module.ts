@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { AuthModule } from './auth.module';
+import { ConcertsModule } from './concerts.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from './auth.module';
     }),
     AuthModule,
     PointsModule,
+    ConcertsModule,
   ],
   controllers: [],
   providers: [],

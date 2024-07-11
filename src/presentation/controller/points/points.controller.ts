@@ -2,7 +2,7 @@ import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/library';
 import { ChargePointCommand } from 'src/application/points/dto/charge-point.command.dto';
 import { GetUserPointQuery } from 'src/application/points/dto/get-user-point.query.dto';
-import { ChargePointUseCase } from 'src/application/points/user-cases/charge-point.user-case';
+import { ChargePointUseCase } from 'src/application/points/user-cases/charge-point.use-case';
 import { QueryUserPointUseCase } from 'src/application/points/user-cases/query-user-point.user-case';
 import { Payload } from 'src/common/decorators/token.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
