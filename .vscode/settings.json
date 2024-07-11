@@ -259,6 +259,26 @@
     {
       "filePath": "src/domain/concerts/model/concert-date.model.ts",
       "group": "concert/date"
+    },
+    {
+      "filePath": "src/presentation/controller/concerts/concerts.controller.ts",
+      "group": "concert/seat/create"
+    },
+    {
+      "filePath": "src/modules/concerts.module.ts",
+      "group": "concert/seat/create"
+    },
+    {
+      "filePath": "src/application/concerts/use-cases/create-seat.use-case.ts",
+      "group": "concert/seat/create"
+    },
+    {
+      "filePath": "src/domain/concerts/seat.service.ts",
+      "group": "concert/seat/create"
+    },
+    {
+      "filePath": "src/infrastructure/database/repositories/concerts/seat.repository.ts",
+      "group": "concert/seat/create"
     }
   ],
   "favorites.groups": [
@@ -272,8 +292,9 @@
     "point",
     "points/chage",
     "concert/create",
-    "concert/date"
+    "concert/date",
+    "concert/seat/create"
   ],
-  "favorites.currentGroup": "concert/date",
+  "favorites.currentGroup": "concert/seat/create",
   "favorites.sortOrder": "DESC"
 }

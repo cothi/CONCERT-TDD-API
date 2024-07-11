@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConcertDateResponseDto } from 'src/presentation/dto/concerts/dto/response/concert-date.response.dto';
 import { IUseCase } from '../../auth/interfaces/use-case.interface';
-import { CreateConcertDateCommand } from '../dto/create-concert-data.command';
+import { CreateConcertDateCommand } from '../command/create-concert-data.command';
 import { ConcertDateService } from 'src/domain/concerts/services/concert-date.service';
 @Injectable()
 export class CreateConcertDateUseCase
@@ -21,7 +21,7 @@ export class CreateConcertDateUseCase
     response.availableSeatCount = concert.availableSeatCount;
     response.concertId = concert.concertId;
     response.date = concert.date;
-    response.id = concert.id;
+    response.concertDateId = concert.id;
     response.totalSeat = concert.totalSeat;
 
     return response;

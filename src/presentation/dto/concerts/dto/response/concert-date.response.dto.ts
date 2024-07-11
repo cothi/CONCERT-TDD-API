@@ -5,7 +5,7 @@ export class ConcertDateResponseDto {
     example: '123e4567-e89b-12d3-a456-426614174000',
     description: '콘서트 날짜 ID',
   })
-  id: string;
+  concertDateId: string;
 
   @ApiProperty({
     example: '123e4567-e89b-12d3-a456-426614174000',

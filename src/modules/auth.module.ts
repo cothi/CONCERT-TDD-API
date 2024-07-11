@@ -9,7 +9,7 @@ import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-use
 import { JwtTokenModule } from 'src/common/modules/jwt/jwt.module';
 import { AuthService } from 'src/domain/auth/services/auth.service';
 import { AUTH_REPOSITORY } from 'src/domain/auth/symbol/auth-repository.symbol';
-import { DatabaseModule } from 'src/infrastructure/database/prisma.module';
+import { DatabaseModule } from 'src/infrastructure/prisma/prisma.module';
 import { AuthRepository } from 'src/infrastructure/database/repositories/auth/auth.repository';
 import { AuthController } from '../presentation/controller/auth/auth.controller';
 

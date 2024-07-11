@@ -8,7 +8,7 @@ import { ChargePointUseCase } from 'src/application/points/user-cases/charge-poi
 import { QueryUserPointUseCase } from 'src/application/points/user-cases/query-user-point.user-case';
 import { PointTransactionService } from 'src/domain/points/services/point-transaction.service';
 import { PointWalletService } from 'src/domain/points/services/point-wallet.service';
-import { DatabaseModule } from 'src/infrastructure/database/prisma.module';
+import { DatabaseModule } from 'src/infrastructure/prisma/prisma.module';
 import { PointTransactionRepository } from 'src/infrastructure/database/repositories/points/point-transaction.repository';
 import { PointWalletRepository } from 'src/infrastructure/database/repositories/points/point-wallet.repository';
 import { PointsController } from 'src/presentation/controller/points/points.controller';

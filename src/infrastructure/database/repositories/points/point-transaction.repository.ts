@@ -1,4 +1,4 @@
-import { PrismaService } from '../../prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { RecordPaymentEntity } from '../../../../domain/points/entity/record.payment.entity';
 

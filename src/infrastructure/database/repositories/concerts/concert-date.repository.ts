@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConcertDate } from '@prisma/client';
 import { CreateConcertDateModel } from 'src/domain/concerts/model/concert-date.model';
-import { PrismaService } from '../../prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 @Injectable()
 export class ConcertDateRepository {

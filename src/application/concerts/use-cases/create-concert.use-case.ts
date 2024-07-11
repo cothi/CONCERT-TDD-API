@@ -1,6 +1,6 @@
 import { IUseCase } from '../../auth/interfaces/use-case.interface';
 import { ConcertResponseDto } from '../../../presentation/dto/concerts/dto/response/concert.response.dto';
-import { CreateConcertCommand } from '../dto/create-concert.command';
+import { CreateConcertCommand } from '../command/create-concert.command';
 import { ConcertService } from '../../../domain/concerts/services/concert.service';
 import { Injectable } from '@nestjs/common';
 @Injectable()
