@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Inject, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Post,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { IUseCase } from 'src/application/auth/interfaces/use-case.interface';
 import { REFRESH_TOKEN_USE_CASE } from 'src/application/auth/symbol/refresh-token.symbol';
 import { REGISTER_USER_USE_CASE } from 'src/application/auth/symbol/register-user.use-case.symbol';
@@ -16,17 +24,25 @@ import { LOGIN_USER_USE_CASE } from '../../../application/auth/symbol/login-user
  * 인증 관련 요청을 처리하는 컨트롤러
  * 로그인, 회원가입, 토큰 갱신 기능을 제공합니다.
  */
+@ApiTags('인증')
 @Controller('auth')
 export class AuthController {
   constructor(
     @Inject(REGISTER_USER_USE_CASE)
-    private readonly registerUserUseCase: IUseCase<RegisterUserModel, AuthResponseDto>,
-
+    private readonly registerUserUseCase: IUseCase<
+      RegisterUserModel,
+      AuthResponseDto
+    >,
     @Inject(LOGIN_USER_USE_CASE)
-    private readonly loginUserUseCase: IUseCase<LoginUserModel, AuthResponseDto>,
-
+    private readonly loginUserUseCase: IUseCase<
+      LoginUserModel,
+      AuthResponseDto
+    >,
     @Inject(REFRESH_TOKEN_USE_CASE)
-    private readonly refreshTokenUseCase: IUseCase<RefreshTokenModel, RefreshTokenResponseDto>,
+    private readonly refreshTokenUseCase: IUseCase<
+      RefreshTokenModel,
+      RefreshTokenResponseDto
+    >,
   ) {}
 
   /**
@@ -36,8 +52,20 @@ export class AuthController {
    */
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '사용자 로그인',
+    description: '이메일을 사용하여 사용자 로그인을 처리합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '로그인 성공',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({ status: 401, description: '인증 실패' })
   async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
-    return await this.loginUserUseCase.execute(LoginUserModel.create(loginDto.email));
+    return await this.loginUserUseCase.execute(
+      LoginUserModel.create(loginDto.email),
+    );
   }
 
   /**
@@ -47,8 +75,22 @@ export class AuthController {
    */
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body() registerDto: RegisterUserDto): Promise<AuthResponseDto> {
-    return await this.registerUserUseCase.execute(RegisterUserModel.create(registerDto.email));
+  @ApiOperation({
+    summary: '사용자 등록',
+    description: '새로운 사용자를 등록합니다.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '사용자 등록 성공',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({ status: 400, description: '잘못된 요청' })
+  async register(
+    @Body() registerDto: RegisterUserDto,
+  ): Promise<AuthResponseDto> {
+    return await this.registerUserUseCase.execute(
+      RegisterUserModel.create(registerDto.email),
+    );
   }
 
   /**
@@ -58,7 +100,19 @@ export class AuthController {
    */
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(@Body() refreshDto: RefreshTokenDto): Promise<RefreshTokenResponseDto> {
+  @ApiOperation({
+    summary: '토큰 갱신',
+    description: '리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '토큰 갱신 성공',
+    type: RefreshTokenResponseDto,
+  })
+  @ApiResponse({ status: 401, description: '유효하지 않은 리프레시 토큰' })
+  async refresh(
+    @Body() refreshDto: RefreshTokenDto,
+  ): Promise<RefreshTokenResponseDto> {
     return await this.refreshTokenUseCase.execute(
       RefreshTokenModel.create(refreshDto.refreshToken),
     );

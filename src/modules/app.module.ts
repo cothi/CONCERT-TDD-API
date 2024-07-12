@@ -1,3 +1,4 @@
+import { EnqueueModule } from './enqueue.module';
 import { PointsModule } from './points.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -7,6 +8,7 @@ import { ConcertsModule } from './concerts.module';
 
 @Module({
   imports: [
+    EnqueueModule,
     ConfigModule.forRoot({
       envFilePath: '.env.dev',
       isGlobal: true,
@@ -21,6 +23,7 @@ import { ConcertsModule } from './concerts.module';
         abortEarly: true,
       },
     }),
+
     AuthModule,
     PointsModule,
     ConcertsModule,

@@ -1,11 +1,20 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { mockPay } from 'src/shared/mocked/payment.mock.data';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { mockPay } from 'src/common/shared/mocked/payment.mock.data';
 
 /**
  * 결제 관련 요청을 처리하는 컨트롤러
  * 결제 처리 기능을 제공합니다.
  */
 @Controller('payment')
+@UseGuards(JwtAuthGuard)
 export class PaymentController {
   /**
    * 결제를 처리합니다.

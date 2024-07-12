@@ -5,6 +5,7 @@ import { CreateConcertUseCase } from 'src/application/concerts/use-cases/create-
 import { CreateSeatUseCase } from 'src/application/concerts/use-cases/create-seat.use-case';
 import { ReserveSeatUseCase } from 'src/application/concerts/use-cases/reserve-seat.user-case';
 import { Payload } from 'src/common/decorators/token.decorator';
+import { EligibleForReservationGuard } from 'src/common/guards/eligible-for-reservation.guard';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { JwtPayload } from 'src/common/interfaces/jwt-token.interface';
 import { CreateConcertDateDto } from 'src/presentation/dto/concerts/dto/request/create-concert-date.dto';
@@ -107,7 +108,7 @@ export class ConcertsController {
   }
 
   @Post('seats/reserve')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, EligibleForReservationGuard)
   @ApiOperation({
     summary: '콘서트 좌석 예약',
     description: '특정 좌석을 예약합니다.',
@@ -118,7 +119,6 @@ export class ConcertsController {
     type: ReserveSeatResponseDto,
   })
   async reserveSeat(
-    @Param('seatId') seatId: string,
     @Body() reserveSeatDto: ReserveSeatDto,
     @Payload() payload: JwtPayload,
   ): Promise<ReserveSeatResponseDto> {
