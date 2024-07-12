@@ -34,7 +34,6 @@ model ConcertDate {
   concert            Concert       @relation(fields: [concertId], references: [id])
   seats              Seat[]
   reservations       Reservation[]
-  queueEntries       QueueEntry[]
 
   @@index([concertId])
 }
@@ -122,16 +121,13 @@ model Reservation {
 model QueueEntry {
   id            String     @id @default(uuid())
   userId        String     @unique
-  concertDateId String
-  position      Int
-  enteredAt     DateTime   @default(now())
+  status        QueueEntryStatus @default(WAITING)
+  enteredAt     DateTime  
   expiresAt     DateTime
   updatedAt     DateTime   @updatedAt
   user          User       @relation(fields: [userId], references: [id])
-  concertDate   ConcertDate @relation(fields: [concertDateId], references: [id])
 
   @@index([userId])
-  @@index([concertDateId])
 }
 
 
@@ -158,4 +154,11 @@ enum PaymentType {
     CHARGE
     TICKET_PURCHASE
     REFUND
+}
+
+enum QueueEntryStatus {
+  WAITING
+  ELIGIBLE
+  EXPIRED
+  COMPLETED
 }

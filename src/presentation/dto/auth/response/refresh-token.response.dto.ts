@@ -1,4 +1,9 @@
-import { PickType } from '@nestjs/swagger';
-import { AuthResponseDto } from './auth.response.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class RefreshTokenResponseDto extends PickType(AuthResponseDto, ['accessToken']) {}
+export class RefreshTokenResponseDto {
+  @ApiProperty({
+    description: '새로 발급된 액세스 토큰',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
+  accessToken: string;
+}

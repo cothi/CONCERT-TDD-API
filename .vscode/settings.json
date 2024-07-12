@@ -319,6 +319,26 @@
     {
       "filePath": "src/infrastructure/database/repositories/concerts/reservation.repository.ts",
       "group": "dev"
+    },
+    {
+      "filePath": "src/infrastructure/database/repositories/enqueue/enqueue.repository.ts",
+      "group": "queue"
+    },
+    {
+      "filePath": "src/domain/enqueue/services/enqueue.service.ts",
+      "group": "queue"
+    },
+    {
+      "filePath": "src",
+      "group": "queue"
+    },
+    {
+      "filePath": "src/application/enqueue/use-cases/enqueue.use-case.ts",
+      "group": "queue"
+    },
+    {
+      "filePath": "src/infrastructure/database/repositories/enqueue/queue.repository.ts",
+      "group": "queue"
     }
   ],
   "favorites.groups": [
@@ -333,8 +353,10 @@
     "points/chage",
     "concert/create",
     "concert/date",
-    "concert/seat/create"
+    "concert/seat/create",
+    "seat/reserve",
+    "queue"
   ],
-  "favorites.currentGroup": "dev",
+  "favorites.currentGroup": "queue",
   "favorites.sortOrder": "DESC"
 }

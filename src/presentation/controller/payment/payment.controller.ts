@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { mockPay } from 'src/shared/mocked/payment.mock.data';
+import { mockPay } from 'src/common/shared/mocked/payment.mock.data';
 
 /**
  * 결제 관련 요청을 처리하는 컨트롤러
