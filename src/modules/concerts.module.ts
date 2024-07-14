@@ -17,11 +17,13 @@ import { CreateConcertUseCase } from '../application/concerts/use-cases/create-c
 import { EnqueueModule } from './enqueue.module';
 import { GetUserReservationsUseCase } from 'src/application/concerts/use-cases/get-user-reservation.use-case';
 import { GetConcertSeatsUseCase } from 'src/application/concerts/use-cases/get-concert-seats.use-case';
+import { GetConcertsUseCase } from 'src/application/concerts/use-cases/get-conserts.use-case';
 
 @Module({
   imports: [DatabaseModule, JwtModule, EnqueueModule],
   controllers: [ConcertsController],
   providers: [
+    GetConcertsUseCase,
     GetUserReservationsUseCase,
     CreateConcertDateUseCase,
     CreateConcertUseCase,

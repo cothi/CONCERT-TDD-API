@@ -1,3 +1,4 @@
+import { GetConcertsUseCase } from './../../../application/concerts/use-cases/get-conserts.use-case';
 import { GetSeatsByConcertIdCommand } from './../../../application/concerts/command/get-concert-by-concertId.command';
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -21,6 +22,7 @@ import { ReserveSeatResponseDto } from 'src/presentation/dto/concerts/dto/respon
 import { GetUserReservationsResponseDto } from 'src/presentation/dto/points/response/get-user-reservations.dto';
 import { GetConcertSeatsUseCase } from './../../../application/concerts/use-cases/get-concert-seats.use-case';
 import { GetSeatsByConcertIdResponseDto } from 'src/presentation/dto/concerts/dto/response/get-seats-by-concertid.dto';
+import { GetConcertsResponseDto } from 'src/presentation/dto/concerts/dto/response/get-concerts.response.dto';
 /**
  * 콘서트 관련 요청을 처리하는 컨트롤러
  * 콘서트 대기열 입장 및 대기열 상태 조회 기능을 제공합니다.
@@ -36,6 +38,7 @@ export class ConcertsController {
     private readonly reserveSeatUseCase: ReserveSeatUseCase,
     private readonly getUserReservationsUseCase: GetUserReservationsUseCase,
     private readonly getConcertSeatsUseCase: GetConcertSeatsUseCase,
+    private readonly getConcertsUseCase: GetConcertsUseCase,
   ) {}
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -54,6 +57,21 @@ export class ConcertsController {
   ): Promise<ConcertResponseDto> {
     return this.createConcertUseCase.execute(createConcertDto);
   }
+
+  @Get()
+  @ApiOperation({
+    summary: '콘서트 조회',
+    description: '모든 콘서트를 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '콘서트 목록',
+    type: [GetConcertsResponseDto],
+  })
+  async getConcerts(): Promise<GetConcertsResponseDto> {
+    return this.getConcertsUseCase.execute();
+  }
+
   @Post(':concertId/dates')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
