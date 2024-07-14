@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IAuthService } from 'src/application/auth/interfaces/auth-service.interface';
 import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
 import { UserModel } from 'src/domain/auth/model/user.model';
@@ -7,7 +6,7 @@ import { AuthRepository } from 'src/infrastructure/database/repositories/auth/au
 import { AuthService } from '../auth.service';
 
 describe('AuthService', () => {
-  let authService: IAuthService;
+  let authService: AuthService;
   let repository: jest.Mocked<AuthRepository>;
 
   beforeEach(async () => {

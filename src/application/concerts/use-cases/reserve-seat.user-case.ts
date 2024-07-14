@@ -3,6 +3,7 @@ import { ReservationStatus, SeatStatus } from '@prisma/client';
 import { IUseCase } from 'src/application/auth/interfaces/use-case.interface';
 import { GCDByConcertDateIdModel } from 'src/domain/concerts/model/concert-date.model';
 import { CreateReservationModel } from 'src/domain/concerts/model/reservation.model';
+import { UpdateSeatStatusModel } from 'src/domain/concerts/model/seat.model';
 import { ConcertDateService } from 'src/domain/concerts/services/concert-date.service';
 import { ReservationService } from 'src/domain/concerts/services/reservation.service';
 import { SeatService } from 'src/domain/concerts/services/seat.service';
@@ -52,11 +53,11 @@ export class ReserveSeatUseCase
       );
 
       // 3. 좌석 상태 업데이트
-      await this.seatService.updateSeatStatus(
-        seat.id,
-        SeatStatus.RESERVED,
-        prisma,
-      );
+      const updateModel: UpdateSeatStatusModel = {
+        seatId: seat.id,
+        status: SeatStatus.RESERVED,
+      };
+      await this.seatService.updateSeatStatus(updateModel, prisma);
 
       return ReserveSeatResponseDto.fromReservation(reservation);
     });

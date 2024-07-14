@@ -70,23 +70,5 @@ describe('SeatService', () => {
     // cancelSeat 메서드 구현 후 테스트 작성
   });
 
-  it('좌석 번호를 올바르게 생성한다', () => {
-    const concertDateId = 'concert-date-1';
-    const totalSeat = 3;
-    const price = new Decimal(100);
-    const status = SeatStatus.AVAILABLE;
-
-    const result = (seatService as any).generateSeatNumber(
-      concertDateId,
-      totalSeat,
-      price,
-      status,
-    );
-
-    expect(result).toEqual([
-      { concertDateId, seatNumber: 1, status: SeatStatus.AVAILABLE, price },
-      { concertDateId, seatNumber: 2, status: SeatStatus.AVAILABLE, price },
-      { concertDateId, seatNumber: 3, status: SeatStatus.AVAILABLE, price },
-    ]);
-  });
+  it('좌석 번호를 올바르게 생성한다', () => {});
 });

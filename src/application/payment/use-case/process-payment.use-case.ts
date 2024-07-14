@@ -1,4 +1,3 @@
-import { UpdateReservationModel } from './../../../domain/concerts/model/reservation.model';
 import { Injectable } from '@nestjs/common';
 import {
   PaymentType,
@@ -7,6 +6,7 @@ import {
   TransactionType,
 } from '@prisma/client';
 import { GetReservationByIdModel } from 'src/domain/concerts/model/reservation.model';
+import { UpdateSeatStatusModel } from 'src/domain/concerts/model/seat.model';
 import { ReservationService } from 'src/domain/concerts/services/reservation.service';
 import { SeatService } from 'src/domain/concerts/services/seat.service';
 import { TransactionService } from 'src/domain/payment/transaction.service';
@@ -15,6 +15,7 @@ import { PointWalletService } from 'src/domain/points/services/point-wallet.serv
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { ProcessPaymentDto } from 'src/presentation/dto/payment/request/process-payment.dto';
 import { PaymentResponseDto } from 'src/presentation/dto/payment/response/payment.response.dto';
+import { UpdateReservationModel } from './../../../domain/concerts/model/reservation.model';
 
 @Injectable()
 export class ProcessPaymentUseCase {
@@ -56,11 +57,11 @@ export class ProcessPaymentUseCase {
         }
 
         // 좌석 상태 업데이트
-        await this.seatService.updateSeatStatus(
-          reservation.seatId,
-          SeatStatus.SOLD,
-          prisma,
-        );
+        const updateModel: UpdateSeatStatusModel = {
+          seatId: reservation.seatId,
+          status: SeatStatus.SOLD,
+        };
+        await this.seatService.updateSeatStatus(updateModel, prisma);
 
         // 예약 상태 업데이트
         const updateReservationModel = new UpdateReservationModel(

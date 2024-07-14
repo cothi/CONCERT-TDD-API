@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Seat, SeatStatus } from '@prisma/client';
+import { Prisma, Seat } from '@prisma/client';
 import { SeatRepository } from 'src/infrastructure/database/repositories/concerts/seat.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
-import { CreateSeatsModel } from '../model/seat.model';
+import {
+  CreateSeatsModel,
+  GetSeatByConcertDateIdModel,
+} from '../model/seat.model';
+import { UpdateSeatStatusModel } from './../model/seat.model';
 
 @Injectable()
 export class SeatService {
@@ -17,16 +21,21 @@ export class SeatService {
   async findAndLockSeat(seatId: string, tx?: PrismaTransaction) {
     return this.seatRepository.findAndLockById(tx, seatId);
   }
+  async findByConcertDateId(concertDateId: string, tx?: PrismaTransaction) {}
 
-  async updateSeatStatus(
-    seatId: string,
-    status: SeatStatus,
-    tx?: PrismaTransaction,
-  ) {
-    return this.seatRepository.updateStatus(seatId, status, tx);
+  async updateSeatStatus(model: UpdateSeatStatusModel, tx?: PrismaTransaction) {
+    return this.seatRepository.updateStatus(model.seatId, model.status, tx);
   }
 
-  async getSeatsByConcertDateId(concertDateId: string) {}
+  async getSeatsByConcertDateId(
+    model: GetSeatByConcertDateIdModel,
+    tx?: PrismaTransaction,
+  ) {
+    return await this.seatRepository.findByConcertDateId(
+      model.concertDateId,
+      tx,
+    );
+  }
 
   async getSeatBySeatId(seatId: string, tx?: PrismaTransaction) {
     return this.seatRepository.findById(seatId, tx);

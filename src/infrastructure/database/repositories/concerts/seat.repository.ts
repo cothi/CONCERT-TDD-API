@@ -33,7 +33,7 @@ export class SeatRepository {
 
   async findAndLockById(tx: PrismaTransaction, seatId: string): Promise<Seat> {
     const [seat] = await (tx ?? this.prisma).$queryRaw<Seat[]>`
-    SELECT * FROM "Seat" WHERE id = ${seatId} FOR UPDATE`;
+    SELECT * FROM "Seat" WHERE id = ${seatId} FOR UPDATE NOWAIT`;
     return seat || null;
   }
   async updateStatus(

@@ -16,6 +16,7 @@ import { ConcertsController } from 'src/presentation/controller/concerts/concert
 import { CreateConcertUseCase } from '../application/concerts/use-cases/create-concert.use-case';
 import { EnqueueModule } from './enqueue.module';
 import { GetUserReservationsUseCase } from 'src/application/concerts/use-cases/get-user-reservation.use-case';
+import { GetConcertSeatsUseCase } from 'src/application/concerts/use-cases/get-concert-seats.use-case';
 
 @Module({
   imports: [DatabaseModule, JwtModule, EnqueueModule],
@@ -25,6 +26,7 @@ import { GetUserReservationsUseCase } from 'src/application/concerts/use-cases/g
     CreateConcertDateUseCase,
     CreateConcertUseCase,
     CreateSeatUseCase,
+    GetConcertSeatsUseCase,
     ReserveSeatUseCase,
     ConcertDateService,
     ReservationService,

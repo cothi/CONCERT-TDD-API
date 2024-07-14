@@ -34,3 +34,7 @@ export class UpdateSeatStatusModel extends PickType(SeatModel, [
 ]) {}
 
 export class GetSeatBySeatIdModel extends PickType(SeatModel, ['seatId']) {}
+
+export class GetSeatByConcertDateIdModel extends PickType(SeatModel, [
+  'concertDateId',
+]) {}
