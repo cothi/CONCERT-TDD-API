@@ -42,4 +42,8 @@ export class ConcertDateResponseDto {
 
     return dto;
   }
+
+  static fromConcertDates(models: ConcertDate[]): ConcertDateResponseDto[] {
+    return models.map((model) => this.fromConcertDate(model));
+  }
 }

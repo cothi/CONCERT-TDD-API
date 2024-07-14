@@ -1,3 +1,4 @@
+import { GetConcertDatesUseCase } from './../../../application/concerts/use-cases/get-concert-dates.use-case';
 import { GetConcertsUseCase } from './../../../application/concerts/use-cases/get-conserts.use-case';
 import { GetSeatsByConcertIdCommand } from './../../../application/concerts/command/get-concert-by-concertId.command';
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
@@ -39,6 +40,7 @@ export class ConcertsController {
     private readonly getUserReservationsUseCase: GetUserReservationsUseCase,
     private readonly getConcertSeatsUseCase: GetConcertSeatsUseCase,
     private readonly getConcertsUseCase: GetConcertsUseCase,
+    private readonly getConcertDatesUseCase: GetConcertDatesUseCase,
   ) {}
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -95,19 +97,21 @@ export class ConcertsController {
     });
   }
 
-  // @Get('dates')
-  // @ApiOperation({
-  //   summary: '콘서트 날짜 조회',
-  //   description: '모든 콘서트 날짜를 조회합니다.',
-  // })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: '콘서트 날짜 목록',
-  //   type: [ConcertDateResponseDto],
-  // })
-  // async getConcertDates(): Promise<ConcertDateResponseDto[]> {
-  //   return this.getConcertDatesUseCase.execute();
-  // }
+  @Get(':concertId/dates')
+  @ApiOperation({
+    summary: '콘서트 날짜 조회',
+    description: '모든 콘서트 날짜를 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '콘서트 날짜 목록',
+    type: [ConcertDateResponseDto],
+  })
+  async getConcertDates(
+    @Param('concertId') concertId: string,
+  ): Promise<ConcertDateResponseDto[]> {
+    return this.getConcertDatesUseCase.execute(concertId);
+  }
 
   @Post('dates/:concertDateId/seats')
   @UseGuards(JwtAuthGuard)
