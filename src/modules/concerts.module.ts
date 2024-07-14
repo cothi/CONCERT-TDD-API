@@ -15,23 +15,25 @@ import { DatabaseModule } from 'src/infrastructure/prisma/prisma.module';
 import { ConcertsController } from 'src/presentation/controller/concerts/concerts.controller';
 import { CreateConcertUseCase } from '../application/concerts/use-cases/create-concert.use-case';
 import { EnqueueModule } from './enqueue.module';
+import { GetUserReservationsUseCase } from 'src/application/concerts/use-cases/get-user-reservation.use-case';
 
 @Module({
   imports: [DatabaseModule, JwtModule, EnqueueModule],
   controllers: [ConcertsController],
   providers: [
-    ReservationService,
-    ReservationRepository,
-    ReserveSeatUseCase,
-    CreateSeatUseCase,
-    SeatRepository,
-    SeatService,
+    GetUserReservationsUseCase,
     CreateConcertDateUseCase,
     CreateConcertUseCase,
-    ConcertService,
+    CreateSeatUseCase,
+    ReserveSeatUseCase,
     ConcertDateService,
+    ReservationService,
+    SeatService,
+    ConcertService,
+    ReservationRepository,
     ConcertRepository,
     ConcertDateRepository,
+    SeatRepository,
   ],
 })
 export class ConcertsModule {}

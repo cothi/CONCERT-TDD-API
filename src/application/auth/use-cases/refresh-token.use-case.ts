@@ -1,18 +1,15 @@
 import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
-import { IUseCase } from '../interfaces/use-case.interface';
-import { Inject } from '@nestjs/common';
-import { AUTH_SERVICE } from '../symbol/auth-service.symbol';
-import { IAuthService } from '../interfaces/auth-service.interface';
-import { RefreshTokenResponseDto } from 'src/presentation/dto/auth/response/refresh-token.response.dto';
 import { RefreshTokenModel } from 'src/domain/auth/model/refresh-token.model';
+import { AuthService } from 'src/domain/auth/services/auth.service';
+import { RefreshTokenResponseDto } from 'src/presentation/dto/auth/response/refresh-token.response.dto';
+import { IUseCase } from '../interfaces/use-case.interface';
 
 export class RefreshTokenUseCase
   implements IUseCase<RefreshTokenModel, RefreshTokenResponseDto>
 {
   constructor(
     private readonly jwtTokenSerice: JwtTokenService,
-    @Inject(AUTH_SERVICE)
-    private readonly authService: IAuthService,
+    private readonly authService: AuthService,
   ) {}
   async execute(input: RefreshTokenModel): Promise<RefreshTokenResponseDto> {
     const tokenResult = this.jwtTokenSerice.verifyToken(input.accessToken);

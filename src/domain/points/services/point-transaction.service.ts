@@ -9,7 +9,9 @@ export class PointTransactionService {
     @Inject(PointTransactionRepository)
     private readonly pointTransactionRepository: PointTransactionRepository,
   ) {}
-  async getPaymentHistory() {}
+  async getPaymentHistory(userId: string) {
+    return await this.pointTransactionRepository.getPointHistory(userId);
+  }
   async recordPaymentHistory(recordPaymentModel: RecordPaymentModel) {
     const recordPaymentEntity = RecordPaymentEntity.create(
       recordPaymentModel.userId,

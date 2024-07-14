@@ -5,6 +5,7 @@ import { CreateSeatCommand } from '../command/create-seat.command';
 import { SeatService } from 'src/domain/concerts/services/seat.service';
 import { SeatStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import { CreateSeatsModel } from 'src/domain/concerts/model/seat.model';
 
 @Injectable()
 export class CreateSeatUseCase
@@ -12,12 +13,13 @@ export class CreateSeatUseCase
 {
   constructor(private readonly seatService: SeatService) {}
   async execute(input: CreateSeatCommand): Promise<CreateSeatResponseDto> {
-    const batch = await this.seatService.createSeat({
+    const createSeatsModel: CreateSeatsModel = {
       concertDateId: input.concertDateId,
       seatNumber: input.seatNumber,
-      status: SeatStatus.AVAILABLE,
       price: new Decimal(input.price),
-    });
+      status: SeatStatus.AVAILABLE,
+    };
+    const batch = await this.seatService.createSeat(createSeatsModel);
     return {
       success: true,
       createdSeatsCount: batch.count,

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ReservationStatus } from '@prisma/client';
+import { Reservation, ReservationStatus } from '@prisma/client';
 
 export class ReserveSeatResponseDto {
   @ApiProperty({
@@ -38,4 +38,15 @@ export class ReserveSeatResponseDto {
     description: '예약 만료 시간',
   })
   expiresAt: Date;
+
+  static fromReservation(model: Reservation): ReserveSeatResponseDto {
+    const dto = new ReserveSeatResponseDto();
+    dto.id = model.id;
+    dto.userId = model.userId;
+    dto.seatId = model.seatId;
+    dto.status = model.status;
+    dto.createdAt = model.createdAt;
+    dto.expiresAt = model.expiresAt;
+    return dto;
+  }
 }

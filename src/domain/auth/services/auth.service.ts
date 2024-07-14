@@ -1,21 +1,16 @@
-import { UserModel } from './../../../domain/auth/model/user.model';
 /*
 https://docs.nestjs.com/providers#services
 */
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
-import { AUTH_REPOSITORY } from 'src/domain/auth/symbol/auth-repository.symbol';
-import { IAuthRepository } from '../../../domain/auth/interfaces/repositories/auth-repository.interface';
-import { IAuthService } from 'src/application/auth/interfaces/auth-service.interface';
+import { AuthRepository } from 'src/infrastructure/database/repositories/auth/auth.repository';
+import { UserModel } from '../model/user.model';
 
 @Injectable()
-export class AuthService implements IAuthService {
-  constructor(
-    @Inject(AUTH_REPOSITORY)
-    private readonly authRepository: IAuthRepository,
-  ) {}
+export class AuthService {
+  constructor(private readonly authRepository: AuthRepository) {}
   async registerUser(registerUserModel: RegisterUserModel): Promise<UserModel> {
     return await this.authRepository.registerUser(registerUserModel.toEntity());
   }

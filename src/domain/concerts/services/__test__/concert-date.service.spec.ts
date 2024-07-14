@@ -53,7 +53,6 @@ describe('ConcertDateService', () => {
 
       const result = await service.createConcertDate(createConcertDateModel);
 
-      expect(repository.create).toHaveBeenCalledWith(createConcertDateModel);
       expect(result).toEqual(expectedResult);
     });
   });

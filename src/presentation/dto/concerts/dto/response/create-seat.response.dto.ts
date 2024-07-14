@@ -1,7 +1,7 @@
 // src/modules/seat/dto/seat-response.dto.ts
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsBoolean, IsUUID, IsOptional } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsUUID } from 'class-validator';
 
 export class CreateSeatResponseDto {
   @ApiProperty({ description: '생성된 좌석의 수' })

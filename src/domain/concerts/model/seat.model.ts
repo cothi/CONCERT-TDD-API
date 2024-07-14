@@ -9,10 +9,28 @@ export class SeatModel {
   status: SeatStatus;
   price: Decimal;
 }
-
+/**
+ *
+ *
+ * @export
+ * @class CreateSeatsModel
+ * @extends {PickType(SeatModel, [
+ *   'concertDateId',
+ *   'seatNumber',
+ *   'status',
+ *   'price',
+ * ])}
+ */
 export class CreateSeatsModel extends PickType(SeatModel, [
   'concertDateId',
   'seatNumber',
   'status',
   'price',
 ]) {}
+
+export class UpdateSeatStatusModel extends PickType(SeatModel, [
+  'seatId',
+  'status',
+]) {}
+
+export class GetSeatBySeatIdModel extends PickType(SeatModel, ['seatId']) {}

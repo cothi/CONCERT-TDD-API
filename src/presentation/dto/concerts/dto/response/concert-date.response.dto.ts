@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ConcertDate } from '@prisma/client';
 
 export class ConcertDateResponseDto {
   @ApiProperty({
@@ -30,4 +31,15 @@ export class ConcertDateResponseDto {
     description: '이용 가능한 좌석 수',
   })
   availableSeatCount: number;
+
+  static fromConcertDate(model: ConcertDate): ConcertDateResponseDto {
+    const dto = new ConcertDateResponseDto();
+    dto.concertDateId = model.id;
+    dto.concertId = model.concertId;
+    dto.date = model.date;
+    dto.totalSeat = model.totalSeat;
+    dto.availableSeatCount = model.availableSeatCount;
+
+    return dto;
+  }
 }

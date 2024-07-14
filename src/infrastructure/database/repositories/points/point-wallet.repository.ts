@@ -23,7 +23,18 @@ export class PointWalletRepository {
     return payment;
   }
 
-  async deductPoints() {}
+  async deductPoints(useId: string, point: Decimal) {
+    return await this.prisma.userPoint.update({
+      where: {
+        userId: useId,
+      },
+      data: {
+        amount: {
+          decrement: point,
+        },
+      },
+    });
+  }
 
   async getBalance(getPointEntity: GetPointEntity) {
     const userPoint = await this.prisma.userPoint.findUnique({

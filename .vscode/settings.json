@@ -343,6 +343,38 @@
     {
       "filePath": "src/presentation/dto/enqueue/request/enqueue.dto.ts",
       "group": "queue"
+    },
+    {
+      "filePath": "src/presentation/dto/payment/request/process-payment.dto.ts",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/presentation/controller/payment/payment.controller.ts",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/presentation/dto/payment/response/payment-history.response.dto.ts",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/presentation/dto/payment/response/payment.response.dto.ts",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/modules/auth.module.ts",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/domain",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/infrastructure",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/application/payment/use-case/process-payment.use-case.ts",
+      "group": "payment"
     }
   ],
   "favorites.groups": [
@@ -359,8 +391,9 @@
     "concert/date",
     "concert/seat/create",
     "seat/reserve",
-    "queue"
+    "queue",
+    "payment"
   ],
-  "favorites.currentGroup": "queue",
-  "favorites.sortOrder": "DESC"
+  "favorites.currentGroup": "payment",
+  "favorites.sortOrder": "ASC"
 }

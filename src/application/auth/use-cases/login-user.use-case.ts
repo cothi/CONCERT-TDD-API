@@ -1,17 +1,14 @@
-import { Inject } from '@nestjs/common';
 import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
 import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
+import { AuthService } from 'src/domain/auth/services/auth.service';
 import { AuthResponseDto } from 'src/presentation/dto/auth/response/auth.response.dto';
-import { IAuthService } from '../interfaces/auth-service.interface';
 import { IUseCase } from '../interfaces/use-case.interface';
-import { AUTH_SERVICE } from '../symbol/auth-service.symbol';
 
 export class LoginUserUseCase
   implements IUseCase<LoginUserModel, AuthResponseDto>
 {
   constructor(
-    @Inject(AUTH_SERVICE)
-    private readonly authService: IAuthService,
+    private readonly authService: AuthService,
     private readonly jwtTokenService: JwtTokenService,
   ) {}
 

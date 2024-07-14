@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Reservation, ReservationStatus } from '@prisma/client';
 import { ReservationRepository } from 'src/infrastructure/database/repositories/concerts/reservation.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { CreateConcertModel } from '../../model/concert.model';
 import { ReservationService } from '../reservation.service';
 
 describe('ReservationService', () => {
@@ -50,14 +51,14 @@ describe('ReservationService', () => {
 
       repository.create.mockResolvedValue(mockReservation);
 
-      const result = await service.createReservation(
+      const concertModel = new CreateConcertModel(
         userId,
         seatId,
         concertDateId,
         concertId,
-        status,
-        tx,
       );
+
+      const result = await service.createReservation(concertModel);
 
       expect(repository.create).toHaveBeenCalledWith(
         expect.objectContaining({

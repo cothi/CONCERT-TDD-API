@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConcertDate } from '@prisma/client';
-import { CreateConcertDateModel } from 'src/domain/concerts/model/concert-date.model';
-import { PrismaService } from '../../../prisma/prisma.service';
+import {
+  CreateConcertDateModel,
+  GCDByConcertIdModel,
+} from 'src/domain/concerts/model/concert-date.model';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { GCDByConcertDateIdModel } from './../../../../domain/concerts/model/concert-date.model';
 
 @Injectable()
 export class ConcertDateRepository {
@@ -23,20 +27,22 @@ export class ConcertDateRepository {
   }
 
   async findById(
-    dateId: string,
+    gcdByConcertIdModel: GCDByConcertDateIdModel,
     tx?: PrismaTransaction,
   ): Promise<ConcertDate | null> {
     return await (tx ?? this.prisma).concertDate.findUnique({
-      where: { id: dateId },
+      where: {
+        id: gcdByConcertIdModel.concertDateId
+      },
     });
   }
 
   async findByConcertId(
-    concertId: string,
+    gcdByConcertDateIdModel: GCDByConcertIdModel,
     tx?: PrismaTransaction,
   ): Promise<ConcertDate[]> {
     return await (tx ?? this.prisma).concertDate.findMany({
-      where: { concertId },
+      where: { concertId: gcdByConcertDateIdModel.concertId },
     });
   }
 }

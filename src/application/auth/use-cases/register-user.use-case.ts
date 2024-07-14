@@ -1,23 +1,20 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
+import { AuthService } from 'src/domain/auth/services/auth.service';
 import { AuthResponseDto } from 'src/presentation/dto/auth/response/auth.response.dto';
-import { IAuthService } from '../interfaces/auth-service.interface';
 import { IUseCase } from '../interfaces/use-case.interface';
-import { AUTH_SERVICE } from '../symbol/auth-service.symbol';
 
 @Injectable()
 export class RegisterUserUseCase
   implements IUseCase<RegisterUserModel, AuthResponseDto>
 {
   constructor(
-    @Inject(AUTH_SERVICE)
-    private readonly authService: IAuthService,
+    private readonly authService: AuthService,
     private readonly jwtTokenService: JwtTokenService,
   ) {}
   async execute(input: RegisterUserModel): Promise<AuthResponseDto> {
     const userModel = await this.authService.registerUser(input);
-    console.log(userModel);
 
     const accessToken = await this.jwtTokenService.generateAccessToken({
       userId: userModel.id,

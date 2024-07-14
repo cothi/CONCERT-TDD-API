@@ -1,15 +1,8 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Inject,
-  Post,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { IUseCase } from 'src/application/auth/interfaces/use-case.interface';
-import { REFRESH_TOKEN_USE_CASE } from 'src/application/auth/symbol/refresh-token.symbol';
-import { REGISTER_USER_USE_CASE } from 'src/application/auth/symbol/register-user.use-case.symbol';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.use-case';
+import { RefreshTokenUseCase } from 'src/application/auth/use-cases/refresh-token.use-case';
+import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.use-case';
 import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 import { RefreshTokenModel } from 'src/domain/auth/model/refresh-token.model';
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
@@ -18,7 +11,6 @@ import { RefreshTokenDto } from 'src/presentation/dto/auth/request/refresh-token
 import { RegisterUserDto } from 'src/presentation/dto/auth/request/register-user.request.dto';
 import { AuthResponseDto } from 'src/presentation/dto/auth/response/auth.response.dto';
 import { RefreshTokenResponseDto } from 'src/presentation/dto/auth/response/refresh-token.response.dto';
-import { LOGIN_USER_USE_CASE } from '../../../application/auth/symbol/login-user.use-case.symbol';
 
 /**
  * 인증 관련 요청을 처리하는 컨트롤러
@@ -28,21 +20,9 @@ import { LOGIN_USER_USE_CASE } from '../../../application/auth/symbol/login-user
 @Controller('auth')
 export class AuthController {
   constructor(
-    @Inject(REGISTER_USER_USE_CASE)
-    private readonly registerUserUseCase: IUseCase<
-      RegisterUserModel,
-      AuthResponseDto
-    >,
-    @Inject(LOGIN_USER_USE_CASE)
-    private readonly loginUserUseCase: IUseCase<
-      LoginUserModel,
-      AuthResponseDto
-    >,
-    @Inject(REFRESH_TOKEN_USE_CASE)
-    private readonly refreshTokenUseCase: IUseCase<
-      RefreshTokenModel,
-      RefreshTokenResponseDto
-    >,
+    private readonly registerUserUseCase: RegisterUserUseCase,
+    private readonly loginUserUseCase: LoginUserUseCase,
+    private readonly refreshTokenUseCase: RefreshTokenUseCase,
   ) {}
 
   /**

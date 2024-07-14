@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSeatsModel } from '../model/seat.model';
 import { Prisma, Seat, SeatStatus } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
 import { SeatRepository } from 'src/infrastructure/database/repositories/concerts/seat.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { CreateSeatsModel } from '../model/seat.model';
 
 @Injectable()
 export class SeatService {
@@ -11,16 +10,11 @@ export class SeatService {
   async createSeat(
     createSeatModel: CreateSeatsModel,
   ): Promise<Prisma.BatchPayload> {
-    const seats = this.generateSeatNumber(
-      createSeatModel.concertDateId,
-      createSeatModel.seatNumber,
-      createSeatModel.price,
-      createSeatModel.status,
-    );
+    const seats = this.generateSeatNumber(createSeatModel);
     return await this.seatRepository.createMany(seats);
   }
 
-  async findAndLockSeat(tx: PrismaTransaction, seatId: string) {
+  async findAndLockSeat(seatId: string, tx?: PrismaTransaction) {
     return this.seatRepository.findAndLockById(tx, seatId);
   }
 
@@ -34,23 +28,22 @@ export class SeatService {
 
   async getSeatsByConcertDateId(concertDateId: string) {}
 
-  async getSeatById(seatId: string) {}
+  async getSeatBySeatId(seatId: string, tx?: PrismaTransaction) {
+    return this.seatRepository.findById(seatId, tx);
+  }
 
   async reserveSeat(seatId: string) {}
 
   async cancelSeat(seatId: string) {}
 
   private generateSeatNumber(
-    concertDateId: string,
-    totalSeat: number,
-    price: Decimal,
-    seatStatus: SeatStatus,
+    createSeatModel: CreateSeatsModel,
   ): Omit<Seat, 'id' | 'createdAt' | 'updatedAt'>[] {
-    return Array.from({ length: totalSeat }, (_, index) => ({
-      concertDateId,
+    return Array.from({ length: createSeatModel.seatNumber }, (_, index) => ({
+      concertDateId: createSeatModel.concertDateId,
       seatNumber: index + 1,
-      status: seatStatus,
-      price: price,
+      status: createSeatModel.status,
+      price: createSeatModel.price,
     }));
   }
 }

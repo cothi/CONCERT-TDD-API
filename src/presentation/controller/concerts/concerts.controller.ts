@@ -1,8 +1,9 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateConcertDateUseCase } from 'src/application/concerts/use-cases/create-concert-date.use-case';
 import { CreateConcertUseCase } from 'src/application/concerts/use-cases/create-concert.use-case';
 import { CreateSeatUseCase } from 'src/application/concerts/use-cases/create-seat.use-case';
+import { GetUserReservationsUseCase } from 'src/application/concerts/use-cases/get-user-reservation.use-case';
 import { ReserveSeatUseCase } from 'src/application/concerts/use-cases/reserve-seat.user-case';
 import { Payload } from 'src/common/decorators/token.decorator';
 import { EligibleForReservationGuard } from 'src/common/guards/eligible-for-reservation.guard';
@@ -16,6 +17,7 @@ import { ConcertDateResponseDto } from 'src/presentation/dto/concerts/dto/respon
 import { ConcertResponseDto } from 'src/presentation/dto/concerts/dto/response/concert.response.dto';
 import { CreateSeatResponseDto } from 'src/presentation/dto/concerts/dto/response/create-seat.response.dto';
 import { ReserveSeatResponseDto } from 'src/presentation/dto/concerts/dto/response/reserve-seat.response.dto';
+import { GetUserReservationsResponseDto } from 'src/presentation/dto/points/response/get-user-reservations.dto';
 /**
  * 콘서트 관련 요청을 처리하는 컨트롤러
  * 콘서트 대기열 입장 및 대기열 상태 조회 기능을 제공합니다.
@@ -29,6 +31,7 @@ export class ConcertsController {
     private readonly createConcertUseCase: CreateConcertUseCase,
     private readonly createSeatUseCase: CreateSeatUseCase,
     private readonly reserveSeatUseCase: ReserveSeatUseCase,
+    private readonly getUserReservationsUseCase: GetUserReservationsUseCase,
   ) {}
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -126,5 +129,22 @@ export class ConcertsController {
       seatId: reserveSeatDto.seatId,
       userId: payload.userId,
     });
+  }
+
+  @Get('seats/reserve')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: '사용자 예약 조회',
+    description: '사용자의 모든 예약 정보를 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '사용자 예약 목록',
+    type: [GetUserReservationsResponseDto],
+  })
+  async getUserReservations(
+    @Payload() payload: JwtPayload,
+  ): Promise<GetUserReservationsResponseDto> {
+    return this.getUserReservationsUseCase.execute(payload.userId);
   }
 }
