@@ -37,5 +37,6 @@ import { GetConcertSeatsUseCase } from 'src/application/concerts/use-cases/get-c
     ConcertDateRepository,
     SeatRepository,
   ],
+  exports: [ReservationService, SeatService],
 })
 export class ConcertsModule {}

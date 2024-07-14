@@ -1,3 +1,4 @@
+import { PaymentModule } from './payment.module';
 import { EnqueueModule } from './enqueue.module';
 import { PointsModule } from './points.module';
 import { Module } from '@nestjs/common';
@@ -8,6 +9,7 @@ import { ConcertsModule } from './concerts.module';
 
 @Module({
   imports: [
+    PaymentModule,
     EnqueueModule,
     ConfigModule.forRoot({
       envFilePath: '.env.dev',

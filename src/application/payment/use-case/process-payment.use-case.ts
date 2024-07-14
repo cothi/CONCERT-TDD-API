@@ -13,8 +13,8 @@ import { TransactionService } from 'src/domain/payment/transaction.service';
 import { PointTransactionService } from 'src/domain/points/services/point-transaction.service';
 import { PointWalletService } from 'src/domain/points/services/point-wallet.service';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { ProcessPaymentDto } from 'src/presentation/dto/payment/request/process-payment.dto';
 import { PaymentResponseDto } from 'src/presentation/dto/payment/response/payment.response.dto';
+import { ProcessPaymentCommand } from '../command/process-paymnet.command';
 import { UpdateReservationModel } from './../../../domain/concerts/model/reservation.model';
 
 @Injectable()
@@ -28,18 +28,18 @@ export class ProcessPaymentUseCase {
     private readonly transactionService: TransactionService,
   ) {}
 
-  async execute(dto: ProcessPaymentDto): Promise<PaymentResponseDto> {
+  async execute(command: ProcessPaymentCommand): Promise<PaymentResponseDto> {
     const resultDto: PaymentResponseDto = await this.prisma.$transaction(
       async (prisma) => {
         // 사용자 포인트 확인
         const userPoint = await this.pointService.getBalance({
-          userId: dto.userId,
+          userId: command.userId,
         });
 
         // 예약 상태 확인
-        const getReservationByIdModel = new GetReservationByIdModel(
-          dto.reservationId,
-        );
+        const getReservationByIdModel: GetReservationByIdModel = {
+          reservationId: command.reservationId,
+        };
         const reservation = await this.reservationService.getReservationById(
           getReservationByIdModel,
           prisma,
@@ -55,6 +55,7 @@ export class ProcessPaymentUseCase {
         if (userPoint < seat.price) {
           throw new Error('포인트가 부족합니다.');
         }
+        console.log(userPoint);
 
         // 좌석 상태 업데이트
         const updateModel: UpdateSeatStatusModel = {
@@ -64,22 +65,22 @@ export class ProcessPaymentUseCase {
         await this.seatService.updateSeatStatus(updateModel, prisma);
 
         // 예약 상태 업데이트
-        const updateReservationModel = new UpdateReservationModel(
-          reservation.id,
-          ReservationStatus.CONFIRMED,
-        );
+        const updateReservationModel: UpdateReservationModel = {
+          reservationId: reservation.id,
+          status: ReservationStatus.CONFIRMED,
+        };
         await this.reservationService.updateStatus(
           updateReservationModel,
           prisma,
         );
 
         // 포인트 차감
-        await this.pointService.deductPoints(dto.userId, seat.price);
+        await this.pointService.deductPoints(command.userId, seat.price);
 
         // 결제 기록 생성
         const payment = await this.pointTransactionService.recordPaymentHistory(
           {
-            userId: dto.userId,
+            userId: command.userId,
             amount: seat.price,
             type: PaymentType.TICKET_PURCHASE,
           },
@@ -88,7 +89,7 @@ export class ProcessPaymentUseCase {
         // 트랜잭션 기록 생성
         await this.transactionService.createTransaction(
           {
-            userId: dto.userId,
+            userId: command.userId,
             amount: seat.price,
             transactionType: TransactionType.PAYMENT,
           },

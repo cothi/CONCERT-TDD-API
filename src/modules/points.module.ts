@@ -26,5 +26,6 @@ import { PointsController } from 'src/presentation/controller/points/points.cont
     ChargePointUseCase,
     QueryUserPointUseCase,
   ],
+  exports: [PointWalletService, PointTransactionService],
 })
 export class PointsModule {}
