@@ -16,9 +16,12 @@ import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { PaymentResponseDto } from 'src/presentation/dto/payment/response/payment.response.dto';
 import { ProcessPaymentCommand } from '../command/process-paymnet.command';
 import { UpdateReservationModel } from './../../../domain/concerts/model/reservation.model';
+import { IUseCase } from 'src/common/interfaces/use-case.interface';
 
 @Injectable()
-export class ProcessPaymentUseCase {
+export class ProcessPaymentUseCase
+  implements IUseCase<ProcessPaymentCommand, PaymentResponseDto>
+{
   constructor(
     private readonly prisma: PrismaService,
     private readonly pointService: PointWalletService,

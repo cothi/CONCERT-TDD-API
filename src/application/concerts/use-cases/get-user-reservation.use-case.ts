@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { GetUserReservationsModel } from 'src/domain/concerts/model/reservation.model';
 import { ReservationService } from 'src/domain/concerts/services/reservation.service';
 import { GetUserReservationsResponseDto } from 'src/presentation/dto/points/response/get-user-reservations.dto';
 
 @Injectable()
-export class GetUserReservationsUseCase {
+export class GetUserReservationsUseCase
+  implements IUseCase<string, GetUserReservationsResponseDto>
+{
   constructor(private reservationService: ReservationService) {}
 
   async execute(userId: string): Promise<GetUserReservationsResponseDto> {

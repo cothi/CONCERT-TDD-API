@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { QueueService } from 'src/domain/enqueue/services/enqueue.service';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { EnqueueDto } from 'src/presentation/dto/enqueue/request/enqueue.dto';
 import { QueueStatusResponseDto } from 'src/presentation/dto/enqueue/response/enqueue-status.reponse.dto';
 @Injectable()
-export class EnqueueUseCase {
+export class EnqueueUseCase
+  implements IUseCase<EnqueueDto, QueueStatusResponseDto>
+{
   constructor(
     private readonly queueService: QueueService,
     private readonly prismaService: PrismaService,

@@ -1,10 +1,14 @@
-import { GetSeatsByConcertIdCommand } from './../command/get-concert-by-concertId.command';
 import { Injectable } from '@nestjs/common';
 import { GetSeatByConcertDateIdModel } from 'src/domain/concerts/model/seat.model';
 import { SeatService } from 'src/domain/concerts/services/seat.service';
-import { GetSeatsByConcertIdResponseDto } from 'src/presentation/dto/concerts/dto/response/get-seats-by-concertid.dto';
+import { GetSeatsByConcertIdResponseDto } from './../../../presentation/dto/concerts/dto/response/get-seats-by-concertid.dto';
+import { GetSeatsByConcertIdCommand } from './../command/get-concert-by-concertId.command';
+import { IUseCase } from 'src/common/interfaces/use-case.interface';
 @Injectable()
-export class GetConcertSeatsUseCase {
+export class GetConcertSeatsUseCase
+  implements
+    IUseCase<GetSeatsByConcertIdCommand, GetSeatsByConcertIdResponseDto>
+{
   constructor(private readonly seatService: SeatService) {}
 
   async execute(

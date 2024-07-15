@@ -2,9 +2,12 @@ import { GCDByConcertIdModel } from 'src/domain/concerts/model/concert-date.mode
 import { ConcertDateResponseDto } from 'src/presentation/dto/concerts/dto/response/concert-date.response.dto';
 import { Injectable } from '@nestjs/common';
 import { ConcertDateService } from 'src/domain/concerts/services/concert-date.service';
+import { IUseCase } from 'src/common/interfaces/use-case.interface';
 
 @Injectable()
-export class GetConcertDatesUseCase {
+export class GetConcertDatesUseCase
+  implements IUseCase<string, ConcertDateResponseDto[]>
+{
   constructor(private readonly concertDateService: ConcertDateService) {}
   async execute(concertId: string): Promise<ConcertDateResponseDto[]> {
     try {
