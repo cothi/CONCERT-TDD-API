@@ -32,6 +32,7 @@ describe('ConcertService', () => {
       create: jest.fn(),
       findById: jest.fn(),
       findAllConcert: jest.fn(),
+      findByConcertName: jest.fn(),
     };
     const module = await Test.createTestingModule({
       providers: [

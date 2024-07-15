@@ -16,12 +16,18 @@ export class ConcertRepository {
   }
 
   async findAllConcert(): Promise<Concert[]> {
-    return this.prisma.concert.findMany();
+    return await this.prisma.concert.findMany();
   }
 
   async findById(id: string): Promise<Concert | null> {
-    return this.prisma.concert.findUnique({
+    return await this.prisma.concert.findUnique({
       where: { id },
+    });
+  }
+
+  async findByConcertName(name: string): Promise<Concert | null> {
+    return await this.prisma.concert.findUnique({
+      where: { name: name },
     });
   }
 }
