@@ -26,7 +26,7 @@ model Concert {
 model ConcertDate {
   id                 String        @id @default(uuid())
   concertId          String
-  date               DateTime
+  date               DateTime      
   totalSeat          Int
   availableSeatCount Int
   createdAt          DateTime      @default(now())

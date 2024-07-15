@@ -27,7 +27,7 @@ export class SeatRepository {
     tx?: PrismaTransaction,
   ): Promise<Seat[]> {
     return (tx ?? this.prisma).seat.findMany({
-      where: { concertDateId },
+      where: { concertDateId: concertDateId },
     });
   }
 

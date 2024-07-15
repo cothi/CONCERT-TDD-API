@@ -30,11 +30,25 @@ export class SeatService {
   }
 
   async findAndLockSeat(seatId: string, tx?: PrismaTransaction) {
-    return this.seatRepository.findAndLockById(tx, seatId);
+    const seat = this.seatRepository.findAndLockById(tx, seatId);
+    if (!seat) {
+      throw new HttpException(
+        '조회한 좌석이 존재하지 않습니다',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return seat;
   }
   async findByConcertDateId(concertDateId: string, tx?: PrismaTransaction) {}
 
   async updateSeatStatus(model: UpdateSeatStatusModel, tx?: PrismaTransaction) {
+    const seat = await this.seatRepository.findById(model.seatId, tx);
+    if (!seat) {
+      throw new HttpException(
+        '요청한 좌석이 존재하지 않습니다',
+        HttpStatus.NOT_FOUND,
+      );
+    }
     return this.seatRepository.updateStatus(model.seatId, model.status, tx);
   }
 

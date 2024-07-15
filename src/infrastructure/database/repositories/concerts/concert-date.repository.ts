@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ConcertDate } from '@prisma/client';
 import {
   CreateConcertDateModel,
+  GCDByConcertDateIdModel,
   GCDByConcertIdModel,
 } from 'src/domain/concerts/model/concert-date.model';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { GCDByConcertDateIdModel } from './../../../../domain/concerts/model/concert-date.model';
 
 @Injectable()
 export class ConcertDateRepository {
@@ -15,8 +15,8 @@ export class ConcertDateRepository {
   async create(
     data: CreateConcertDateModel,
     tx?: PrismaTransaction,
-  ): Promise<ConcertDate> {
-    return await (tx ?? this.prisma).concertDate.create({
+  ): Promise<ConcertDate | null> {
+    const concertDate = await (tx ?? this.prisma).concertDate.create({
       data: {
         concertId: data.concertId,
         date: data.date,
@@ -24,6 +24,8 @@ export class ConcertDateRepository {
         availableSeatCount: data.totalSeat,
       },
     });
+
+    return concertDate;
   }
 
   async findById(
@@ -32,7 +34,7 @@ export class ConcertDateRepository {
   ): Promise<ConcertDate | null> {
     return await (tx ?? this.prisma).concertDate.findUnique({
       where: {
-        id: gcdByConcertIdModel.concertDateId
+        id: gcdByConcertIdModel.concertDateId,
       },
     });
   }
@@ -43,6 +45,18 @@ export class ConcertDateRepository {
   ): Promise<ConcertDate[]> {
     return await (tx ?? this.prisma).concertDate.findMany({
       where: { concertId: gcdByConcertDateIdModel.concertId },
+    });
+  }
+
+  async findByDate(
+    createConcertDateModel: CreateConcertDateModel,
+    tx?: PrismaTransaction,
+  ): Promise<ConcertDate | null> {
+    return await (tx ?? this.prisma).concertDate.findFirst({
+      where: {
+        date: createConcertDateModel.date,
+        concertId: createConcertDateModel.concertId,
+      },
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConcertDateRepository } from 'src/infrastructure/database/repositories/concerts/concert-date.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import { CreateConcertDateModel } from '../model/concert-date.model';
@@ -15,6 +15,16 @@ export class ConcertDateService {
     createConcertDateModel: CreateConcertDateModel,
     tx?: PrismaTransaction,
   ) {
+    const concertDate = await this.concertDateRepository.findByDate(
+      createConcertDateModel,
+    );
+
+    if (concertDate) {
+      throw new HttpException(
+        '이미 요청한 날짜에 콘서트가 생성이 되었습니다.',
+        HttpStatus.CONFLICT,
+      );
+    }
     return await this.concertDateRepository.create(createConcertDateModel, tx);
   }
   async getConcertDateByConcertId(
@@ -30,9 +40,16 @@ export class ConcertDateService {
     gcdByConcertDateIdModel: GCDByConcertDateIdModel,
     tx?: PrismaTransaction,
   ) {
-    return await this.concertDateRepository.findById(
+    const concertDate = await this.concertDateRepository.findById(
       gcdByConcertDateIdModel,
       tx,
     );
+    if (!concertDate) {
+      throw new HttpException(
+        '조회한 콘서트 날짜가 없습니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return concertDate;
   }
 }

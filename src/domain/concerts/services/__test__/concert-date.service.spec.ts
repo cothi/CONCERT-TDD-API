@@ -25,6 +25,7 @@ describe('ConcertDateService', () => {
       create: jest.fn(),
       findByConcertId: jest.fn(),
       findById: jest.fn(),
+      findByDate: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({

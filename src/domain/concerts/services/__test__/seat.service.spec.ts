@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SeatRepository } from 'src/infrastructure/database/repositories/concerts/seat.repository';
-import { Prisma, SeatStatus } from '@prisma/client';
+import { Prisma, Seat, SeatStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-import { SeatService } from '../seat.service';
+import { SeatRepository } from 'src/infrastructure/database/repositories/concerts/seat.repository';
 import { CreateSeatsModel } from '../../model/seat.model';
+import { SeatService } from '../seat.service';
 
 describe('SeatService', () => {
   let seatService: SeatService;
@@ -37,8 +37,10 @@ describe('SeatService', () => {
     };
 
     const expectedResult: Prisma.BatchPayload = { count: 5 };
-    seatRepository.createMany.mockResolvedValue(expectedResult);
+    const seats: Seat[] = [];
 
+    seatRepository.findByConcertDateId.mockResolvedValue(seats);
+    seatRepository.createMany.mockResolvedValue(expectedResult);
     const result = await seatService.createSeat(createSeatModel);
 
     expect(seatRepository.createMany).toHaveBeenCalledWith(

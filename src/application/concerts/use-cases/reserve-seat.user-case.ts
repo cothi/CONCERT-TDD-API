@@ -23,43 +23,50 @@ export class ReserveSeatUseCase
   ) {}
   async execute(input: ReserveSeatCommand): Promise<ReserveSeatResponseDto> {
     return this.prismaService.$transaction(async (prisma) => {
-      // 1. 좌석 확인 및 락 획득
-      const seat = await this.seatService.findAndLockSeat(input.seatId, prisma);
-
-      if (!seat || seat.status !== SeatStatus.AVAILABLE) {
-        throw new Error('Seat is not available');
-      }
-
-      const getConcertModel: GCDByConcertDateIdModel = {
-        concertDateId: seat.concertDateId,
-      };
-      const concertDate =
-        await this.concertDateService.getConcertDateByConcertDateId(
-          getConcertModel,
+      try {
+        // 1. 좌석 확인 및 락 획득
+        const seat = await this.seatService.findAndLockSeat(
+          input.seatId,
           prisma,
         );
-      // 2. 좌석 예약
-      const createReservationModel: CreateReservationModel = {
-        userId: input.userId,
-        seatId: input.seatId,
-        concertDateId: seat.concertDateId,
-        concertId: concertDate.concertId,
-        status: ReservationStatus.PENDING,
-        expireAt: new Date(Date.now() + 1000 * 60 * 5), // 10분
-      };
-      const reservation = await this.reservationService.createReservation(
-        createReservationModel,
-        prisma,
-      );
 
-      // 3. 좌석 상태 업데이트
-      const updateModel: UpdateSeatStatusModel = {
-        seatId: seat.id,
-        status: SeatStatus.RESERVED,
-      };
-      await this.seatService.updateSeatStatus(updateModel, prisma);
+        if (seat.status !== SeatStatus.AVAILABLE) {
+          throw new Error('Seat is not available');
+        }
 
-      return ReserveSeatResponseDto.fromReservation(reservation);
+        const getConcertModel: GCDByConcertDateIdModel = {
+          concertDateId: seat.concertDateId,
+        };
+        const concertDate =
+          await this.concertDateService.getConcertDateByConcertDateId(
+            getConcertModel,
+            prisma,
+          );
+        // 2. 좌석 예약
+        const createReservationModel: CreateReservationModel = {
+          userId: input.userId,
+          seatId: input.seatId,
+          concertDateId: seat.concertDateId,
+          concertId: concertDate.concertId,
+          status: ReservationStatus.PENDING,
+          expireAt: new Date(Date.now() + 1000 * 60 * 5), // 10분
+        };
+        const reservation = await this.reservationService.createReservation(
+          createReservationModel,
+          prisma,
+        );
+
+        // 3. 좌석 상태 업데이트
+        const updateModel: UpdateSeatStatusModel = {
+          seatId: seat.id,
+          status: SeatStatus.RESERVED,
+        };
+        await this.seatService.updateSeatStatus(updateModel, prisma);
+
+        return ReserveSeatResponseDto.fromReservation(reservation);
+      } catch (error) {
+        throw error;
+      }
     });
   }
 }
