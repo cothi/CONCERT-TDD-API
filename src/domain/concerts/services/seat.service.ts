@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Prisma, Seat } from '@prisma/client';
 import { SeatRepository } from 'src/infrastructure/database/repositories/concerts/seat.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
@@ -13,7 +13,18 @@ export class SeatService {
   constructor(private readonly seatRepository: SeatRepository) {}
   async createSeat(
     createSeatModel: CreateSeatsModel,
+    tx?: PrismaTransaction,
   ): Promise<Prisma.BatchPayload> {
+    const getSeats = await this.seatRepository.findByConcertDateId(
+      createSeatModel.concertDateId,
+      tx,
+    );
+    if (getSeats.length > 0) {
+      throw new HttpException(
+        '이미 시트가 생성되었습니다.',
+        HttpStatus.CONFLICT,
+      );
+    }
     const seats = this.generateSeatNumber(createSeatModel);
     return await this.seatRepository.createMany(seats);
   }

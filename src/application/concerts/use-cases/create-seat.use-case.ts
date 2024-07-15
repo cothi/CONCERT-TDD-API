@@ -13,17 +13,21 @@ export class CreateSeatUseCase
 {
   constructor(private readonly seatService: SeatService) {}
   async execute(input: CreateSeatCommand): Promise<CreateSeatResponseDto> {
-    const createSeatsModel: CreateSeatsModel = {
-      concertDateId: input.concertDateId,
-      seatNumber: input.seatNumber,
-      price: new Decimal(input.price),
-      status: SeatStatus.AVAILABLE,
-    };
-    const batch = await this.seatService.createSeat(createSeatsModel);
-    return {
-      success: true,
-      createdSeatsCount: batch.count,
-      concertDateId: input.concertDateId,
-    };
+    try {
+      const createSeatsModel: CreateSeatsModel = {
+        concertDateId: input.concertDateId,
+        seatNumber: input.seatNumber,
+        price: new Decimal(input.price),
+        status: SeatStatus.AVAILABLE,
+      };
+      const batch = await this.seatService.createSeat(createSeatsModel);
+      return {
+        success: true,
+        createdSeatsCount: batch.count,
+        concertDateId: input.concertDateId,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 }

@@ -13,12 +13,18 @@ export class CreateConcertDateUseCase
   async execute(
     input: CreateConcertDateCommand,
   ): Promise<ConcertDateResponseDto> {
-    const model: CreateConcertDateModel = {
-      concertId: input.concertId,
-      date: input.date,
-      totalSeat: input.totalSeat,
-    };
-    const concertDate = await this.concertDateService.createConcertDate(model);
-    return ConcertDateResponseDto.fromConcertDate(concertDate);
+    try {
+      const model: CreateConcertDateModel = {
+        concertId: input.concertId,
+        date: input.date,
+        totalSeat: input.totalSeat,
+      };
+      const concertDate =
+        await this.concertDateService.createConcertDate(model);
+
+      return ConcertDateResponseDto.fromConcertDate(concertDate);
+    } catch (error) {
+      throw error;
+    }
   }
 }
