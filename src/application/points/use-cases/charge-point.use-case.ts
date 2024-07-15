@@ -1,5 +1,5 @@
 import { ChargePointResponseDto } from 'src/presentation/dto/points/response/charge-point.response.dto';
-import { IUseCase } from '../../auth/interfaces/use-case.interface';
+import { IUseCase } from '../../../common/interfaces/use-case.interface';
 import { ChargePointCommand } from '../dto/charge-point.command.dto';
 import { PaymentType } from '../enums/payment-type.enum';
 import { Inject } from '@nestjs/common';

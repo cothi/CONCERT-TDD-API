@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ReservationStatus, SeatStatus } from '@prisma/client';
-import { IUseCase } from 'src/application/auth/interfaces/use-case.interface';
+import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { GCDByConcertDateIdModel } from 'src/domain/concerts/model/concert-date.model';
 import { CreateReservationModel } from 'src/domain/concerts/model/reservation.model';
 import { UpdateSeatStatusModel } from 'src/domain/concerts/model/seat.model';

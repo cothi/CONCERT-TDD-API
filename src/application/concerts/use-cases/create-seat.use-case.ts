@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IUseCase } from 'src/application/auth/interfaces/use-case.interface';
+import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { CreateSeatResponseDto } from 'src/presentation/dto/concerts/dto/response/create-seat.response.dto';
 import { CreateSeatCommand } from '../command/create-seat.command';
 import { SeatService } from 'src/domain/concerts/services/seat.service';

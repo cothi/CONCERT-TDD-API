@@ -2,7 +2,7 @@ import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
 import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 import { AuthService } from 'src/domain/auth/services/auth.service';
 import { AuthResponseDto } from 'src/presentation/dto/auth/response/auth.response.dto';
-import { IUseCase } from '../interfaces/use-case.interface';
+import { IUseCase } from '../../../common/interfaces/use-case.interface';
 
 export class LoginUserUseCase
   implements IUseCase<LoginUserModel, AuthResponseDto>
@@ -13,25 +13,26 @@ export class LoginUserUseCase
   ) {}
 
   async execute(input: LoginUserModel): Promise<AuthResponseDto> {
-    const userModel = await this.authService.findUserByEmail(input);
-    if (!userModel) {
-      throw new Error('User not found');
+    try {
+      const user = await this.authService.findUserByEmail(input);
+
+      const accessToken = this.jwtTokenService.generateAccessToken({
+        userId: user.id,
+        email: user.email,
+        type: 'access',
+      });
+      const refreshToken = this.jwtTokenService.generateRefreshToken({
+        userId: user.id,
+        email: user.email,
+        type: 'refresh',
+      });
+
+      return {
+        accessToken,
+        refreshToken,
+      };
+    } catch (error) {
+      throw error;
     }
-
-    const accessToken = this.jwtTokenService.generateAccessToken({
-      userId: userModel.id,
-      email: userModel.email,
-      type: 'access',
-    });
-    const refreshToken = this.jwtTokenService.generateRefreshToken({
-      userId: userModel.id,
-      email: userModel.email,
-      type: 'refresh',
-    });
-
-    return {
-      accessToken,
-      refreshToken,
-    };
   }
 }

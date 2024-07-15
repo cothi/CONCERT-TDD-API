@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateConcertDateModel } from 'src/domain/concerts/model/concert-date.model';
 import { ConcertDateService } from 'src/domain/concerts/services/concert-date.service';
 import { ConcertDateResponseDto } from 'src/presentation/dto/concerts/dto/response/concert-date.response.dto';
-import { IUseCase } from '../../auth/interfaces/use-case.interface';
+import { IUseCase } from '../../../common/interfaces/use-case.interface';
 import { CreateConcertDateCommand } from '../command/create-concert-data.command';
 @Injectable()
 export class CreateConcertDateUseCase

@@ -1,4 +1,4 @@
-import { IUseCase } from '../../auth/interfaces/use-case.interface';
+import { IUseCase } from '../../../common/interfaces/use-case.interface';
 import { QueryUserPointResponseDto } from 'src/presentation/dto/points/response/query-user-point.response.dto';
 import { GetUserPointQuery } from '../dto/get-user-point.query.dto';
 import { Inject, Injectable } from '@nestjs/common';
