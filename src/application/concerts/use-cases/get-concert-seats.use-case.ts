@@ -10,12 +10,16 @@ export class GetConcertSeatsUseCase {
   async execute(
     command: GetSeatsByConcertIdCommand,
   ): Promise<GetSeatsByConcertIdResponseDto> {
-    const model: GetSeatByConcertDateIdModel = {
-      concertDateId: command.concertDateId,
-    };
+    try {
+      const model: GetSeatByConcertDateIdModel = {
+        concertDateId: command.concertDateId,
+      };
 
-    const seats = await this.seatService.getSeatsByConcertDateId(model);
+      const seats = await this.seatService.getSeatsByConcertDateId(model);
 
-    return GetSeatsByConcertIdResponseDto.fromSeats(seats);
+      return GetSeatsByConcertIdResponseDto.fromSeats(seats);
+    } catch (error) {
+      throw error;
+    }
   }
 }

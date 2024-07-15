@@ -18,10 +18,6 @@ export class GetQueueStatusUseCase {
           prisma,
         );
 
-        if (!queueEntry) {
-          throw new NotFoundException('유저가 대기열에 없음');
-        }
-
         const queuedAhead = await this.queueService.getQueuedAhead(
           queueEntry.enteredAt,
           prisma,

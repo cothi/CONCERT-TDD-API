@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ChargePointEntity } from 'src/domain/points/entity/charge-point.entity';
 import { GetPointEntity } from 'src/domain/points/entity/get-point.entity';
 import { PointWalletRepository } from '../../../infrastructure/database/repositories/points/point-wallet.repository';
@@ -25,7 +25,16 @@ export class PointWalletService {
     return await this.pointWalletRepository.getBalance(getPointEntity);
   }
 
-  async deductPoints(useId: string, point: Decimal) {
-    return this.pointWalletRepository.deductPoints(useId, point);
+  async deductPoints(userId: string, point: Decimal) {
+    const userPoint = await this.pointWalletRepository.getBalance(
+      GetPointEntity.create(userId),
+    );
+    if (userPoint < point) {
+      throw new HttpException(
+        '유저의 포인트가 부족합니다.',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+    return this.pointWalletRepository.deductPoints(userId, point);
   }
 }

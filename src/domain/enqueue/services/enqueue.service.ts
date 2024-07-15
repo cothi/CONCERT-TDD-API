@@ -31,7 +31,7 @@ export class QueueService {
    * @returns 사용자의 대기열 항목 또는 null
    **/
   async getQueueEntryWithLock(useId: string, tx?: PrismaTransaction) {
-    return this.queueEntryRepository.findByUserIdWithLock(useId, tx);
+    return await this.queueEntryRepository.findByUserIdWithLock(useId, tx);
   }
 
   /**

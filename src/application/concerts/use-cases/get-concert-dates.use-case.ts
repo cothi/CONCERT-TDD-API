@@ -7,14 +7,18 @@ import { ConcertDateService } from 'src/domain/concerts/services/concert-date.se
 export class GetConcertDatesUseCase {
   constructor(private readonly concertDateService: ConcertDateService) {}
   async execute(concertId: string): Promise<ConcertDateResponseDto[]> {
-    const gcdByConcertIdModel: GCDByConcertIdModel = {
-      concertId: concertId,
-    };
-    const concertDates =
-      await this.concertDateService.getConcertDateByConcertId(
-        gcdByConcertIdModel,
-      );
+    try {
+      const gcdByConcertIdModel: GCDByConcertIdModel = {
+        concertId: concertId,
+      };
+      const concertDates =
+        await this.concertDateService.getConcertDateByConcertId(
+          gcdByConcertIdModel,
+        );
 
-    return ConcertDateResponseDto.fromConcertDates(concertDates);
+      return ConcertDateResponseDto.fromConcertDates(concertDates);
+    } catch (error) {
+      throw error;
+    }
   }
 }

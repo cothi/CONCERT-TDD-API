@@ -8,20 +8,24 @@ export class GetUserReservationsUseCase {
   constructor(private reservationService: ReservationService) {}
 
   async execute(userId: string): Promise<GetUserReservationsResponseDto> {
-    const model: GetUserReservationsModel = {
-      userId: userId,
-    };
-    const reservations =
-      await this.reservationService.getUserReservations(model);
+    try {
+      const model: GetUserReservationsModel = {
+        userId: userId,
+      };
+      const reservations =
+        await this.reservationService.getUserReservations(model);
 
-    const reservationArray = reservations.map((reservation) => ({
-      id: reservation.id,
-      concertName: reservation.concert.name,
-      seatNumber: reservation.seat.seatNumber,
-      reservationDate: reservation.concertDate.date,
-      status: reservation.status,
-    }));
+      const reservationArray = reservations.map((reservation) => ({
+        id: reservation.id,
+        concertName: reservation.concert.name,
+        seatNumber: reservation.seat.seatNumber,
+        reservationDate: reservation.concertDate.date,
+        status: reservation.status,
+      }));
 
-    return GetUserReservationsResponseDto.fromReservations(reservationArray);
+      return GetUserReservationsResponseDto.fromReservations(reservationArray);
+    } catch (error) {
+      throw error;
+    }
   }
 }

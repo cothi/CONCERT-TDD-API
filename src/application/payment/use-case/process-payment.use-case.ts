@@ -31,84 +31,77 @@ export class ProcessPaymentUseCase {
   async execute(command: ProcessPaymentCommand): Promise<PaymentResponseDto> {
     const resultDto: PaymentResponseDto = await this.prisma.$transaction(
       async (prisma) => {
-        // 사용자 포인트 확인
-        const userPoint = await this.pointService.getBalance({
-          userId: command.userId,
-        });
+        try {
+          // 예약 상태 확인
+          const getReservationByIdModel: GetReservationByIdModel = {
+            reservationId: command.reservationId,
+          };
+          const reservation = await this.reservationService.getReservationById(
+            getReservationByIdModel,
+            prisma,
+          );
+          if (reservation.status !== ReservationStatus.PENDING) {
+            throw new Error('현재 예약 결제가 가능하지 않습니다.');
+          }
 
-        // 예약 상태 확인
-        const getReservationByIdModel: GetReservationByIdModel = {
-          reservationId: command.reservationId,
-        };
-        const reservation = await this.reservationService.getReservationById(
-          getReservationByIdModel,
-          prisma,
-        );
-        if (reservation.status !== ReservationStatus.PENDING) {
-          throw new Error('현재 예약 결제가 가능하지 않습니다.');
+          const seat = await this.seatService.getSeatBySeatId(
+            reservation.seatId,
+            prisma,
+          );
+          // 포인트 차감
+          await this.pointService.deductPoints(command.userId, seat.price);
+
+          // 좌석 상태 업데이트
+          const updateModel: UpdateSeatStatusModel = {
+            seatId: reservation.seatId,
+            status: SeatStatus.SOLD,
+          };
+          await this.seatService.updateSeatStatus(updateModel, prisma);
+
+          // 예약 상태 업데이트
+          const updateReservationModel: UpdateReservationModel = {
+            reservationId: reservation.id,
+            status: ReservationStatus.CONFIRMED,
+          };
+          await this.reservationService.updateStatus(
+            updateReservationModel,
+            prisma,
+          );
+
+          // 결제 기록 생성
+          const payment =
+            await this.pointTransactionService.recordPaymentHistory({
+              userId: command.userId,
+              amount: seat.price,
+              type: PaymentType.TICKET_PURCHASE,
+            });
+
+          // 트랜잭션 기록 생성
+          await this.transactionService.createTransaction(
+            {
+              userId: command.userId,
+              amount: seat.price,
+              transactionType: TransactionType.PAYMENT,
+            },
+            prisma,
+          );
+
+          return {
+            paymentId: payment.id,
+            userId: payment.userId,
+            amount: payment.amount,
+            paymentType: payment.paymentType,
+            createdAt: payment.createdAt,
+            reservationId: reservation.id,
+            reservationStatus: reservation.status,
+            seatId: seat.id,
+            seatStatus: seat.status,
+            success: true,
+            message: '결제가 성공적으로 처리되었습니다.',
+          };
+        } catch (error) {
+          throw error;
         }
-
-        const seat = await this.seatService.getSeatBySeatId(
-          reservation.seatId,
-          prisma,
-        );
-        if (userPoint < seat.price) {
-          throw new Error('포인트가 부족합니다.');
-        }
-        console.log(userPoint);
-
-        // 좌석 상태 업데이트
-        const updateModel: UpdateSeatStatusModel = {
-          seatId: reservation.seatId,
-          status: SeatStatus.SOLD,
-        };
-        await this.seatService.updateSeatStatus(updateModel, prisma);
-
-        // 예약 상태 업데이트
-        const updateReservationModel: UpdateReservationModel = {
-          reservationId: reservation.id,
-          status: ReservationStatus.CONFIRMED,
-        };
-        await this.reservationService.updateStatus(
-          updateReservationModel,
-          prisma,
-        );
-
-        // 포인트 차감
-        await this.pointService.deductPoints(command.userId, seat.price);
-
-        // 결제 기록 생성
-        const payment = await this.pointTransactionService.recordPaymentHistory(
-          {
-            userId: command.userId,
-            amount: seat.price,
-            type: PaymentType.TICKET_PURCHASE,
-          },
-        );
-
-        // 트랜잭션 기록 생성
-        await this.transactionService.createTransaction(
-          {
-            userId: command.userId,
-            amount: seat.price,
-            transactionType: TransactionType.PAYMENT,
-          },
-          prisma,
-        );
-
-        return {
-          paymentId: payment.id,
-          userId: payment.userId,
-          amount: payment.amount,
-          paymentType: payment.paymentType,
-          createdAt: payment.createdAt,
-          reservationId: reservation.id,
-          reservationStatus: reservation.status,
-          seatId: seat.id,
-          seatStatus: seat.status,
-          success: true,
-          message: '결제가 성공적으로 처리되었습니다.',
-        };
       },
     );
     return resultDto;

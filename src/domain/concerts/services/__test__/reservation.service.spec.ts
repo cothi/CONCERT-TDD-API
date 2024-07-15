@@ -118,18 +118,6 @@ describe('ReservationService', () => {
       expect(repository.getReservationById).toHaveBeenCalledWith(getModel, tx);
       expect(result).toEqual(mockReservation);
     });
-
-    it('예약이 없을 경우 null을 반환해야 한다', async () => {
-      const getModel: GetReservationByIdModel = {
-        reservationId: '1',
-      };
-
-      repository.getReservationById.mockResolvedValue(null);
-
-      const result = await service.getReservationById(getModel);
-
-      expect(result).toBeNull();
-    });
   });
 
   describe('updateStatus', () => {
@@ -145,6 +133,7 @@ describe('ReservationService', () => {
         status: ReservationStatus.CONFIRMED,
       };
       repository.updateStatus.mockResolvedValue(updatedReservation);
+      repository.getReservationById.mockResolvedValue(mockReservation);
 
       const result = await service.updateStatus(updateModel, tx);
 

@@ -7,7 +7,11 @@ export class GetConcertsUseCase {
   constructor(private readonly concertService: ConcertService) {}
 
   async execute(): Promise<GetConcertsResponseDto> {
-    const concerts = await this.concertService.getAllConcerts();
-    return GetConcertsResponseDto.fromConcerts(concerts);
+    try {
+      const concerts = await this.concertService.getAllConcerts();
+      return GetConcertsResponseDto.fromConcerts(concerts);
+    } catch (error) {
+      throw error;
+    }
   }
 }

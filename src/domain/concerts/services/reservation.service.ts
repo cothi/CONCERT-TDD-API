@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Reservation } from '@prisma/client';
 import { ReservationRepository } from 'src/infrastructure/database/repositories/concerts/reservation.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
@@ -26,15 +26,33 @@ export class ReservationService {
     getReservationByIdModel: GetReservationByIdModel,
     tx?: PrismaTransaction,
   ): Promise<Reservation | null> {
-    return await this.reservationRepository.getReservationById(
+    const reservation = await this.reservationRepository.getReservationById(
       getReservationByIdModel,
       tx,
     );
+    if (!reservation) {
+      throw new HttpException(
+        '요청한 예약이 존재하지 않습니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return reservation;
   }
   async updateStatus(
     updateReservationModel: UpdateReservationModel,
     tx?: PrismaTransaction,
   ): Promise<Reservation> {
+    const model = new GetReservationByIdModel();
+    model.reservationId = updateReservationModel.reservationId;
+    const reservation =
+      await this.reservationRepository.getReservationById(model);
+
+    if (!reservation) {
+      throw new HttpException(
+        '요청한 예약이 존재하지 않습니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
     return await this.reservationRepository.updateStatus(
       updateReservationModel,
       tx,
