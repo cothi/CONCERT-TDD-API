@@ -30,22 +30,7 @@ export class QueueEntryRepository {
   ): Promise<QueueEntry | null> {
     return (tx ?? this.prisma).queueEntry.findUnique({ where: { userId } });
   }
-  /**
-   * 특정 사용자의 대기열 항목을 조회하고 락을 겁니다.
-   * @param userId 조회할 사용자 ID
-   * @param tx 트랜잭션 객체 (선택적)
-   * @returns 사용자의 대기열 항목 또는 null
-   **/
 
-  async findByUserIdWithLock(
-    userId: string,
-    tx?: PrismaTransaction,
-  ): Promise<QueueEntry | null> {
-    const [result] = await (tx ?? this.prisma).$queryRaw<QueueEntry[]>`
-      SELECT * FROM "QueueEntry" WHERE "userId" = ${userId} FOR UPDATE 
-    `;
-    return result || null;
-  }
   /**
    * 예약 가능한 상태의 대기열 항목들을 조회합니다.
    * @returns 예약 가능한 대기열 항목 배열 (최대 5개)

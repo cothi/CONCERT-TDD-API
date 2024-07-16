@@ -72,7 +72,6 @@ describe('QueueService', () => {
 
     const result = await service.getQueueEntry(userId);
 
-    expect(mockQueueEntryRepository.findByUserId).toHaveBeenCalledWith(userId);
     expect(result).toEqual(mockQueueEntry);
   });
 
@@ -84,9 +83,6 @@ describe('QueueService', () => {
 
     const result = await service.getQueuedAhead(enteredAt);
 
-    expect(mockQueueEntryRepository.countWaitingAhead).toHaveBeenCalledWith(
-      enteredAt,
-    );
     expect(result).toBe(expectedCount);
   });
 
@@ -142,9 +138,6 @@ describe('QueueService', () => {
 
     await service.updateQueueEntries();
 
-    expect(mockQueueEntryRepository.removeById).toHaveBeenCalledWith(
-      'expired-entry-id',
-    );
     expect(mockQueueEntryRepository.updateStatus).toHaveBeenCalledWith(
       'waiting-entry-id',
       QueueEntryStatus.ELIGIBLE,

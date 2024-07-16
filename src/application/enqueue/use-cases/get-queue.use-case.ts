@@ -14,33 +14,34 @@ export class GetQueueStatusUseCase
   ) {}
 
   async execute(userId: string): Promise<QueueStatusResponseDto> {
-    const responseDto = await this.prismaService.$transaction(
-      async (prisma) => {
-        const queueEntry = await this.queueService.getQueueEntryWithLock(
-          userId,
-          prisma,
-        );
+    try {
+      const responseDto = await this.prismaService.$transaction(
+        async (prisma) => {
+          const queueEntry = await this.queueService.getQueueEntry(userId);
 
-        const queuedAhead = await this.queueService.getQueuedAhead(
-          queueEntry.enteredAt,
-          prisma,
-        );
-        const isEligibleForReservation =
-          await this.queueService.isEligibleForReservation(
-            queueEntry.status,
+          const queuedAhead = await this.queueService.getQueuedAhead(
+            queueEntry.enteredAt,
             prisma,
           );
+          const isEligibleForReservation =
+            await this.queueService.isEligibleForReservation(
+              queueEntry.status,
+              prisma,
+            );
 
-        return {
-          status: queueEntry.status,
-          isEligibleForReservation,
-          queuedAhead,
-          enteredAt: queueEntry.enteredAt,
-          expiresAt: queueEntry.expiresAt,
-        };
-      },
-    );
+          return {
+            status: queueEntry.status,
+            isEligibleForReservation,
+            queuedAhead,
+            enteredAt: queueEntry.enteredAt,
+            expiresAt: queueEntry.expiresAt,
+          };
+        },
+      );
 
-    return responseDto;
+      return responseDto;
+    } catch (error) {
+      throw error;
+    }
   }
 }

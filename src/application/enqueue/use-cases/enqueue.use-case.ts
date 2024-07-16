@@ -3,46 +3,34 @@ import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { QueueService } from 'src/domain/enqueue/services/enqueue.service';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { EnqueueDto } from 'src/presentation/dto/enqueue/request/enqueue.dto';
-import { QueueStatusResponseDto } from 'src/presentation/dto/enqueue/response/enqueue-status.reponse.dto';
+import { EnqueueResponseDto } from 'src/presentation/dto/enqueue/response/enqueue.response.dto';
 @Injectable()
 export class EnqueueUseCase
-  implements IUseCase<EnqueueDto, QueueStatusResponseDto>
+  implements IUseCase<EnqueueDto, EnqueueResponseDto>
 {
   constructor(
     private readonly queueService: QueueService,
     private readonly prismaService: PrismaService,
   ) {}
 
-  async execute(dto: EnqueueDto): Promise<QueueStatusResponseDto> {
-    const responseDto = await this.prismaService.$transaction(
-      async (prisma) => {
-        const findQueueEntry = await this.queueService.getQueueEntryWithLock(
-          dto.userId,
-          prisma,
-        );
-        if (findQueueEntry) {
-          throw new Error('User already in queue');
-        }
-        const queueEntry = await this.queueService.enqueue(dto.userId, prisma);
-        const queuedAhead = await this.queueService.getQueuedAhead(
-          queueEntry.enteredAt,
-          prisma,
-        );
-        const isEligibleForReservation =
-          await this.queueService.isEligibleForReservation(
-            queueEntry.status,
+  async execute(dto: EnqueueDto): Promise<EnqueueResponseDto> {
+    try {
+      const responseDto = await this.prismaService.$transaction(
+        async (prisma) => {
+          const queueEntry = await this.queueService.enqueue(
+            dto.userId,
             prisma,
           );
 
-        return {
-          status: queueEntry.status,
-          isEligibleForReservation,
-          queuedAhead,
-          enteredAt: queueEntry.enteredAt,
-          expiresAt: queueEntry.expiresAt,
-        };
-      },
-    );
-    return responseDto;
+          return {
+            status: queueEntry.status,
+            enteredAt: queueEntry.enteredAt,
+          };
+        },
+      );
+      return responseDto;
+    } catch (error) {
+      throw error;
+    }
   }
 }

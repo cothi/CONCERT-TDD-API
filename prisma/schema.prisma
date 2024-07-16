@@ -123,7 +123,7 @@ model QueueEntry {
   userId        String     @unique
   status        QueueEntryStatus @default(WAITING)
   enteredAt     DateTime  
-  expiresAt     DateTime
+  expiresAt     DateTime?
   updatedAt     DateTime   @updatedAt
   user          User       @relation(fields: [userId], references: [id])
 

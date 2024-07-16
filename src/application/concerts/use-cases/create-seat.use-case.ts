@@ -3,9 +3,9 @@ import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { CreateSeatResponseDto } from 'src/presentation/dto/concerts/dto/response/create-seat.response.dto';
 import { CreateSeatCommand } from '../command/create-seat.command';
 import { SeatService } from 'src/domain/concerts/services/seat.service';
-import { SeatStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { CreateSeatsModel } from 'src/domain/concerts/model/seat.model';
+import { SeatStatus } from '@prisma/client';
 
 @Injectable()
 export class CreateSeatUseCase
