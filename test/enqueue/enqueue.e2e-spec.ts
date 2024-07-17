@@ -21,8 +21,8 @@ describe('Enqueue Test (e2e)', () => {
     await app.close();
   });
 
-  describe('대기열 등록', () => {
-    it('다수의 유저의 대기열 등록을 정상적으로 처리해야 합니다. - /enqueue (POST)', async () => {
+  describe('대기열 등록 - /enqueue', () => {
+    it('다수의 유저의 대기열 등록을 정상적으로 처리해야 합니다. (POST)', async () => {
       const numberOfUsers = 50;
 
       const users = await Promise.all(
@@ -48,7 +48,7 @@ describe('Enqueue Test (e2e)', () => {
         expect(res.status).toBe(201);
       });
     }, 30000);
-    it('사용자 등록 후 대기열 등록 시 중복 등록 방지 - /enqueue (POST)', async () => {
+    it('사용자 등록 후 대기열 등록 시 중복 등록 방지 (POST)', async () => {
       const registerResponse = await apiRequests.createUserRequest();
       expect(registerResponse.status).toBe(201);
 
@@ -64,9 +64,9 @@ describe('Enqueue Test (e2e)', () => {
     });
   });
 
-  describe('대기열 조회', () => {
+  describe('대기열 조회 - /enqueue', () => {
     // 사용자 등록 및 대기열 등록 후 확인
-    it('사용자 등록 및 대기열 등록 후 조회 - /enqueue (POST)', async () => {
+    it('사용자 등록 및 대기열 등록 후 조회 (POST)', async () => {
       const registerResponse = await apiRequests.createUserRequest();
       expect(registerResponse.status).toBe(201);
 
@@ -82,7 +82,7 @@ describe('Enqueue Test (e2e)', () => {
     });
 
     // 사용자 등록 및 대기열에 없으면 404 반환
-    it('사용자 등록 및 대기열에 없으면 조회 시에는 404 반환 - /enqueue (GET) ', async () => {
+    it('사용자 등록 및 대기열에 없으면 조회 시에는 404 반환  (GET) ', async () => {
       const registerResponse = await apiRequests.createUserRequest();
       expect(registerResponse.status).toBe(201);
 
@@ -93,7 +93,7 @@ describe('Enqueue Test (e2e)', () => {
     });
 
     // 사용자 등록 없이 대기열 조회 시 401 반환
-    it('사용자 등록 없이 대기열 조회 시 401 반환 - /enqueue (GET)', async () => {
+    it('사용자 등록 없이 대기열 조회 시 401 반환  (GET)', async () => {
       const queueStatusResponse =
         await apiRequests.getQueueStatusRequest('invalid-token');
       expect(queueStatusResponse.status).toBe(401);

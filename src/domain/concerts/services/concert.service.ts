@@ -26,7 +26,9 @@ export class ConcertService {
   }
 
   async getConcertById(findConcertModel: FindConcertModel): Promise<Concert> {
-    const concert = this.concertRepository.findById(findConcertModel.concertId);
+    const concert = await this.concertRepository.findById(
+      findConcertModel.concertId,
+    );
     if (!concert) {
       throw new HttpException(
         '콘서트가 존재하지 않습니다.',
@@ -37,6 +39,6 @@ export class ConcertService {
   }
 
   async getAllConcerts(): Promise<Concert[]> {
-    return this.concertRepository.findAllConcert();
+    return await this.concertRepository.findAllConcert();
   }
 }

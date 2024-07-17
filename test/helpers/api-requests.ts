@@ -6,6 +6,8 @@ import request from 'supertest';
 export const createApiRequests = (app: INestApplication) => ({
   loginRequest: (email: string) =>
     request(app.getHttpServer()).post('/auth/login').send({ email }),
+  tokenRefreshRequest: (refreshToken: string) =>
+    request(app.getHttpServer()).post('/auth/refresh').send({ refreshToken }),
 
   createUserRequest: (email: string = `user${Date.now()}@example.com`) =>
     request(app.getHttpServer()).post('/auth/register').send({ email }),
@@ -49,11 +51,6 @@ export const createApiRequests = (app: INestApplication) => ({
       .set('Authorization', `Bearer ${accessToken}`)
       .send({ seatNumber, price }),
 
-  getConcertSeatsRequest: (concertDateId: string, accessToken: string) =>
-    request(app.getHttpServer())
-      .get(`/concerts/dates/${concertDateId}/seats`)
-      .set('Authorization', `Bearer ${accessToken}`),
-
   createReservationRequest: (accessToken: string, seatId: string) =>
     request(app.getHttpServer())
       .post('/concerts/seats/reserve')
@@ -65,8 +62,23 @@ export const createApiRequests = (app: INestApplication) => ({
       .post('/payment')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({ reservationId }),
+
+  reserveSeatRequest: (accessToken: string, seatId: string) =>
+    request(app.getHttpServer())
+      .post('/concerts/seats/reserve')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ seatId }),
   getQueueStatusRequest: (accessToken: string) =>
     request(app.getHttpServer())
       .get(`/enqueue`)
+      .set('Authorization', `Bearer ${accessToken}`),
+
+  getConcertSeatsRequest: (concertDateId: string, accessToken: string) =>
+    request(app.getHttpServer())
+      .get(`/concerts/dates/${concertDateId}/seats`)
+      .set('Authorization', `Bearer ${accessToken}`),
+  getReservationRequest: (accessToken: string) =>
+    request(app.getHttpServer())
+      .get('/concerts/seats/reserve')
       .set('Authorization', `Bearer ${accessToken}`),
 });

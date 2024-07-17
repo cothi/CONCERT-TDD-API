@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.use-case';
 import { RefreshTokenUseCase } from 'src/application/auth/use-cases/refresh-token.use-case';
@@ -42,6 +50,7 @@ export class AuthController {
     type: AuthResponseDto,
   })
   @ApiResponse({ status: 401, description: '인증 실패' })
+  @UsePipes(new ValidationPipe({ transform: true }))
   async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
     return await this.loginUserUseCase.execute(
       LoginUserModel.create(loginDto.email),
@@ -65,6 +74,7 @@ export class AuthController {
     type: AuthResponseDto,
   })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async register(
     @Body() registerDto: RegisterUserDto,
   ): Promise<AuthResponseDto> {
@@ -90,6 +100,7 @@ export class AuthController {
     type: RefreshTokenResponseDto,
   })
   @ApiResponse({ status: 401, description: '유효하지 않은 리프레시 토큰' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async refresh(
     @Body() refreshDto: RefreshTokenDto,
   ): Promise<RefreshTokenResponseDto> {

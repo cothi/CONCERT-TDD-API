@@ -22,8 +22,8 @@ export class ReserveSeatUseCase
     private readonly concertDateService: ConcertDateService,
   ) {}
   async execute(input: ReserveSeatCommand): Promise<ReserveSeatResponseDto> {
-    return this.prismaService.$transaction(async (prisma) => {
-      try {
+    try {
+      return this.prismaService.$transaction(async (prisma) => {
         // 1. 좌석 확인 및 락 획득
         const seat = await this.seatService.findAndLockSeat(
           input.seatId,
@@ -67,9 +67,9 @@ export class ReserveSeatUseCase
         await this.seatService.updateSeatStatus(updateModel, prisma);
 
         return ReserveSeatResponseDto.fromReservation(reservation);
-      } catch (error) {
-        throw error;
-      }
-    });
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 }

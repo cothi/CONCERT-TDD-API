@@ -6,6 +6,14 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   const config = new DocumentBuilder()
     .setTitle('Ticketing API')
@@ -14,10 +22,8 @@ async function bootstrap() {
     .addTag('tickets')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-
   SwaggerModule.setup('api', app, document);
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe());
+
   await app.listen(3000);
 }
 bootstrap();

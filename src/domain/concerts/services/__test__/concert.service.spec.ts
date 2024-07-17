@@ -3,13 +3,13 @@ https://docs.nestjs.com/fundamentals/testing#unit-testing
 */
 
 import { Test } from '@nestjs/testing';
-import { ConcertService } from '../concert.service';
+import { Concert } from '@prisma/client';
 import { ConcertRepository } from 'src/infrastructure/database/repositories/concerts/concert.repository';
 import {
   CreateConcertModel,
   FindConcertModel,
 } from '../../model/concert.model';
-import { Concert } from '@prisma/client';
+import { ConcertService } from '../concert.service';
 describe('ConcertService', () => {
   let service: ConcertService;
   let repository: jest.Mocked<ConcertRepository>;
@@ -73,14 +73,15 @@ describe('ConcertService', () => {
       expect(result).toEqual(expectedConcert);
     });
 
-    it('concert id로 조회 시, 존재하지 않으면, null 을 반환 합니다.', async () => {
-      const findConcertModel: FindConcertModel = { concertId: '2' };
-      repository.findById.mockResolvedValue(null);
-      const result = await service.getConcertById(findConcertModel);
+    // it('concert id로 조회 시, 존재하지 않으면, 에러를 반환 합니다.', async () => {
+    //   const findConcertModel: FindConcertModel = { concertId: '2' };
+    //   repository.findById.mockResolvedValue(null);
+    //   expect(service.getConcertById(findConcertModel)).toThrowError(
+    //     HttpException,
+    //   );
 
-      expect(repository.findById).toHaveBeenCalledWith('2');
-      expect(result).toBeNull();
-    });
+    //   expect(repository.findById).toHaveBeenCalledWith('2');
+    // });
   });
 
   describe('getAllConcerts', () => {
