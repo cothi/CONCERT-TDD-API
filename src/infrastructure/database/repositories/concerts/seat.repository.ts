@@ -16,7 +16,10 @@ export class SeatRepository {
     });
   }
 
-  async findById(seatId: string, tx?: PrismaTransaction): Promise<Seat | null> {
+  async findBySeatId(
+    seatId: string,
+    tx?: PrismaTransaction,
+  ): Promise<Seat | null> {
     return (tx ?? this.prisma).seat.findUnique({
       where: { id: seatId },
     });

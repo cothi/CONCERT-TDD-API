@@ -31,7 +31,7 @@ model ConcertDate {
   availableSeatCount Int
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
-  concert            Concert       @relation(fields: [concertId], references: [id])
+  concert            Concert       @relation(fields: [concertId], references: [id], onDelete: Cascade)
   seats              Seat[]
   reservations       Reservation[]
 
@@ -56,7 +56,7 @@ model UserPoint {
   amount    Decimal  @db.Decimal(10, 2)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Payment {
@@ -66,7 +66,7 @@ model Payment {
   createdAt   DateTime    @default(now())
   paymentType PaymentType
   updatedAt   DateTime    @updatedAt
-  user        User        @relation(fields: [userId], references: [id])
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -78,7 +78,7 @@ model Transaction {
   transactionType TransactionType
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
-  user            User            @relation(fields: [userId], references: [id])
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -91,7 +91,7 @@ model Seat {
   concertDateId String
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  concertDate   ConcertDate     @relation(fields: [concertDateId], references: [id])
+  concertDate   ConcertDate     @relation(fields: [concertDateId], references: [id], onDelete: Cascade)
   reservations  Reservation[]
 
   @@index([concertDateId])
@@ -107,10 +107,10 @@ model Reservation {
   createdAt     DateTime          @default(now())
   expiresAt     DateTime
   updatedAt     DateTime          @updatedAt
-  user          User              @relation(fields: [userId], references: [id])
-  seat          Seat              @relation(fields: [seatId], references: [id])
-  concert       Concert           @relation(fields: [concertId], references: [id])
-  concertDate   ConcertDate       @relation(fields: [concertDateId], references: [id])
+  user          User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  seat          Seat              @relation(fields: [seatId], references: [id], onDelete: Restrict)
+  concert       Concert           @relation(fields: [concertId], references: [id], onDelete: Restrict)
+  concertDate   ConcertDate       @relation(fields: [concertDateId], references: [id], onDelete: Restrict)
 
   @@index([userId])
   @@index([seatId])
@@ -125,7 +125,7 @@ model QueueEntry {
   enteredAt     DateTime  
   expiresAt     DateTime?
   updatedAt     DateTime   @updatedAt
-  user          User       @relation(fields: [userId], references: [id])
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

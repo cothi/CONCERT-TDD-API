@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ReservationStatus, SeatStatus } from '@prisma/client';
 import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { GCDByConcertDateIdModel } from 'src/domain/concerts/model/concert-date.model';
@@ -31,7 +31,10 @@ export class ReserveSeatUseCase
         );
 
         if (seat.status !== SeatStatus.AVAILABLE) {
-          throw new Error('Seat is not available');
+          throw new HttpException(
+            'Seat is not available',
+            HttpStatus.FORBIDDEN,
+          );
         }
 
         const getConcertModel: GCDByConcertDateIdModel = {

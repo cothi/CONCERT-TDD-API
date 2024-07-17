@@ -24,16 +24,15 @@ export class PrismaService
   }
 
   async deleteTableData() {
-    await this.concert.deleteMany();
-    await this.concertDate.deleteMany();
-    await this.queueEntry.deleteMany();
-
-    await this.payment.deleteMany();
-    await this.seat.deleteMany();
-    await this.transaction.deleteMany();
     await this.reservation.deleteMany();
-
     await this.user.deleteMany();
+    await this.seat.deleteMany();
+    await this.concert.deleteMany();
+
+    await this.queueEntry.deleteMany();
+    await this.payment.deleteMany();
+    await this.transaction.deleteMany();
     await this.userPoint.deleteMany();
+    await this.concertDate.deleteMany();
   }
 }

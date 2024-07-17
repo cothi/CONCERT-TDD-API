@@ -42,7 +42,7 @@ export class SeatService {
   async findByConcertDateId(concertDateId: string, tx?: PrismaTransaction) {}
 
   async updateSeatStatus(model: UpdateSeatStatusModel, tx?: PrismaTransaction) {
-    const seat = await this.seatRepository.findById(model.seatId, tx);
+    const seat = await this.seatRepository.findBySeatId(model.seatId, tx);
     if (!seat) {
       throw new HttpException(
         '요청한 좌석이 존재하지 않습니다',
@@ -56,14 +56,29 @@ export class SeatService {
     model: GetSeatByConcertDateIdModel,
     tx?: PrismaTransaction,
   ) {
-    return await this.seatRepository.findByConcertDateId(
+    const seats = await this.seatRepository.findByConcertDateId(
       model.concertDateId,
       tx,
     );
+
+    if (seats.length === 0) {
+      throw new HttpException(
+        '해당 공연일에 생성된 좌석이 없습니다',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return seats;
   }
 
-  async getSeatBySeatId(seatId: string, tx?: PrismaTransaction) {
-    return this.seatRepository.findById(seatId, tx);
+  async getSeatBySeatId(seatId: string, tx?: PrismaTransaction): Promise<Seat> {
+    const seat = await this.seatRepository.findBySeatId(seatId, tx);
+    if (!seat) {
+      throw new HttpException(
+        '요청한 시트가 존재하지 않습니다',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return seat;
   }
 
   async reserveSeat(seatId: string) {}

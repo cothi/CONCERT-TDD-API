@@ -39,6 +39,14 @@ export class ReservationRepository {
       where: { id: getReservationByIdModel.reservationId },
     });
   }
+  async getReservationByWithLock(
+    getReservationByIdModel: GetReservationByIdModel,
+    tx?: PrismaTransaction,
+  ): Promise<Reservation | null> {
+    const [reservation] = await (tx ?? this.prisma).$queryRaw<Reservation[]>`
+    SELECT * FROM "Reservation" WHERE id = ${getReservationByIdModel.reservationId} FOR UPDATE NOWAIT`;
+    return reservation;
+  }
 
   async updateStatus(
     updateReservationModel: UpdateReservationModel,

@@ -1,6 +1,13 @@
 // src/presentation/dto/payment/payment-response.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { PaymentType, ReservationStatus, SeatStatus } from '@prisma/client';
+import {
+  Payment,
+  PaymentType,
+  Reservation,
+  ReservationStatus,
+  Seat,
+  SeatStatus,
+} from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export class PaymentResponseDto {
@@ -84,4 +91,26 @@ export class PaymentResponseDto {
     required: false,
   })
   message?: string;
+
+  static fromEntity(
+    payment: Payment,
+    reservation: Reservation,
+    seat: Seat,
+    success: boolean,
+    message: string,
+  ): PaymentResponseDto {
+    const dto = new PaymentResponseDto();
+    dto.paymentId = payment.id;
+    dto.userId = payment.userId;
+    dto.amount = payment.amount;
+    dto.paymentType = payment.paymentType;
+    dto.createdAt = payment.createdAt;
+    dto.reservationId = reservation.id;
+    dto.reservationStatus = reservation.status;
+    dto.seatId = seat.id;
+    dto.seatStatus = seat.status;
+    dto.success = success;
+    dto.message = message;
+    return dto;
+  }
 }

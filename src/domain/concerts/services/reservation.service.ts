@@ -38,6 +38,23 @@ export class ReservationService {
     }
     return reservation;
   }
+  async getReservationByWithLock(
+    getReservationByIdModel: GetReservationByIdModel,
+    tx?: PrismaTransaction,
+  ) {
+    const reservation =
+      await this.reservationRepository.getReservationByWithLock(
+        getReservationByIdModel,
+        tx,
+      );
+    if (!reservation) {
+      throw new HttpException(
+        '요청한 예약이 존재하지 않습니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return reservation;
+  }
   async updateStatus(
     updateReservationModel: UpdateReservationModel,
     tx?: PrismaTransaction,

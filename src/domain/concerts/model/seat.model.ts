@@ -31,7 +31,14 @@ export class CreateSeatsModel extends PickType(SeatModel, [
 export class UpdateSeatStatusModel extends PickType(SeatModel, [
   'seatId',
   'status',
-]) {}
+]) {
+  static toModel(seatId: string, status: SeatStatus) {
+    const model = new UpdateSeatStatusModel();
+    model.seatId = seatId;
+    model.status = status;
+    return model;
+  }
+}
 
 export class GetSeatBySeatIdModel extends PickType(SeatModel, ['seatId']) {}
 

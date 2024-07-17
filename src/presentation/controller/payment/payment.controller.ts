@@ -1,4 +1,4 @@
-import { ProcessPaymentCommand } from './../../../application/payment/command/process-paymnet.command';
+import { ProcessPaymentCommand } from '../../../application/payment/command/process-payment.command';
 import { Body, Controller, Injectable, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,

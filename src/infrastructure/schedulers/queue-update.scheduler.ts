@@ -6,7 +6,7 @@ import { QueueService } from 'src/domain/enqueue/services/enqueue.service';
 export class QueueUpdateScheduler {
   constructor(private queueService: QueueService) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_SECOND)
   async handleCron() {
     await this.queueService.updateQueueEntries();
   }
