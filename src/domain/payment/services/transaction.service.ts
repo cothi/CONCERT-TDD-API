@@ -4,7 +4,7 @@ import { TransactionRepository } from 'src/infrastructure/database/repositories/
 import {
   CreateTransactionModel,
   UpdateTransactionStatusModel,
-} from './model/transaction.model';
+} from '../model/transaction.model';
 
 @Injectable()
 export class TransactionService {
