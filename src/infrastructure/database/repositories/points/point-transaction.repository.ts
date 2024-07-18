@@ -1,19 +1,23 @@
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { RecordPaymentEntity } from '../../../../domain/points/entity/record.payment.entity';
+import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 
 @Injectable()
 export class PointTransactionRepository {
   constructor(private readonly prisma: PrismaService) {}
-  async getPointHistory(userId: string) {
-    return await this.prisma.payment.findMany({
+  async getPointHistory(userId: string, tx?: PrismaTransaction) {
+    return await (tx ?? this.prisma).payment.findMany({
       where: {
         userId,
       },
     });
   }
-  async recordPointHistory(recordPaymentEntity: RecordPaymentEntity) {
-    return await this.prisma.payment.create({
+  async recordPointHistory(
+    recordPaymentEntity: RecordPaymentEntity,
+    tx?: PrismaTransaction,
+  ) {
+    return await (tx ?? this.prisma).payment.create({
       data: {
         userId: recordPaymentEntity.userId,
         paymentType: recordPaymentEntity.paymentType,
@@ -22,5 +26,3 @@ export class PointTransactionRepository {
     });
   }
 }
-
- 

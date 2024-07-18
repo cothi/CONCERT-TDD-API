@@ -13,12 +13,16 @@ export class QueryUserPointUseCase
     private readonly pointWalletService: PointWalletService,
   ) {}
   async execute(input: GetUserPointQuery): Promise<QueryUserPointResponseDto> {
-    const userPoint = await this.pointWalletService.getBalance({
-      userId: input.userId,
-    });
+    try {
+      const userPoint = await this.pointWalletService.getBalance({
+        userId: input.userId,
+      });
 
-    const queryUserPointResponseDto =
-      QueryUserPointResponseDto.create(userPoint);
-    return queryUserPointResponseDto;
+      const queryUserPointResponseDto =
+        QueryUserPointResponseDto.create(userPoint);
+      return queryUserPointResponseDto;
+    } catch (error) {
+      throw error;
+    }
   }
 }

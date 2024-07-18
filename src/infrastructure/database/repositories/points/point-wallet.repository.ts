@@ -3,13 +3,18 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { GetPointEntity } from 'src/domain/points/entity/get-point.entity';
 import { Decimal } from '@prisma/client/runtime/library';
+import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { UserPoint } from '@prisma/client';
 
 @Injectable()
 export class PointWalletRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async chargePoints(chargePointEntity: ChargePointEntity) {
-    const payment = await this.prisma.userPoint.upsert({
+  async chargePoints(
+    chargePointEntity: ChargePointEntity,
+    tx?: PrismaTransaction,
+  ) {
+    return await (tx ?? this.prisma).userPoint.upsert({
       where: {
         userId: chargePointEntity.userId,
       },
@@ -19,12 +24,10 @@ export class PointWalletRepository {
         amount: chargePointEntity.chargeAmount,
       },
     });
-
-    return payment;
   }
 
-  async deductPoints(useId: string, point: Decimal) {
-    return await this.prisma.userPoint.update({
+  async deductPoints(useId: string, point: Decimal, tx?: PrismaTransaction) {
+    return await (tx ?? this.prisma).userPoint.update({
       where: {
         userId: useId,
       },
@@ -36,13 +39,14 @@ export class PointWalletRepository {
     });
   }
 
-  async getBalance(getPointEntity: GetPointEntity) {
-    const userPoint = await this.prisma.userPoint.findUnique({
+  async getBalance(
+    getPointEntity: GetPointEntity,
+    tx?: PrismaTransaction,
+  ): Promise<UserPoint | null> {
+    return await (tx ?? this.prisma).userPoint.findUnique({
       where: {
         userId: getPointEntity.userId,
       },
     });
-
-    return userPoint ? userPoint.amount : new Decimal(0);
   }
 }

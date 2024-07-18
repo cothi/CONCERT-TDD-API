@@ -39,6 +39,7 @@ export class SeatService {
     }
     return seat;
   }
+  // TODO: Implement the following methods
   async findByConcertDateId(concertDateId: string, tx?: PrismaTransaction) {}
 
   async updateSeatStatus(model: UpdateSeatStatusModel, tx?: PrismaTransaction) {
@@ -81,8 +82,10 @@ export class SeatService {
     return seat;
   }
 
+  // TODO: Implement the following methods
   async reserveSeat(seatId: string) {}
 
+  // TODO: Implement the following methods
   async cancelSeat(seatId: string) {}
 
   private generateSeatNumber(

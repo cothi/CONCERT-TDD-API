@@ -17,7 +17,10 @@ export class GetQueueStatusUseCase
     try {
       const responseDto = await this.prismaService.$transaction(
         async (prisma) => {
-          const queueEntry = await this.queueService.getQueueEntry(userId);
+          const queueEntry = await this.queueService.getQueueEntry(
+            userId,
+            prisma,
+          );
 
           const queuedAhead = await this.queueService.getQueuedAhead(
             queueEntry.enteredAt,

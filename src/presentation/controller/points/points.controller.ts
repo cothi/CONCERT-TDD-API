@@ -20,7 +20,7 @@ import { QueryUserPointResponseDto } from 'src/presentation/dto/points/response/
 export class PointsController {
   constructor(
     private readonly chargePointUseCase: ChargePointUseCase,
-    private readonly quertyUserPointUseCase: QueryUserPointUseCase,
+    private readonly queryUserPointUseCase: QueryUserPointUseCase,
   ) {}
 
   /**
@@ -43,7 +43,7 @@ export class PointsController {
     @Payload() payload: JwtPayload,
   ): Promise<QueryUserPointResponseDto> {
     const query = GetUserPointQuery.create(payload.userId);
-    return await this.quertyUserPointUseCase.execute(query);
+    return await this.queryUserPointUseCase.execute(query);
   }
 
   @Patch('charge')

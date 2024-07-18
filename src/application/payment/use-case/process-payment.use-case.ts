@@ -60,7 +60,11 @@ export class ProcessPaymentUseCase
               prisma,
             );
             // 포인트 차감
-            await this.pointService.deductPoints(command.userId, seat.price);
+            await this.pointService.deductPoints(
+              command.userId,
+              seat.price,
+              prisma,
+            );
 
             // 좌석 상태 업데이트
             const updateModel = UpdateSeatStatusModel.toModel(
@@ -82,11 +86,14 @@ export class ProcessPaymentUseCase
 
             // 결제 기록 생성
             const payment =
-              await this.pointTransactionService.recordPaymentHistory({
-                userId: command.userId,
-                amount: seat.price,
-                type: PaymentType.TICKET_PURCHASE,
-              });
+              await this.pointTransactionService.recordPaymentHistory(
+                {
+                  userId: command.userId,
+                  amount: seat.price,
+                  type: PaymentType.TICKET_PURCHASE,
+                },
+                prisma,
+              );
 
             // 트랜잭션 기록 생성
             await this.transactionService.createTransaction(

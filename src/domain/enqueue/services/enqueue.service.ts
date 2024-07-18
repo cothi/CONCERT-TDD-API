@@ -14,8 +14,10 @@ export class QueueService {
    * @returns 생성된 대기열 항목
    */
   async enqueue(userId: string, tx?: PrismaTransaction): Promise<QueueEntry> {
-    const queueEntry = await this.queueEntryRepository.findByUserId(userId);
+    const queueEntry = await this.queueEntryRepository.findByUserId(userId, tx);
+
     if (queueEntry) {
+      console.log(queueEntry);
       throw new HttpException(
         '이미 대기열 안에 존재합니다.',
         HttpStatus.CONFLICT,
@@ -74,7 +76,7 @@ export class QueueService {
   ): Promise<boolean> {
     if (status === QueueEntryStatus.ELIGIBLE) return true;
     const eligibleCount =
-      await this.queueEntryRepository.countEligibleEntries();
+      await this.queueEntryRepository.countEligibleEntries(tx);
     return (
       status === QueueEntryStatus.WAITING &&
       eligibleCount < QUEUE_CONFIG.MAX_ELIGIBLE_ENTRIES
@@ -85,10 +87,10 @@ export class QueueService {
    * 대기열 항목들의 상태를 업데이트합니다.
    * 만료된 항목을 만료시키고, 새로운 항목을 예약 가능 상태로 변경합니다.
    */
-  async updateQueueEntries(): Promise<void> {
+  async updateQueueEntries(tx?: PrismaTransaction): Promise<void> {
     // 예약 가능한 항목들을 조회합니다.
     const eligibleEntries =
-      await this.queueEntryRepository.findEligibleEntries();
+      await this.queueEntryRepository.findEligibleEntries(tx);
 
     // 만료된 항목들을 제거합니다.
     for (const entry of eligibleEntries) {
@@ -102,14 +104,16 @@ export class QueueService {
 
     // 남아있는 예약 가능한 항목의 수를 계산합니다.
     const remainingEligibleCount =
-      await this.queueEntryRepository.countEligibleEntries();
+      await this.queueEntryRepository.countEligibleEntries(tx);
     const availableSlots =
       QUEUE_CONFIG.MAX_ELIGIBLE_ENTRIES - remainingEligibleCount;
 
     // 새로운 항목들을 예약 가능 상태로 변경합니다.
     if (availableSlots > 0) {
-      const waitingEntries =
-        await this.queueEntryRepository.findWaitingEntries(availableSlots);
+      const waitingEntries = await this.queueEntryRepository.findWaitingEntries(
+        availableSlots,
+        tx,
+      );
       for (const entry of waitingEntries) {
         await this.queueEntryRepository.updateStatus(
           entry.id,

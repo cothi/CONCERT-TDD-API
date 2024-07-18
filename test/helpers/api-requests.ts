@@ -81,4 +81,8 @@ export const createApiRequests = (app: INestApplication) => ({
     request(app.getHttpServer())
       .get('/concerts/seats/reserve')
       .set('Authorization', `Bearer ${accessToken}`),
+  getPointsRequest: (accessToken: string) =>
+    request(app.getHttpServer())
+      .get('/points')
+      .set('Authorization', `Bearer ${accessToken}`),
 });
