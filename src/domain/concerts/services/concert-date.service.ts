@@ -31,10 +31,17 @@ export class ConcertDateService {
     gcdByConcertIdModel: GCDByConcertIdModel,
     tx?: PrismaTransaction,
   ) {
-    return await this.concertDateRepository.findByConcertId(
+    const concertDate = await this.concertDateRepository.findByConcertId(
       gcdByConcertIdModel,
       tx,
     );
+    if (!concertDate) {
+      throw new HttpException(
+        '조회한 콘서트 날짜가 없습니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return concertDate;
   }
   async getConcertDateByConcertDateId(
     gcdByConcertDateIdModel: GCDByConcertDateIdModel,

@@ -72,16 +72,6 @@ describe('ConcertService', () => {
       expect(repository.findById).toHaveBeenCalledWith('1');
       expect(result).toEqual(expectedConcert);
     });
-
-    // it('concert id로 조회 시, 존재하지 않으면, 에러를 반환 합니다.', async () => {
-    //   const findConcertModel: FindConcertModel = { concertId: '2' };
-    //   repository.findById.mockResolvedValue(null);
-    //   expect(service.getConcertById(findConcertModel)).toThrowError(
-    //     HttpException,
-    //   );
-
-    //   expect(repository.findById).toHaveBeenCalledWith('2');
-    // });
   });
 
   describe('getAllConcerts', () => {

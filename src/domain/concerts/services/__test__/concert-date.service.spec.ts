@@ -3,7 +3,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConcertDateRepository } from 'src/infrastructure/database/repositories/concerts/concert-date.repository';
 import { ConcertDateService } from '../concert-date.service';
-import { CreateConcertDateModel } from '../../model/concert-date.model';
+import {
+  CreateConcertDateModel,
+  GCDByConcertDateIdModel,
+  GCDByConcertIdModel,
+} from '../../model/concert-date.model';
 import { ConcertDate } from '@prisma/client';
 
 describe('ConcertDateService', () => {
@@ -19,6 +23,17 @@ describe('ConcertDateService', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
   };
+  const expectedResults: ConcertDate[] = [
+    {
+      id: '1',
+      concertId: '2',
+      date: new Date(),
+      totalSeat: 2,
+      availableSeatCount: 2,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
 
   beforeEach(async () => {
     const repositoryMock = {
@@ -62,13 +77,27 @@ describe('ConcertDateService', () => {
     it('concert id로 콘서트 날짜를 가져와야 합니다.', async () => {
       // 이 메서드의 구현이 아직 없으므로 테스트를 추가하지 않았습니다.
       // 구현 후 테스트를 추가해야 합니다.
+      const gcdByConcertIdModel: GCDByConcertIdModel = {
+        concertId: '1',
+      };
+      await repository.findByConcertId.mockResolvedValue(expectedResults);
+
+      const result =
+        await service.getConcertDateByConcertId(gcdByConcertIdModel);
+      expect(result).toEqual(expectedResults);
     });
   });
 
   describe('getConcertDateByConcertDateId', () => {
     it('date id로 콘서트 날짜를 가져와야 합니다.', async () => {
-      // 이 메서드의 구현이 아직 없으므로 테스트를 추가하지 않았습니다.
-      // 구현 후 테스트를 추가해야 합니다.
+      const gcdByConcertDateIdModel: GCDByConcertDateIdModel = {
+        concertDateId: '1',
+      };
+      await repository.findById.mockResolvedValue(expectedResult);
+      const result = await service.getConcertDateByConcertDateId(
+        gcdByConcertDateIdModel,
+      );
+      expect(result).toEqual(expectedResult);
     });
   });
 });

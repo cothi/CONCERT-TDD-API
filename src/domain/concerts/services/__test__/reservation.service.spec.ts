@@ -55,6 +55,7 @@ describe('ReservationService', () => {
             getReservationById: jest.fn(),
             updateStatus: jest.fn(),
             findByUserId: jest.fn(),
+            getReservationByWithLock: jest.fn(),
           },
         },
       ],
@@ -116,6 +117,21 @@ describe('ReservationService', () => {
       const result = await service.getReservationById(getModel, tx);
 
       expect(repository.getReservationById).toHaveBeenCalledWith(getModel, tx);
+      expect(result).toEqual(mockReservation);
+    });
+  });
+  describe('getReservationByIdWithLock', () => {
+    it('ID로 예약을 조회해야 한다', async () => {
+      const getModel: GetReservationByIdModel = { reservationId: '1' };
+      const tx = {} as PrismaTransaction;
+      repository.getReservationByWithLock.mockResolvedValue(mockReservation);
+
+      const result = await service.getReservationByWithLock(getModel, tx);
+
+      expect(repository.getReservationByWithLock).toHaveBeenCalledWith(
+        getModel,
+        tx,
+      );
       expect(result).toEqual(mockReservation);
     });
   });
