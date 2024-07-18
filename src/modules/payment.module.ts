@@ -9,8 +9,8 @@ import { DatabaseModule } from 'src/infrastructure/prisma/prisma.module';
 import { PaymentController } from 'src/presentation/controller/payment/payment.controller';
 import { PointsModule } from './points.module';
 import { ConcertsModule } from './concerts.module';
-import { TransactionService } from 'src/domain/payment/transaction.service';
 import { TransactionRepository } from 'src/infrastructure/database/repositories/payment/payment.repository';
+import { TransactionService } from 'src/domain/payment/services/transaction.service';
 
 @Module({
   imports: [JwtModule, DatabaseModule, PointsModule, ConcertsModule],

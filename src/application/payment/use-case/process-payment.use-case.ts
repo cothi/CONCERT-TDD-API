@@ -9,7 +9,6 @@ import { GetReservationByIdModel } from 'src/domain/concerts/model/reservation.m
 import { UpdateSeatStatusModel } from 'src/domain/concerts/model/seat.model';
 import { ReservationService } from 'src/domain/concerts/services/reservation.service';
 import { SeatService } from 'src/domain/concerts/services/seat.service';
-import { TransactionService } from 'src/domain/payment/transaction.service';
 import { PointTransactionService } from 'src/domain/points/services/point-transaction.service';
 import { PointWalletService } from 'src/domain/points/services/point-wallet.service';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
@@ -17,6 +16,7 @@ import { PaymentResponseDto } from 'src/presentation/dto/payment/response/paymen
 import { UpdateReservationModel } from './../../../domain/concerts/model/reservation.model';
 import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { ProcessPaymentCommand } from '../command/process-payment.command';
+import { TransactionService } from 'src/domain/payment/services/transaction.service';
 
 @Injectable()
 export class ProcessPaymentUseCase

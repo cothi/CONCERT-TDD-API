@@ -17,7 +17,6 @@ export class QueueService {
     const queueEntry = await this.queueEntryRepository.findByUserId(userId, tx);
 
     if (queueEntry) {
-      console.log(queueEntry);
       throw new HttpException(
         '이미 대기열 안에 존재합니다.',
         HttpStatus.CONFLICT,
