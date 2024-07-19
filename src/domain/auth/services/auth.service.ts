@@ -23,10 +23,7 @@ export class AuthService {
     return await this.authRepository.registerUser(registerUserModel.toEntity());
   }
   async findUserByEmail(loginUserModel: LoginUserModel): Promise<UserModel> {
-    const user = await this.authRepository.findUserByEmail(
-      loginUserModel.toEntity(),
-    );
-    if (!user) {
+    const user = await this.authRepository.findUserByEmail( loginUserModel.toEntity(),); if (!user) {
       throw new HttpException(
         '유저가 존재하지 않습니다.',
         HttpStatus.NOT_FOUND,
