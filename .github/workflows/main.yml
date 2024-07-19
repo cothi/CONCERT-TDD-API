@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       JWT_SECRET: ${ { secrets.JWT_SECRET } }
+      DATABASE_URL: postgresql://postg:postg@localhost:5432/test?pool_timeout=0&connection_limit=0
     services:
       postgres:
         image: postgres:16
