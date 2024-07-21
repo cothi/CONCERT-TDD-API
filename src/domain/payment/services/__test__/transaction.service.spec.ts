@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TransactionRepository } from 'src/infrastructure/database/repositories/payment/payment.repository';
+import { TransactionRepository } from 'src/infrastructure/payment/payment.repository';
 import { TransactionService } from '../transaction.service';
 import {
   CreateTransactionModel,

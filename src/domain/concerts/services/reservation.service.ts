@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Reservation } from '@prisma/client';
-import { ReservationRepository } from 'src/infrastructure/database/repositories/concerts/reservation.repository';
+import { ReservationRepository } from 'src/infrastructure/concerts/reservation.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import {
   CreateReservationModel,

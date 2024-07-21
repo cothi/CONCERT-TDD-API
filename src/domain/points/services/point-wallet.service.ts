@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ChargePointEntity } from 'src/domain/points/entity/charge-point.entity';
 import { GetPointEntity } from 'src/domain/points/entity/get-point.entity';
-import { PointWalletRepository } from '../../../infrastructure/database/repositories/points/point-wallet.repository';
+import { PointWalletRepository } from '../../../infrastructure/points/point-wallet.repository';
 import { ChargePointModel, GetPointModel } from '../model/point.model';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';

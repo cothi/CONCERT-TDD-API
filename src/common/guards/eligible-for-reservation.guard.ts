@@ -5,7 +5,7 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { QueueEntryRepository } from 'src/infrastructure/database/repositories/enqueue/queue.repository';
+import { QueueEntryRepository } from 'src/infrastructure/enqueue/queue.repository';
 
 @Injectable()
 export class EligibleForReservationGuard implements CanActivate {

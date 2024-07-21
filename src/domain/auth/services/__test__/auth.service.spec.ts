@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
 import { UserModel } from 'src/domain/auth/model/user.model';
-import { AuthRepository } from 'src/infrastructure/database/repositories/auth/auth.repository';
+import { AuthRepository } from 'src/infrastructure/auth/auth.repository';
 import { AuthService } from '../auth.service';
 
 describe('AuthService', () => {

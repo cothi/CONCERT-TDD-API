@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Prisma, Seat } from '@prisma/client';
-import { SeatRepository } from 'src/infrastructure/database/repositories/concerts/seat.repository';
+import { SeatRepository } from 'src/infrastructure/concerts/seat.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import {
   CreateSeatsModel,

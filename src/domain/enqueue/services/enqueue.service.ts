@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { QueueEntry, QueueEntryStatus } from '@prisma/client';
 import { QUEUE_CONFIG } from 'src/common/config/config';
-import { QueueEntryRepository } from 'src/infrastructure/database/repositories/enqueue/queue.repository';
+import { QueueEntryRepository } from 'src/infrastructure/enqueue/queue.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 
 @Injectable()

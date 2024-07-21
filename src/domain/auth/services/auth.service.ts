@@ -3,27 +3,29 @@ https://docs.nestjs.com/providers#services
 */
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
-import { AuthRepository } from 'src/infrastructure/database/repositories/auth/auth.repository';
+import { AuthRepository } from 'src/infrastructure/auth/auth.repository';
+import { FindUserByEmailModel } from '../model/find-user-by-email.model';
 import { UserModel } from '../model/user.model';
+import { FindUserByIdModel } from '../model/find-use-by-id.model';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly authRepository: AuthRepository) {}
-  async registerUser(registerUserModel: RegisterUserModel): Promise<UserModel> {
-    const model = new LoginUserModel(registerUserModel.email);
-    const user = await this.authRepository.findUserByEmail(model.toEntity());
+  async registerUser(model: RegisterUserModel): Promise<UserModel> {
+    const findModel = FindUserByEmailModel.create(model.email);
+    const user = await this.authRepository.findUserByEmail(findModel);
     if (user) {
       throw new HttpException(
         '이미 동일한 이메일이 존재합니다.',
         HttpStatus.NOT_ACCEPTABLE,
       );
     }
-    return await this.authRepository.registerUser(registerUserModel.toEntity());
+    return await this.authRepository.registerUser(model)
   }
-  async findUserByEmail(loginUserModel: LoginUserModel): Promise<UserModel> {
-    const user = await this.authRepository.findUserByEmail( loginUserModel.toEntity(),); if (!user) {
+  async findUserByEmail(model: FindUserByEmailModel): Promise<UserModel> {
+    const user = await this.authRepository.findUserByEmail(model);
+    if (!user) {
       throw new HttpException(
         '유저가 존재하지 않습니다.',
         HttpStatus.NOT_FOUND,
@@ -32,8 +34,8 @@ export class AuthService {
     return user;
   }
 
-  async findUserById(userId: string): Promise<UserModel> {
-    const user = await this.authRepository.findUserById(userId);
+  async findUserById(model: FindUserByIdModel): Promise<UserModel> {
+    const user = await this.authRepository.findUserById(model);
     if (!user) {
       throw new HttpException(
         '유저가 존재하지 않습니다.',

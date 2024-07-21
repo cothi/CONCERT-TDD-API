@@ -3,7 +3,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { QueueEntry, QueueEntryStatus } from '@prisma/client';
 import { QueueService } from '../enqueue.service';
-import { QueueEntryRepository } from 'src/infrastructure/database/repositories/enqueue/queue.repository';
+import { QueueEntryRepository } from 'src/infrastructure/enqueue/queue.repository';
 
 // QueueEntryRepository 모킹
 const mockQueueEntryRepository = {

@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ConcertDateRepository } from 'src/infrastructure/database/repositories/concerts/concert-date.repository';
+import { ConcertDateRepository } from 'src/infrastructure/concerts/concert-date.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import { CreateConcertDateModel } from '../model/concert-date.model';
 import {

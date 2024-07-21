@@ -1,6 +1,6 @@
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { RecordPaymentEntity } from '../../../../domain/points/entity/record.payment.entity';
+import { RecordPaymentEntity } from '../../domain/points/entity/record.payment.entity';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 
 @Injectable()

@@ -15,7 +15,8 @@ export class RegisterUserUseCase
   ) {}
   async execute(input: RegisterUserModel): Promise<AuthResponseDto> {
     try {
-      const userModel = await this.authService.registerUser(input);
+      const reigsterModel = RegisterUserModel.create(input.email);
+      const userModel = await this.authService.registerUser(reigsterModel);
 
       const accessToken = this.jwtTokenService.generateAccessToken({
         userId: userModel.id,

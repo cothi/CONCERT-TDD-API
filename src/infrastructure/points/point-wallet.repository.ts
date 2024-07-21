@@ -1,5 +1,5 @@
 import { ChargePointEntity } from 'src/domain/points/entity/charge-point.entity';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { GetPointEntity } from 'src/domain/points/entity/get-point.entity';
 import { Decimal } from '@prisma/client/runtime/library';

@@ -4,7 +4,7 @@ https://docs.nestjs.com/fundamentals/testing#unit-testing
 
 import { Test } from '@nestjs/testing';
 import { Concert } from '@prisma/client';
-import { ConcertRepository } from 'src/infrastructure/database/repositories/concerts/concert.repository';
+import { ConcertRepository } from 'src/infrastructure/concerts/concert.repository';
 import {
   CreateConcertModel,
   FindConcertModel,

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Transaction } from '@prisma/client';
-import { TransactionRepository } from 'src/infrastructure/database/repositories/payment/payment.repository';
+import { TransactionRepository } from 'src/infrastructure/payment/payment.repository';
 import {
   CreateTransactionModel,
   UpdateTransactionStatusModel,

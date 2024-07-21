@@ -1,4 +1,4 @@
-import { PointWalletRepository } from 'src/infrastructure/database/repositories/points/point-wallet.repository';
+import { PointWalletRepository } from 'src/infrastructure/points/point-wallet.repository';
 import { PointWalletService } from '../point-wallet.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Decimal } from '@prisma/client/runtime/library';

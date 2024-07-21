@@ -9,8 +9,8 @@ import { QueryUserPointUseCase } from 'src/application/points/use-cases/query-us
 import { PointTransactionService } from 'src/domain/points/services/point-transaction.service';
 import { PointWalletService } from 'src/domain/points/services/point-wallet.service';
 import { DatabaseModule } from 'src/infrastructure/prisma/prisma.module';
-import { PointTransactionRepository } from 'src/infrastructure/database/repositories/points/point-transaction.repository';
-import { PointWalletRepository } from 'src/infrastructure/database/repositories/points/point-wallet.repository';
+import { PointTransactionRepository } from 'src/infrastructure/points/point-transaction.repository';
+import { PointWalletRepository } from 'src/infrastructure/points/point-wallet.repository';
 import { PointsController } from 'src/presentation/controller/points/points.controller';
 
 @Module({

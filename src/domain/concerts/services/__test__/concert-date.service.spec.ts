@@ -1,7 +1,7 @@
 // src/modules/concert/services/concert-date.service.spec.ts
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConcertDateRepository } from 'src/infrastructure/database/repositories/concerts/concert-date.repository';
+import { ConcertDateRepository } from 'src/infrastructure/concerts/concert-date.repository';
 import { ConcertDateService } from '../concert-date.service';
 import {
   CreateConcertDateModel,

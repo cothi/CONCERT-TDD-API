@@ -1,8 +1,9 @@
+import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
+import { FindUserByIdModel } from 'src/domain/auth/model/find-use-by-id.model';
 import { RefreshTokenModel } from 'src/domain/auth/model/refresh-token.model';
 import { AuthService } from 'src/domain/auth/services/auth.service';
 import { RefreshTokenResponseDto } from 'src/presentation/dto/auth/response/refresh-token.response.dto';
-import { IUseCase } from '../../../common/interfaces/use-case.interface';
 
 export class RefreshTokenUseCase
   implements IUseCase<RefreshTokenModel, RefreshTokenResponseDto>
@@ -15,8 +16,9 @@ export class RefreshTokenUseCase
     try {
       const tokenResult = this.jwtTokenService.verifyToken(input.accessToken);
 
+      const findModel = FindUserByIdModel.create(tokenResult.payload.userId);
       const user = await this.authService.findUserById(
-        tokenResult.payload.userId,
+        findModel
       );
 
       const accessToken = this.jwtTokenService.generateAccessToken({

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { RecordPaymentEntity } from 'src/domain/points/entity/record.payment.entity';
-import { PointTransactionRepository } from 'src/infrastructure/database/repositories/points/point-transaction.repository';
+import { PointTransactionRepository } from 'src/infrastructure/points/point-transaction.repository';
 import { RecordPaymentModel } from '../model/point.model';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 

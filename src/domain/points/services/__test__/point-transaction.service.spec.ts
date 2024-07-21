@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Payment, PaymentType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-import { PointTransactionRepository } from 'src/infrastructure/database/repositories/points/point-transaction.repository';
+import { PointTransactionRepository } from 'src/infrastructure/points/point-transaction.repository';
 import { PointTransactionService } from '../point-transaction.service';
 import { RecordPaymentModel } from '../../model/point.model';
 

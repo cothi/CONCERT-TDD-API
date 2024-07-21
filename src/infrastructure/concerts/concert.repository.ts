@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Concert } from '@prisma/client';
 import { CreateConcertModel } from 'src/domain/concerts/model/concert.model';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ConcertRepository {

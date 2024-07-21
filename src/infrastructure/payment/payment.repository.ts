@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, Transaction } from '@prisma/client';
 import { CreateTransactionModel } from 'src/domain/payment/model/transaction.model';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { UpdateTransactionStatusModel } from './../../../../domain/payment/model/transaction.model';
+import { UpdateTransactionStatusModel } from '../../domain/payment/model/transaction.model';
 
 @Injectable()
 export class TransactionRepository {

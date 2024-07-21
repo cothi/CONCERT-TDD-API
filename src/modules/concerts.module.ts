@@ -7,10 +7,10 @@ import { ConcertDateService } from 'src/domain/concerts/services/concert-date.se
 import { ConcertService } from 'src/domain/concerts/services/concert.service';
 import { ReservationService } from 'src/domain/concerts/services/reservation.service';
 import { SeatService } from 'src/domain/concerts/services/seat.service';
-import { ConcertDateRepository } from 'src/infrastructure/database/repositories/concerts/concert-date.repository';
-import { ConcertRepository } from 'src/infrastructure/database/repositories/concerts/concert.repository';
-import { ReservationRepository } from 'src/infrastructure/database/repositories/concerts/reservation.repository';
-import { SeatRepository } from 'src/infrastructure/database/repositories/concerts/seat.repository';
+import { ConcertDateRepository } from 'src/infrastructure/concerts/concert-date.repository';
+import { ConcertRepository } from 'src/infrastructure/concerts/concert.repository';
+import { ReservationRepository } from 'src/infrastructure/concerts/reservation.repository';
+import { SeatRepository } from 'src/infrastructure/concerts/seat.repository';
 import { DatabaseModule } from 'src/infrastructure/prisma/prisma.module';
 import { ConcertsController } from 'src/presentation/controller/concerts/concerts.controller';
 import { CreateConcertUseCase } from '../application/concerts/use-cases/create-concert.use-case';

@@ -1,6 +1,6 @@
 import { Decimal } from '@prisma/client/runtime/library';
 import { Test, TestingModule } from '@nestjs/testing';
-import { SeatRepository } from 'src/infrastructure/database/repositories/concerts/seat.repository';
+import { SeatRepository } from 'src/infrastructure/concerts/seat.repository';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Seat, SeatStatus } from '@prisma/client';
 import { SeatService } from '../seat.service';

@@ -6,7 +6,7 @@ import {
   GCDByConcertIdModel,
 } from 'src/domain/concerts/model/concert-date.model';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ConcertDateRepository {

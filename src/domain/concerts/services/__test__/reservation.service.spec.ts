@@ -2,7 +2,7 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReservationService } from '../reservation.service';
-import { ReservationRepository } from 'src/infrastructure/database/repositories/concerts/reservation.repository';
+import { ReservationRepository } from 'src/infrastructure/concerts/reservation.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import { Reservation, ReservationStatus } from '@prisma/client';
 import {
