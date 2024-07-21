@@ -1,0 +1,399 @@
+{
+  "favorites.resources": [
+    {
+      "filePath": "docker-compose.yml",
+      "group": "test"
+    },
+    {
+      "filePath": "src/modules/auth.module.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/presentation/controller/auth/auth.controller.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/presentation/dto/request/auth/register.request.dto.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/presentation/dto/request/auth/user.request.dto.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/presentation/dto/request/auth/user-register.request.dto.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/application/auth/services/auth.service.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/domain/auth/model/user.model.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/auth/auth.repository.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/presentation/dto/response/auth/login.response.dto.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/domain/auth/entity/user.entity.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/common/modules/jwt/jwt.service.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/modules/jwt/jwt.module.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/modules/interfaces/token-service.interface.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/interfaces/jwt-token.interface.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/interfaces/token-service.interface.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/interfaces/token-verification-result.interface.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/common/interfaces/token-result.interface.ts",
+      "group": "main"
+    },
+    {
+      "filePath": "src/application/auth/interfaces/auth-service.interface.ts",
+      "group": "Default"
+    },
+    {
+      "filePath": "src/application/auth/commands/login-user.command.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/application/auth/handlers/login-user.handler.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/application/auth/interfaces/auth-service.interface.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/application/auth/services/auth.service.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/presentation/controller/auth/auth.controller.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/domain/auth/interfaces/repositories/auth-repository.interface.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/auth/auth.repository.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/presentation/dto/auth/request/login.request.dto.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/application/auth/symbol/login-user.use-case.symbol.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/domain/auth/entity/login-user.entity.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/domain/auth/model/login-user.model.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/application/auth/use-cases/login-user.use-case.ts",
+      "group": "auth/login"
+    },
+    {
+      "filePath": "src/presentation/controller/auth/auth.controller.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/presentation/dto/auth/request/refresh.request.dto.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/presentation/dto/auth/response/auth.response.dto.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/auth/auth.repository.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/application/auth/use-cases/refresh-token.use-case.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/domain/auth/interfaces/repositories/auth-repository.interface.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/application/auth/services/auth.service.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/modules/auth.module.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/domain/auth/model/refresh-token.model.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/presentation/dto/auth/request/refresh-token.request.dto.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/presentation/dto/auth/response/refresh-token.response.dto.ts",
+      "group": "auth/refresh"
+    },
+    {
+      "filePath": "src/presentation/controller/points/points.controller.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/points/point-wallet.repository.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/modules/points.module.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/services/point-wallet.service.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/user-cases/charge-point.user-case.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/presentation/dto/points/request/charge-point.request.dto.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/presentation/dto/points/response/charge-point.response.dto.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "prisma/schema.prisma",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/points/point-history.repository.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/services/point-history.service.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/infrastructrue/database/repositories/points/payment-history.repository.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/services/payment-history.service.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/services/point-transaction.service.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/presentation/controller/concerts/concerts.controller.ts",
+      "group": "concert/create"
+    },
+    {
+      "filePath": "src/application/concerts/dto/create-concert.use-case.dto.ts",
+      "group": "concert/create"
+    },
+    {
+      "filePath": "src/modules/concerts.module.ts",
+      "group": "concert/create"
+    },
+    {
+      "filePath": "src/domain/concerts/services/concert.service.ts",
+      "group": "concert/create"
+    },
+    {
+      "filePath": "src/application/concerts/use-cases/create-concert.use-case.ts",
+      "group": "concert/create"
+    },
+    {
+      "filePath": "src/presentation/controller/concerts/concerts.controller.ts",
+      "group": "concert/date"
+    },
+    {
+      "filePath": "src/modules/concerts.module.ts",
+      "group": "concert/date"
+    },
+    {
+      "filePath": "src/infrastructure/database/repositories/concerts/concert-date.repository.ts",
+      "group": "concert/date"
+    },
+    {
+      "filePath": "src/domain/concerts/services/concert-date.service.ts",
+      "group": "concert/date"
+    },
+    {
+      "filePath": "src/domain/concerts/model/concert-date.model.ts",
+      "group": "concert/date"
+    },
+    {
+      "filePath": "src/presentation/controller/concerts/concerts.controller.ts",
+      "group": "concert/seat/create"
+    },
+    {
+      "filePath": "src/modules/concerts.module.ts",
+      "group": "concert/seat/create"
+    },
+    {
+      "filePath": "src/application/concerts/use-cases/create-seat.use-case.ts",
+      "group": "concert/seat/create"
+    },
+    {
+      "filePath": "src/domain/concerts/seat.service.ts",
+      "group": "concert/seat/create"
+    },
+    {
+      "filePath": "src/infrastructure/database/repositories/concerts/seat.repository.ts",
+      "group": "concert/seat/create"
+    },
+    {
+      "filePath": "src/infrastructure/database/repositories/points/point-wallet.repository.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/points/user-cases/charge-point.use-case.ts",
+      "group": "points/chage"
+    },
+    {
+      "filePath": "src/application/concerts/use-cases/reserve-seat.user-case.ts",
+      "group": "dev"
+    },
+    {
+      "filePath": "src/application/concerts/command/reserve-seat.command.ts",
+      "group": "dev"
+    },
+    {
+      "filePath": "src/presentation/controller/concerts/concerts.controller.ts",
+      "group": "dev"
+    },
+    {
+      "filePath": "src/presentation/dto/concerts/dto/response/reservation.response.dto.ts",
+      "group": "dev"
+    },
+    {
+      "filePath": "src/presentation/dto/concerts/dto/request/reserve-seat.dto.ts",
+      "group": "dev"
+    },
+    {
+      "filePath": "src/domain/concerts/services/seat.service.ts",
+      "group": "dev"
+    },
+    {
+      "filePath": "src/domain/concerts/services/reservation.service.ts",
+      "group": "dev"
+    },
+    {
+      "filePath": "src/infrastructure/database/repositories/concerts/reservation.repository.ts",
+      "group": "dev"
+    },
+    {
+      "filePath": "src/infrastructure/database/repositories/enqueue/enqueue.repository.ts",
+      "group": "queue"
+    },
+    {
+      "filePath": "src/domain/enqueue/services/enqueue.service.ts",
+      "group": "queue"
+    },
+    {
+      "filePath": "src",
+      "group": "queue"
+    },
+    {
+      "filePath": "src/application/enqueue/use-cases/enqueue.use-case.ts",
+      "group": "queue"
+    },
+    {
+      "filePath": "src/infrastructure/database/repositories/enqueue/queue.repository.ts",
+      "group": "queue"
+    },
+    {
+      "filePath": "src/presentation/dto/enqueue/request/enqueue.dto.ts",
+      "group": "queue"
+    },
+    {
+      "filePath": "src/presentation/dto/payment/request/process-payment.dto.ts",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/presentation/controller/payment/payment.controller.ts",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/presentation/dto/payment/response/payment-history.response.dto.ts",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/presentation/dto/payment/response/payment.response.dto.ts",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/modules/auth.module.ts",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/domain",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/infrastructure",
+      "group": "payment"
+    },
+    {
+      "filePath": "src/application/payment/use-case/process-payment.use-case.ts",
+      "group": "payment"
+    }
+  ],
+  "favorites.groups": [
+    "Default",
+    "test",
+    "main",
+    "auth",
+    "dev",
+    "auth/login",
+    "auth/refresh",
+    "point",
+    "points/chage",
+    "concert/create",
+    "concert/date",
+    "concert/seat/create",
+    "seat/reserve",
+    "queue",
+    "payment"
+  ],
+  "favorites.currentGroup": "payment",
+  "favorites.sortOrder": "ASC"
+}

@@ -1,0 +1,164 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+// model User{
+//     id String @id @default(uuid())
+//     email String @unique
+//     createAt DateTime @default(now())
+//     updateAt DateTime @updatedAt
+// }
+
+model Concert {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  concertDates ConcertDate[]
+  reservations Reservation[]
+}
+
+model ConcertDate {
+  id                 String        @id @default(uuid())
+  concertId          String
+  date               DateTime      
+  totalSeat          Int
+  availableSeatCount Int
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  concert            Concert       @relation(fields: [concertId], references: [id], onDelete: Cascade)
+  seats              Seat[]
+  reservations       Reservation[]
+
+  @@index([concertId])
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userPoint    UserPoint?
+  queueEntries QueueEntry?
+  payments     Payment[]
+  transactions Transaction[]
+  reservations Reservation[]
+}
+
+model UserPoint {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  amount    Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id          String      @id @default(uuid())
+  userId      String
+  amount      Decimal     @db.Decimal(10, 2)
+  createdAt   DateTime    @default(now())
+  paymentType PaymentType
+  updatedAt   DateTime    @updatedAt
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Transaction {
+  id              String          @id @default(uuid())
+  userId          String
+  amount          Decimal         @db.Decimal(10, 2)
+  transactionType TransactionType
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Seat {
+  id            String          @id @default(uuid())
+  seatNumber    Int
+  price         Decimal         @db.Decimal(10, 2)
+  status        SeatStatus
+  concertDateId String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  concertDate   ConcertDate     @relation(fields: [concertDateId], references: [id], onDelete: Cascade)
+  reservations  Reservation[]
+
+  @@index([concertDateId])
+}
+
+model Reservation {
+  id            String            @id @default(uuid())
+  userId        String
+  seatId        String
+  concertId     String
+  concertDateId String
+  status        ReservationStatus
+  createdAt     DateTime          @default(now())
+  expiresAt     DateTime
+  updatedAt     DateTime          @updatedAt
+  user          User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  seat          Seat              @relation(fields: [seatId], references: [id], onDelete: Restrict)
+  concert       Concert           @relation(fields: [concertId], references: [id], onDelete: Restrict)
+  concertDate   ConcertDate       @relation(fields: [concertDateId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([seatId])
+  @@index([concertId])
+  @@index([concertDateId])
+}
+
+model QueueEntry {
+  id            String     @id @default(uuid())
+  userId        String     @unique
+  status        QueueEntryStatus @default(WAITING)
+  enteredAt     DateTime  
+  expiresAt     DateTime?
+  updatedAt     DateTime   @updatedAt
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+
+// Enum 타입 정의
+
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum TransactionType {
+  CHARGE
+  PAYMENT
+  REFUND
+}
+enum SeatStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+}
+enum PaymentType {
+    CHARGE
+    TICKET_PURCHASE
+    REFUND
+}
+
+enum QueueEntryStatus {
+  WAITING
+  ELIGIBLE
+  EXPIRED
+  COMPLETED
+}

@@ -2,20 +2,12 @@
   "singleQuote": true,
   "trailingComma": "all",
   "endOfLine": "lf",
-  "printWidth": 100,
+  "printWidth": 80,
   "tabWidth": 2,
   "semi": true,
   "bracketSpacing": true,
-  "arrowParens": "avoid",
+  "arrowParens": "always",
   "proseWrap": "preserve",
   "quoteProps": "as-needed",
-  "embeddedLanguageFormatting": "auto",
-  "overrides": [
-    {
-      "files": "*.ts",
-      "options": {
-        "parser": "typescript"
-      }
-    }
-  ]
+  "embeddedLanguageFormatting": "auto"
 }

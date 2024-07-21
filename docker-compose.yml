@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: postg
+      POSTGRES_PASSWORD: postg
+      POSTGRES_LOGGING_COLLECTOR: 'on'
+      POSTGRES_LOG_STATEMENT: 'all'
+      POSTGRES_LOG_CONNECTIONS: 'on'
+      POSTGRES_LOG_DISCONNECTIONS: 'on'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
