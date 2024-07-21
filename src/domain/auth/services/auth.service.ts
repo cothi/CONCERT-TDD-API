@@ -4,7 +4,7 @@ https://docs.nestjs.com/providers#services
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
-import { AuthRepository } from 'src/infrastructure/auth/auth.repository';
+import { AuthRepository } from 'src/infrastructure/auth/repositories/auth.repository';
 import { FindUserByEmailModel } from '../model/find-user-by-email.model';
 import { UserModel } from '../model/user.model';
 import { FindUserByIdModel } from '../model/find-use-by-id.model';

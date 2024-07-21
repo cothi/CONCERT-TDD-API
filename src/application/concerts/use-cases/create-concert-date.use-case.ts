@@ -24,13 +24,16 @@ export class CreateConcertDateUseCase
       };
       const concert =
         await this.concertService.getConcertById(findConcertModel);
-      const model: CreateConcertDateModel = {
-        concertId: concert.id,
-        date: input.date,
-        totalSeat: input.totalSeat,
-      };
-      const concertDate =
-        await this.concertDateService.createConcertDate(model);
+
+      const createConcertDateModel = CreateConcertDateModel.create(
+        concert.id,
+        input.date,
+        input.totalSeat,
+      );
+
+      const concertDate = await this.concertDateService.createConcertDate(
+        createConcertDateModel,
+      );
       return ConcertDateResponseDto.fromConcertDate(concertDate);
     } catch (error) {
       throw error;

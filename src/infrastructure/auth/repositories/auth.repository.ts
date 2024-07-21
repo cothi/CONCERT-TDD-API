@@ -6,7 +6,7 @@ import { FindUserByEmailModel } from 'src/domain/auth/model/find-user-by-email.m
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
 import { UserModel } from 'src/domain/auth/model/user.model';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { AuthMapper } from './mapper/auth.mapper';
+import { AuthMapper } from '../mapper/auth.mapper';
 
 @Injectable()
 export class AuthRepository implements IAuthRepository {

@@ -9,7 +9,7 @@ import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types'
 import {
   GetReservationByIdModel,
   GetUserReservationsModel,
-} from '../../domain/concerts/model/reservation.model';
+} from '../../../domain/concerts/model/reservation.model';
 
 @Injectable()
 export class ReservationRepository {

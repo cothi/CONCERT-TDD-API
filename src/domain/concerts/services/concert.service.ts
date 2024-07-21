@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Concert } from '@prisma/client';
-import { ConcertRepository } from 'src/infrastructure/concerts/concert.repository';
+import { ConcertRepository } from 'src/infrastructure/concerts/repositories/concert.repository';
 import { CreateConcertModel, FindConcertModel } from '../model/concert.model';
 
 @Injectable()
