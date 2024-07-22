@@ -1,33 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { Concert } from '@prisma/client';
-import { CreateConcertModel } from 'src/domain/concerts/model/concert.model';
+import {
+  ConcertModel,
+  CreateConcertModel,
+  FindConcertByIdModel,
+  FindConcertByNameModel,
+} from 'src/domain/concerts/model/concert.model';
 import { PrismaService } from '../../prisma/prisma.service';
+import { ConcertMapper } from '../mapper/concert.mapper';
 
 @Injectable()
 export class ConcertRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createConcertModel: CreateConcertModel) {
-    return this.prisma.concert.create({
+  async create(model: CreateConcertModel) {
+    const entity = ConcertMapper.toMapCreateConcertEntity(model);
+    const concert = await this.prisma.concert.create({
       data: {
-        name: createConcertModel.name,
+        name: entity.name,
       },
     });
+    return ConcertMapper.toMapConcertModel(concert);
   }
 
-  async findAllConcert(): Promise<Concert[]> {
-    return await this.prisma.concert.findMany();
+  async findAllConcert(): Promise<ConcertModel[]> {
+    const conserts = await this.prisma.concert.findMany();
+    return ConcertMapper.toMapConcertsModel(conserts);
   }
-
-  async findById(id: string): Promise<Concert | null> {
-    return await this.prisma.concert.findUnique({
-      where: { id },
+  async findById(model: FindConcertByIdModel): Promise<ConcertModel | null> {
+    const entity = ConcertMapper.toMapFindConcertByIdEntity(model);
+    const concert = await this.prisma.concert.findUnique({
+      where: { id: entity.concertId },
     });
+    return ConcertMapper.toMapConcertModel(concert);
   }
 
-  async findByConcertName(name: string): Promise<Concert | null> {
-    return await this.prisma.concert.findUnique({
-      where: { name: name },
+  async findByConcertName(
+    model: FindConcertByNameModel,
+  ): Promise<ConcertModel | null> {
+    const entity = ConcertMapper.toMapFindConcertByNameEntity(model);
+    const concert = await this.prisma.concert.findUnique({
+      where: { name: entity.name },
     });
+    return ConcertMapper.toMapConcertModel(concert);
   }
 }

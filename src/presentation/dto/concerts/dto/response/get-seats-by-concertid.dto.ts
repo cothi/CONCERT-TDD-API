@@ -1,12 +1,12 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
-import { Seat } from '@prisma/client';
+import { SeatModel } from 'src/domain/concerts/model/seat.model';
 export class GetSeatsByConcertIdResponseDto {
   @ApiResponseProperty({
     type: [],
   })
-  seats: Seat[];
+  seats: SeatModel[];
 
-  static fromSeats(seats: Seat[]): GetSeatsByConcertIdResponseDto {
+  static fromSeats(seats: SeatModel[]): GetSeatsByConcertIdResponseDto {
     const dto = new GetSeatsByConcertIdResponseDto();
     dto.seats = seats;
     return dto;

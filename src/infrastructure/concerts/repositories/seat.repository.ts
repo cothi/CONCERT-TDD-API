@@ -1,52 +1,72 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Prisma, Seat, SeatStatus } from '@prisma/client';
+import { Prisma, Seat } from '@prisma/client';
+import {
+  CreateSeatModel,
+  GetSeatByConcertDateIdModel,
+  GetSeatBySeatIdModel,
+  SeatModel,
+  UpdateSeatStatusModel,
+} from 'src/domain/concerts/model/seat.model';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { PrismaService } from '../../prisma/prisma.service';
+import { SeatMapper } from '../mapper/seat.mapper';
 
 @Injectable()
 export class SeatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createMany(
-    seats: Omit<Seat, 'id' | 'createdAt' | 'updatedAt'>[],
+    model: CreateSeatModel[],
     tx?: PrismaTransaction,
   ): Promise<Prisma.BatchPayload> {
-    return (tx ?? this.prisma).seat.createMany({
-      data: seats,
+    const entities = SeatMapper.toMapCreateSeatsEntity(model);
+    const seats = await (tx ?? this.prisma).seat.createMany({
+      data: entities,
     });
+    return seats;
   }
 
   async findBySeatId(
-    seatId: string,
+    model: GetSeatBySeatIdModel,
     tx?: PrismaTransaction,
-  ): Promise<Seat | null> {
-    return (tx ?? this.prisma).seat.findUnique({
-      where: { id: seatId },
+  ): Promise<SeatModel | null> {
+    const entity = SeatMapper.toMapGetSeatByIdEntity(model);
+    const seat = await (tx ?? this.prisma).seat.findUnique({
+      where: { id: entity.id },
     });
+    return SeatMapper.toMapSeatModel(seat);
+  }
+
+  async findAndLockById(
+    model: GetSeatBySeatIdModel,
+    tx?: PrismaTransaction,
+  ): Promise<SeatModel | null> {
+    const entity = SeatMapper.toMapGetSeatByIdEntity(model);
+    const [seat] = await (tx ?? this.prisma).$queryRaw<Seat[]>`
+    SELECT * FROM "Seat" WHERE id = ${entity.id} FOR UPDATE NOWAIT`;
+    return SeatMapper.toMapSeatModel(seat);
   }
 
   async findByConcertDateId(
-    concertDateId: string,
+    model: GetSeatByConcertDateIdModel,
     tx?: PrismaTransaction,
-  ): Promise<Seat[]> {
-    return (tx ?? this.prisma).seat.findMany({
-      where: { concertDateId: concertDateId },
+  ): Promise<SeatModel[]> {
+    const entity = SeatMapper.toMapGetSeatByConcertDateIdEntity(model);
+    const seats = await (tx ?? this.prisma).seat.findMany({
+      where: { concertDateId: entity.concertDateId },
     });
-  }
-
-  async findAndLockById(tx: PrismaTransaction, seatId: string): Promise<Seat> {
-    const [seat] = await (tx ?? this.prisma).$queryRaw<Seat[]>`
-    SELECT * FROM "Seat" WHERE id = ${seatId} FOR UPDATE NOWAIT`;
-    return seat || null;
+    return SeatMapper.toMapSeatModels(seats);
   }
   async updateStatus(
-    seatId: string,
-    status: SeatStatus,
+    model: UpdateSeatStatusModel,
     tx?: PrismaTransaction,
-  ) {
-    return (tx ?? this.prisma).seat.update({
-      where: { id: seatId },
-      data: { status },
+  ): Promise<SeatModel> {
+    const entity = SeatMapper.toMapUpdateSeatStatusEntity(model);
+
+    const seat = await (tx ?? this.prisma).seat.update({
+      where: { id: entity.id },
+      data: { status: entity.status },
     });
+    return SeatMapper.toMapSeatModel(seat);
   }
 }

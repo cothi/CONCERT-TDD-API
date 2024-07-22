@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Concert } from '@prisma/client';
+import { ConcertModel } from 'src/domain/concerts/model/concert.model';
 
 export class GetConcertsResponseDto {
   @ApiProperty({
     description: '콘서트 목록',
   })
-  concerts: Concert[];
+  concerts: ConcertModel[];
 
-  static fromConcerts(concerts: Concert[]) {
+  static fromConcerts(concerts: ConcertModel[]) {
     const dto = new GetConcertsResponseDto();
     dto.concerts = concerts;
 

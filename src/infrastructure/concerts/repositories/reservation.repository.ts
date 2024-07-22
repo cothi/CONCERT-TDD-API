@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Reservation, ReservationStatus } from '@prisma/client';
+import { Reservation } from '@prisma/client';
 import {
   CreateReservationModel,
+  ReservationModel,
   UpdateReservationModel,
 } from 'src/domain/concerts/model/reservation.model';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
@@ -10,56 +11,65 @@ import {
   GetReservationByIdModel,
   GetUserReservationsModel,
 } from '../../../domain/concerts/model/reservation.model';
+import { ReservationMapper } from '../mapper/reservation.mapper';
 
 @Injectable()
 export class ReservationRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(
-    createReservationModel: CreateReservationModel,
+    model: CreateReservationModel,
     tx?: PrismaTransaction,
-  ): Promise<Reservation> {
-    return await (tx ?? this.prisma).reservation.create({
+  ): Promise<ReservationModel> {
+    const entity = ReservationMapper.toMapCreateReservationEntity(model);
+    const reservation = await (tx ?? this.prisma).reservation.create({
       data: {
-        userId: createReservationModel.userId,
-        concertId: createReservationModel.concertId,
-        concertDateId: createReservationModel.concertDateId,
-        seatId: createReservationModel.seatId,
-        status: ReservationStatus.PENDING,
-        expiresAt: createReservationModel.expireAt,
+        userId: entity.userId,
+        concertId: entity.concertId,
+        concertDateId: entity.concertDateId,
+        seatId: entity.seatId,
+        status: entity.status,
+        expiresAt: entity.expiresAt,
       },
     });
+    return ReservationMapper.toMapReservationModel(reservation);
   }
 
   async getReservationById(
-    getReservationByIdModel: GetReservationByIdModel,
+    model: GetReservationByIdModel,
     tx?: PrismaTransaction,
-  ): Promise<Reservation | null> {
-    return await (tx ?? this.prisma).reservation.findUnique({
-      where: { id: getReservationByIdModel.reservationId },
+  ): Promise<ReservationModel | null> {
+    const entity = ReservationMapper.toMapGetReservationByIdEntity(model);
+    const reservation = await (tx ?? this.prisma).reservation.findUnique({
+      where: { id: entity.id },
     });
+    return ReservationMapper.toMapReservationModel(reservation);
   }
   async getReservationByWithLock(
-    getReservationByIdModel: GetReservationByIdModel,
+    model: GetReservationByIdModel,
     tx?: PrismaTransaction,
-  ): Promise<Reservation | null> {
+  ): Promise<ReservationModel | null> {
+    const entity = ReservationMapper.toMapGetReservationByIdEntity(model);
     const [reservation] = await (tx ?? this.prisma).$queryRaw<Reservation[]>`
-    SELECT * FROM "Reservation" WHERE id = ${getReservationByIdModel.reservationId} FOR UPDATE NOWAIT`;
-    return reservation;
+    SELECT * FROM "Reservation" WHERE id = ${entity.id} FOR UPDATE NOWAIT`;
+    return ReservationMapper.toMapReservationModel(reservation);
   }
 
   async updateStatus(
-    updateReservationModel: UpdateReservationModel,
+    model: UpdateReservationModel,
     tx?: PrismaTransaction,
-  ): Promise<Reservation> {
-    return await (tx ?? this.prisma).reservation.update({
-      where: { id: updateReservationModel.reservationId },
-      data: { status: updateReservationModel.status },
+  ): Promise<ReservationModel> {
+    const entity = ReservationMapper.toMapUpdateReservationStatusEntity(model);
+    const reservation = await (tx ?? this.prisma).reservation.update({
+      where: { id: entity.id },
+      data: { status: entity.status },
     });
+    return ReservationMapper.toMapReservationModel(reservation);
   }
-  async findByUserId(getUserReservationsModel: GetUserReservationsModel) {
-    return await this.prisma.reservation.findMany({
-      where: { userId: getUserReservationsModel.userId },
+  async findByUserId(model: GetUserReservationsModel) {
+    const entity = ReservationMapper.toMapFindReservationByUserIdEntity(model);
+    const reservations = await this.prisma.reservation.findMany({
+      where: { userId: entity.userId },
       include: {
         concert: { select: { name: true } },
         concertDate: { select: { date: true } },
@@ -67,6 +77,7 @@ export class ReservationRepository {
       },
       orderBy: { createdAt: 'desc' },
     });
+    return reservations;
   }
 }
 

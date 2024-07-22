@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ConcertDate } from '@prisma/client';
 import { ConcertDateModel } from 'src/domain/concerts/model/concert-date.model';
 
 export class ConcertDateResponseDto {
@@ -44,18 +43,19 @@ export class ConcertDateResponseDto {
     return dto;
   }
 
-  static ConcertDates(model: ConcertDate): ConcertDateResponseDto {
+  static ConcertDates(model: ConcertDateModel): ConcertDateResponseDto {
     const dto = new ConcertDateResponseDto();
-    dto.concertDateId = model.id;
+    dto.concertDateId = model.concertDateId;
     dto.concertId = model.concertId;
     dto.date = model.date;
     dto.totalSeat = model.totalSeat;
     dto.availableSeatCount = model.availableSeatCount;
-
     return dto;
   }
 
-  static fromConcertDates(models: ConcertDate[]): ConcertDateResponseDto[] {
+  static fromConcertDates(
+    models: ConcertDateModel[],
+  ): ConcertDateResponseDto[] {
     return models.map((model) => this.ConcertDates(model));
   }
 }

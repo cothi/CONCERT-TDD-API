@@ -54,4 +54,8 @@ export class ConcertDateMapper {
     );
     return model;
   }
+  static toMapConcertDatesModel(entitys: ConcertDate[]): ConcertDateModel[] {
+    const models = entitys.map((entity) => this.toMapConcertDateModel(entity));
+    return models;
+  }
 }

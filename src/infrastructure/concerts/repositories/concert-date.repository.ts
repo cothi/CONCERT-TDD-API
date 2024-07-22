@@ -49,11 +49,12 @@ export class ConcertDateRepository {
   async findByConcertId(
     model: GCDByConcertIdModel,
     tx?: PrismaTransaction,
-  ): Promise<ConcertDate[]> {
+  ): Promise<ConcertDateModel[]> {
     const entity = ConcertDateMapper.toMapConcertByConcertIdEntity(model);
-    return await (tx ?? this.prisma).concertDate.findMany({
+    const concerts = await (tx ?? this.prisma).concertDate.findMany({
       where: { concertId: entity.concertId },
     });
+    return ConcertDateMapper.toMapConcertDatesModel(concerts);
   }
 
   async findByDate(

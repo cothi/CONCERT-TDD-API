@@ -1,10 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Prisma, Seat } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { SeatRepository } from 'src/infrastructure/concerts/repositories/seat.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import {
+  CreateSeatModel,
   CreateSeatsModel,
   GetSeatByConcertDateIdModel,
+  GetSeatBySeatIdModel,
+  SeatModel,
 } from '../model/seat.model';
 import { UpdateSeatStatusModel } from './../model/seat.model';
 
@@ -12,11 +15,14 @@ import { UpdateSeatStatusModel } from './../model/seat.model';
 export class SeatService {
   constructor(private readonly seatRepository: SeatRepository) {}
   async createSeat(
-    createSeatModel: CreateSeatsModel,
+    model: CreateSeatsModel,
     tx?: PrismaTransaction,
   ): Promise<Prisma.BatchPayload> {
+    const findConcertIdSeatModel = GetSeatByConcertDateIdModel.create(
+      model.concertDateId,
+    );
     const getSeats = await this.seatRepository.findByConcertDateId(
-      createSeatModel.concertDateId,
+      findConcertIdSeatModel,
       tx,
     );
     if (getSeats.length > 0) {
@@ -25,12 +31,15 @@ export class SeatService {
         HttpStatus.CONFLICT,
       );
     }
-    const seats = this.generateSeatNumber(createSeatModel);
+    const seats = this.generateSeatNumber(model);
     return await this.seatRepository.createMany(seats);
   }
 
-  async findAndLockSeat(seatId: string, tx?: PrismaTransaction) {
-    const seat = this.seatRepository.findAndLockById(tx, seatId);
+  async findAndLockSeat(
+    model: GetSeatBySeatIdModel,
+    tx?: PrismaTransaction,
+  ): Promise<SeatModel> {
+    const seat = this.seatRepository.findAndLockById(model, tx);
     if (!seat) {
       throw new HttpException(
         '조회한 좌석이 존재하지 않습니다',
@@ -39,28 +48,26 @@ export class SeatService {
     }
     return seat;
   }
-  // TODO: Implement the following methods
-  async findByConcertDateId(concertDateId: string, tx?: PrismaTransaction) {}
-
-  async updateSeatStatus(model: UpdateSeatStatusModel, tx?: PrismaTransaction) {
-    const seat = await this.seatRepository.findBySeatId(model.seatId, tx);
+  async updateSeatStatus(
+    model: UpdateSeatStatusModel,
+    tx?: PrismaTransaction,
+  ): Promise<SeatModel> {
+    const findSeatModel = GetSeatBySeatIdModel.create(model.seatId);
+    const seat = await this.seatRepository.findBySeatId(findSeatModel, tx);
     if (!seat) {
       throw new HttpException(
         '요청한 좌석이 존재하지 않습니다',
         HttpStatus.NOT_FOUND,
       );
     }
-    return this.seatRepository.updateStatus(model.seatId, model.status, tx);
+    return this.seatRepository.updateStatus(model, tx);
   }
 
   async getSeatsByConcertDateId(
     model: GetSeatByConcertDateIdModel,
     tx?: PrismaTransaction,
-  ) {
-    const seats = await this.seatRepository.findByConcertDateId(
-      model.concertDateId,
-      tx,
-    );
+  ): Promise<SeatModel[]> {
+    const seats = await this.seatRepository.findByConcertDateId(model, tx);
 
     if (seats.length === 0) {
       throw new HttpException(
@@ -71,8 +78,11 @@ export class SeatService {
     return seats;
   }
 
-  async getSeatBySeatId(seatId: string, tx?: PrismaTransaction): Promise<Seat> {
-    const seat = await this.seatRepository.findBySeatId(seatId, tx);
+  async getSeatBySeatId(
+    model: GetSeatBySeatIdModel,
+    tx?: PrismaTransaction,
+  ): Promise<SeatModel> {
+    const seat = await this.seatRepository.findBySeatId(model, tx);
     if (!seat) {
       throw new HttpException(
         '요청한 시트가 존재하지 않습니다',
@@ -81,21 +91,18 @@ export class SeatService {
     }
     return seat;
   }
-
-  // TODO: Implement the following methods
-  async reserveSeat(seatId: string) {}
-
-  // TODO: Implement the following methods
-  async cancelSeat(seatId: string) {}
-
-  private generateSeatNumber(
-    createSeatModel: CreateSeatsModel,
-  ): Omit<Seat, 'id' | 'createdAt' | 'updatedAt'>[] {
-    return Array.from({ length: createSeatModel.seatNumber }, (_, index) => ({
-      concertDateId: createSeatModel.concertDateId,
+  private generateSeatNumber(model: CreateSeatsModel): CreateSeatModel[] {
+    return Array.from({ length: model.seatNumber }, (_, index) => ({
+      concertDateId: model.concertDateId,
       seatNumber: index + 1,
-      status: createSeatModel.status,
-      price: createSeatModel.price,
+      status: model.status,
+      price: model.price,
     }));
   }
+  // TODO: Implement the following methods
+  async reserveSeat(seatId: string) {}
+  // TODO: Implement the following methods
+  async cancelSeat(seatId: string) {}
+  // TODO: Implement the following methods
+  async findByConcertDateId(concertDateId: string, tx?: PrismaTransaction) {}
 }

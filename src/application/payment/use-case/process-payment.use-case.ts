@@ -6,7 +6,10 @@ import {
   TransactionType,
 } from '@prisma/client';
 import { GetReservationByIdModel } from 'src/domain/concerts/model/reservation.model';
-import { UpdateSeatStatusModel } from 'src/domain/concerts/model/seat.model';
+import {
+  GetSeatBySeatIdModel,
+  UpdateSeatStatusModel,
+} from 'src/domain/concerts/model/seat.model';
 import { ReservationService } from 'src/domain/concerts/services/reservation.service';
 import { SeatService } from 'src/domain/concerts/services/seat.service';
 import { PointTransactionService } from 'src/domain/points/services/point-transaction.service';
@@ -37,14 +40,15 @@ export class ProcessPaymentUseCase
         async (prisma) => {
           try {
             // 예약 상태 확인
-            const getReservationByIdModel: GetReservationByIdModel = {
-              reservationId: command.reservationId,
-            };
+            const getReservationByIdModel = GetReservationByIdModel.create(
+              command.reservationId,
+            );
             const reservation =
               await this.reservationService.getReservationByWithLock(
                 getReservationByIdModel,
                 prisma,
               );
+
             if (
               reservation.status !== ReservationStatus.PENDING ||
               reservation.userId !== command.userId
@@ -55,8 +59,11 @@ export class ProcessPaymentUseCase
               );
             }
 
-            const seat = await this.seatService.getSeatBySeatId(
+            const findSeatModel = GetSeatBySeatIdModel.create(
               reservation.seatId,
+            );
+            const seat = await this.seatService.getSeatBySeatId(
+              findSeatModel,
               prisma,
             );
             // 포인트 차감
@@ -67,16 +74,15 @@ export class ProcessPaymentUseCase
             );
 
             // 좌석 상태 업데이트
-            const updateModel = UpdateSeatStatusModel.toModel(
+            const updateModel = UpdateSeatStatusModel.create(
               reservation.seatId,
               SeatStatus.SOLD,
             );
-
             await this.seatService.updateSeatStatus(updateModel, prisma);
 
             // 예약 상태 업데이트
             const updateReservationModel: UpdateReservationModel = {
-              reservationId: reservation.id,
+              reservationId: reservation.reservationId,
               status: ReservationStatus.CONFIRMED,
             };
             await this.reservationService.updateStatus(

@@ -5,7 +5,7 @@ import { ConcertDateResponseDto } from 'src/presentation/dto/concerts/dto/respon
 import { IUseCase } from '../../../common/interfaces/use-case.interface';
 import { CreateConcertDateCommand } from '../command/create-concert-data.command';
 import { ConcertService } from 'src/domain/concerts/services/concert.service';
-import { FindConcertModel } from 'src/domain/concerts/model/concert.model';
+import { FindConcertByIdModel } from 'src/domain/concerts/model/concert.model';
 @Injectable()
 export class CreateConcertDateUseCase
   implements IUseCase<CreateConcertDateCommand, ConcertDateResponseDto>
@@ -16,21 +16,17 @@ export class CreateConcertDateUseCase
   ) {}
 
   async execute(
-    input: CreateConcertDateCommand,
+    cmd: CreateConcertDateCommand,
   ): Promise<ConcertDateResponseDto> {
     try {
-      const findConcertModel: FindConcertModel = {
-        concertId: input.concertId,
-      };
-      const concert =
-        await this.concertService.getConcertById(findConcertModel);
+      const findModel = FindConcertByIdModel.create(cmd.concertId);
+      const concert = await this.concertService.getConcertById(findModel);
 
       const createConcertDateModel = CreateConcertDateModel.create(
-        concert.id,
-        input.date,
-        input.totalSeat,
+        concert.concertId,
+        cmd.date,
+        cmd.totalSeat,
       );
-
       const concertDate = await this.concertDateService.createConcertDate(
         createConcertDateModel,
       );

@@ -12,15 +12,13 @@ export class GetConcertSeatsUseCase
   constructor(private readonly seatService: SeatService) {}
 
   async execute(
-    command: GetSeatsByConcertIdCommand,
+    cmd: GetSeatsByConcertIdCommand,
   ): Promise<GetSeatsByConcertIdResponseDto> {
     try {
       const model: GetSeatByConcertDateIdModel = {
-        concertDateId: command.concertDateId,
+        concertDateId: cmd.concertDateId,
       };
-
       const seats = await this.seatService.getSeatsByConcertDateId(model);
-
       return GetSeatsByConcertIdResponseDto.fromSeats(seats);
     } catch (error) {
       throw error;

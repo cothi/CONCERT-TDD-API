@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Reservation } from '@prisma/client';
-import { ReservationRepository } from 'src/infrastructure/concerts/reservation.repository';
+import { ReservationRepository } from 'src/infrastructure/concerts/repositories/reservation.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import {
   CreateReservationModel,
   GetReservationByIdModel,
+  ReservationModel,
 } from '../model/reservation.model';
 import {
   GetUserReservationsModel,
@@ -18,14 +18,14 @@ export class ReservationService {
   async createReservation(
     createReservationModel: CreateReservationModel,
     tx?: PrismaTransaction,
-  ): Promise<Reservation> {
+  ): Promise<ReservationModel> {
     return await this.reservationRepository.create(createReservationModel, tx);
   }
 
   async getReservationById(
     getReservationByIdModel: GetReservationByIdModel,
     tx?: PrismaTransaction,
-  ): Promise<Reservation | null> {
+  ): Promise<ReservationModel | null> {
     const reservation = await this.reservationRepository.getReservationById(
       getReservationByIdModel,
       tx,
@@ -41,7 +41,7 @@ export class ReservationService {
   async getReservationByWithLock(
     getReservationByIdModel: GetReservationByIdModel,
     tx?: PrismaTransaction,
-  ) {
+  ): Promise<ReservationModel | null> {
     const reservation =
       await this.reservationRepository.getReservationByWithLock(
         getReservationByIdModel,
@@ -58,7 +58,7 @@ export class ReservationService {
   async updateStatus(
     updateReservationModel: UpdateReservationModel,
     tx?: PrismaTransaction,
-  ): Promise<Reservation> {
+  ): Promise<ReservationModel> {
     const model = new GetReservationByIdModel();
     model.reservationId = updateReservationModel.reservationId;
     const reservation =
