@@ -82,8 +82,8 @@ export class ProcessPaymentUseCase
 
             // 예약 상태 업데이트
             const updateReservationModel = UpdateReservationModel.create(
-              reservation.status,
               ReservationStatus.CONFIRMED,
+              reservation.reservationId,
             );
             await this.reservationService.updateStatus(
               updateReservationModel,

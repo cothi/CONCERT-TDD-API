@@ -33,6 +33,7 @@ export class PointWalletMapper {
   }
 
   static toMapPointModel(entity: UserPoint): PointWalletModel {
+    if (!entity) return null;
     const model = PointWalletModel.create(
       entity.id,
       entity.createdAt,

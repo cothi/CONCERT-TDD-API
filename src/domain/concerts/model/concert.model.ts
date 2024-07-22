@@ -45,3 +45,4 @@ export class FindConcertByNameModel extends PickType(ConcertModel, ['name']) {
     return model;
   }
 }
+export class FindConcertsModel {}

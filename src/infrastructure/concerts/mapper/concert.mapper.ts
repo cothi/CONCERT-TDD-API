@@ -35,13 +35,19 @@ export class ConcertMapper {
     return models;
   }
 
-  static toMapConcertModel(entity: Concert) {
-    const model = ConcertModel.create(
-      entity.id,
-      entity.name,
-      entity.createdAt,
-      entity.updatedAt,
-    );
-    return model;
+  static toMapConcertModel(entity: Concert): ConcertModel {
+    if (!entity) return null;
+    try {
+      const model = ConcertModel.create(
+        entity.id,
+        entity.name,
+        entity.createdAt,
+        entity.updatedAt,
+      );
+      return model;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 }

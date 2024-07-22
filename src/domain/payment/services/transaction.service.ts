@@ -16,20 +16,20 @@ export class TransactionService {
     model: CreateTransactionModel,
     tx?: PrismaTransaction,
   ): Promise<TransactionModel> {
-    return this.transactionRepository.create(model, tx);
+    return await this.transactionRepository.create(model, tx);
   }
 
   async getTransactionsByUserId(
     model: GetTransactionByUserIdModel,
     tx?: PrismaTransaction,
   ): Promise<TransactionModel[]> {
-    return this.transactionRepository.findByUserId(model, tx);
+    return await this.transactionRepository.findByUserId(model, tx);
   }
 
   async updateTransactionStatus(
     model: UpdateTransactionStatusModel,
     tx?: PrismaTransaction,
   ): Promise<TransactionModel> {
-    return this.transactionRepository.updateStatus(model, tx);
+    return await this.transactionRepository.updateStatus(model, tx);
   }
 }

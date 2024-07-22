@@ -28,6 +28,7 @@ export class PointPaymentMapper {
     return entity;
   }
   static toMapPaymentModel(entity: Payment): PaymentModel {
+    if (!entity) return null;
     const model = PaymentModel.create(
       entity.amount,
       entity.userId,

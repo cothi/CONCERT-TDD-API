@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { IUseCase } from 'src/common/interfaces/use-case.interface';
+import { CreateEnqueueModel } from 'src/domain/enqueue/model/enqueue.model';
 import { QueueService } from 'src/domain/enqueue/services/enqueue.service';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { EnqueueDto } from 'src/presentation/dto/enqueue/request/enqueue.dto';
@@ -17,8 +18,9 @@ export class EnqueueUseCase
     try {
       const responseDto = await this.prismaService.$transaction(
         async (prisma) => {
+          const createModel = CreateEnqueueModel.create(dto.userId);
           const queueEntry = await this.queueService.enqueue(
-            dto.userId,
+            createModel,
             prisma,
           );
 
@@ -30,6 +32,7 @@ export class EnqueueUseCase
       );
       return responseDto;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }

@@ -19,6 +19,7 @@ export class ReservationModel {
     createdAt: Date,
     updatedAt: Date,
     expiresAt: Date,
+    status: ReservationStatus,
   ): ReservationModel {
     const model = new ReservationModel();
     model.reservationId = reservationId;
@@ -29,6 +30,7 @@ export class ReservationModel {
     model.createdAt = createdAt;
     model.updatedAt = updatedAt;
     model.expireAt = expiresAt;
+    model.status = status;
     return model;
   }
 }

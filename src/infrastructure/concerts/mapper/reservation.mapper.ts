@@ -63,6 +63,7 @@ export class ReservationMapper {
       entity.createdAt,
       entity.updatedAt,
       entity.expiresAt,
+      entity.status,
     );
     return model;
   }

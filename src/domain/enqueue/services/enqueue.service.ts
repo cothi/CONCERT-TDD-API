@@ -1,8 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { QueueEntry, QueueEntryStatus } from '@prisma/client';
+import { QueueEntryStatus } from '@prisma/client';
 import { QUEUE_CONFIG } from 'src/common/config/config';
-import { QueueEntryRepository } from 'src/infrastructure/enqueue/queue.repository';
+import { QueueEntryRepository } from 'src/infrastructure/enqueue/repository/queue.repository';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import {
+  CountWaitingAheadModel,
+  CreateEnqueueModel,
+  GetQueueEntryByUserIdModel,
+  GetWaitingEntriesModel,
+  QueueModel,
+  UpdateQueueStatusModel,
+} from '../model/enqueue.model';
 
 @Injectable()
 export class QueueService {
@@ -13,24 +21,25 @@ export class QueueService {
    * @param userId 사용자 ID
    * @returns 생성된 대기열 항목
    */
-  async enqueue(userId: string, tx?: PrismaTransaction): Promise<QueueEntry> {
-    const queueEntry = await this.queueEntryRepository.findByUserId(userId, tx);
-
-    if (queueEntry) {
+  async enqueue(
+    model: CreateEnqueueModel,
+    tx?: PrismaTransaction,
+  ): Promise<QueueModel> {
+    const getModel = GetQueueEntryByUserIdModel.create(model.userId);
+    const queueEntry = await this.queueEntryRepository.findByUserId(
+      getModel,
+      tx,
+    );
+    if (
+      queueEntry.status === QueueEntryStatus.WAITING ||
+      queueEntry.status === QueueEntryStatus.ELIGIBLE
+    ) {
       throw new HttpException(
         '이미 대기열 안에 존재합니다.',
         HttpStatus.CONFLICT,
       );
     }
-
-    return await this.queueEntryRepository.create(
-      {
-        status: QueueEntryStatus.WAITING,
-        enteredAt: new Date(),
-        user: { connect: { id: userId } },
-      },
-      tx,
-    );
+    return await this.queueEntryRepository.create(model, tx);
   }
 
   /**
@@ -38,11 +47,11 @@ export class QueueService {
    * @param userId 사용자 ID
    * @returns 대기열 항목
    */
-  async getQueueEntry(
-    userId: string,
+  async getQueueEntryByUserId(
+    model: GetQueueEntryByUserIdModel,
     tx?: PrismaTransaction,
-  ): Promise<QueueEntry> {
-    const queueEntry = await this.queueEntryRepository.findByUserId(userId, tx);
+  ): Promise<QueueModel> {
+    const queueEntry = await this.queueEntryRepository.findByUserId(model, tx);
     if (!queueEntry) {
       throw new HttpException(
         '대기열안에 존재하지 않습니다.',
@@ -58,10 +67,10 @@ export class QueueService {
    * @returns 대기 중인 항목의 수
    */
   async getQueuedAhead(
-    enteredAt: Date,
+    model: CountWaitingAheadModel,
     tx?: PrismaTransaction,
   ): Promise<number> {
-    return await this.queueEntryRepository.countWaitingAhead(enteredAt, tx);
+    return await this.queueEntryRepository.countWaitingAhead(model, tx);
   }
 
   /**
@@ -86,7 +95,7 @@ export class QueueService {
    * 대기열 항목들의 상태를 업데이트합니다.
    * 만료된 항목을 만료시키고, 새로운 항목을 예약 가능 상태로 변경합니다.
    */
-  async updateQueueEntries(tx?: PrismaTransaction): Promise<void> {
+  async updateQueueEntries(tx?: PrismaTransaction) {
     // 예약 가능한 항목들을 조회합니다.
     const eligibleEntries =
       await this.queueEntryRepository.findEligibleEntries(tx);
@@ -94,10 +103,11 @@ export class QueueService {
     // 만료된 항목들을 제거합니다.
     for (const entry of eligibleEntries) {
       if (entry.expiresAt < new Date()) {
-        await this.queueEntryRepository.updateStatus(
+        const updateModel = UpdateQueueStatusModel.create(
           entry.id,
           QueueEntryStatus.EXPIRED,
         );
+        await this.queueEntryRepository.updateStatus(updateModel, tx);
       }
     }
 
@@ -109,18 +119,19 @@ export class QueueService {
 
     // 새로운 항목들을 예약 가능 상태로 변경합니다.
     if (availableSlots > 0) {
+      const getModel = GetWaitingEntriesModel.create(availableSlots);
       const waitingEntries = await this.queueEntryRepository.findWaitingEntries(
-        availableSlots,
+        getModel,
         tx,
       );
       for (const entry of waitingEntries) {
-        await this.queueEntryRepository.updateStatus(
+        const updateModel = UpdateQueueStatusModel.create(
           entry.id,
           QueueEntryStatus.ELIGIBLE,
-          {
-            expiresAt: new Date(Date.now() + QUEUE_CONFIG.EXPIRATION_TIME_MS), // 현재로부터 5분 후QUEUE_CONFIG
-          },
         );
+        await this.queueEntryRepository.updateStatus(updateModel, tx, {
+          expiresAt: new Date(Date.now() + QUEUE_CONFIG.EXPIRATION_TIME_MS), // 현재로부터 5분 후QUEUE_CONFIG
+        });
       }
     }
   }

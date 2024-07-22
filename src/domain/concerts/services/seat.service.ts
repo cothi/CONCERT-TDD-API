@@ -39,7 +39,7 @@ export class SeatService {
     model: GetSeatBySeatIdModel,
     tx?: PrismaTransaction,
   ): Promise<SeatModel> {
-    const seat = this.seatRepository.findAndLockById(model, tx);
+    const seat = await this.seatRepository.findAndLockById(model, tx);
     if (!seat) {
       throw new HttpException(
         '조회한 좌석이 존재하지 않습니다',

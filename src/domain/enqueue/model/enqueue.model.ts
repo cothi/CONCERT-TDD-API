@@ -1,0 +1,83 @@
+import { PickType } from '@nestjs/swagger';
+import { QueueEntryStatus } from '@prisma/client';
+
+export class QueueModel {
+  id: string;
+  userId: string;
+  status: QueueEntryStatus;
+  enteredAt: Date;
+  expiresAt: Date;
+
+  static create(
+    id: string,
+    userId: string,
+    status: QueueEntryStatus,
+    enteredAt: Date,
+    expiresAt: Date,
+  ): QueueModel {
+    const model = new QueueModel();
+    model.enteredAt = enteredAt;
+    model.id = id;
+    model.status = status;
+    model.userId = userId;
+    model.expiresAt = expiresAt;
+    return model;
+  }
+}
+export class CreateEnqueueModel extends PickType(QueueModel, ['userId']) {
+  static create(userId: string): CreateEnqueueModel {
+    const model = new CreateEnqueueModel();
+    model.userId = userId;
+    return model;
+  }
+}
+
+export class GetQueueEntryByUserIdModel extends PickType(QueueModel, [
+  'userId',
+]) {
+  static create(userId: string): GetQueueEntryByUserIdModel {
+    const model = new GetQueueEntryByUserIdModel();
+    model.userId = userId;
+    return model;
+  }
+}
+
+export class UpdateQueueStatusModel extends PickType(QueueModel, [
+  'id',
+  'status',
+]) {
+  static create(id: string, status: QueueEntryStatus): UpdateQueueStatusModel {
+    const model = new UpdateQueueStatusModel();
+    model.id = id;
+    model.status = status;
+    return model;
+  }
+}
+
+export class RemoveQueueByIdModel extends PickType(QueueModel, ['id']) {
+  static create(id: string): RemoveQueueByIdModel {
+    const model = new RemoveQueueByIdModel();
+    model.id = id;
+    return model;
+  }
+}
+
+export class CountWaitingAheadModel extends PickType(QueueModel, [
+  'enteredAt',
+]) {
+  static create(enteredAt: Date): CountWaitingAheadModel {
+    const model = new CountWaitingAheadModel();
+    model.enteredAt = enteredAt;
+    return model;
+  }
+}
+
+export class GetWaitingEntriesModel {
+  limit: number;
+
+  static create(limit: number): GetWaitingEntriesModel {
+    const model = new GetWaitingEntriesModel();
+    model.limit = limit;
+    return model;
+  }
+}

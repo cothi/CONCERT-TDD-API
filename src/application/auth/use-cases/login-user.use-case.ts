@@ -12,13 +12,14 @@ export class LoginUserUseCase
 {
   constructor(
     private readonly authService: AuthService,
-    private readonly jwtTokenService: JwtTokenService
+    private readonly jwtTokenService: JwtTokenService,
   ) {}
 
   async execute(input: LoginUserModel): Promise<AuthResponseDto> {
     try {
       const findModel = FindUserByEmailModel.create(input.email);
       const user = await this.authService.findUserByEmail(findModel);
+
       const accessToken = this.jwtTokenService.generateAccessToken({
         userId: user.id,
         email: user.email,

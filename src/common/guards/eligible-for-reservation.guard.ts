@@ -5,7 +5,8 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { QueueEntryRepository } from 'src/infrastructure/enqueue/queue.repository';
+import { GetQueueEntryByUserIdModel } from 'src/domain/enqueue/model/enqueue.model';
+import { QueueEntryRepository } from 'src/infrastructure/enqueue/repository/queue.repository';
 
 @Injectable()
 export class EligibleForReservationGuard implements CanActivate {
@@ -31,7 +32,8 @@ export class EligibleForReservationGuard implements CanActivate {
   }
 
   private async checkEligibility(userId: string): Promise<boolean> {
-    const queueEntry = await this.queueEntryRepository.findByUserId(userId);
+    const getModel = GetQueueEntryByUserIdModel.create(userId);
+    const queueEntry = await this.queueEntryRepository.findByUserId(getModel);
     if (!queueEntry) {
       throw new HttpException(
         '유저가 대기열 안에 존재하지 않습니다.',

@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { IUseCase } from 'src/common/interfaces/use-case.interface';
+import {
+  CountWaitingAheadModel,
+  GetQueueEntryByUserIdModel,
+} from 'src/domain/enqueue/model/enqueue.model';
 import { QueueService } from 'src/domain/enqueue/services/enqueue.service';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { QueueStatusResponseDto } from 'src/presentation/dto/enqueue/response/enqueue-status.reponse.dto';
@@ -17,15 +21,20 @@ export class GetQueueStatusUseCase
     try {
       const responseDto = await this.prismaService.$transaction(
         async (prisma) => {
-          const queueEntry = await this.queueService.getQueueEntry(
-            userId,
+          const model = GetQueueEntryByUserIdModel.create(userId);
+          const queueEntry = await this.queueService.getQueueEntryByUserId(
+            model,
             prisma,
           );
 
-          const queuedAhead = await this.queueService.getQueuedAhead(
+          const getQueueAheadModel = CountWaitingAheadModel.create(
             queueEntry.enteredAt,
+          );
+          const queuedAhead = await this.queueService.getQueuedAhead(
+            getQueueAheadModel,
             prisma,
           );
+
           const isEligibleForReservation =
             await this.queueService.isEligibleForReservation(
               queueEntry.status,
@@ -34,7 +43,7 @@ export class GetQueueStatusUseCase
 
           return {
             status: queueEntry.status,
-            isEligibleForReservation,
+            isEligibleForReservation: isEligibleForReservation,
             queuedAhead,
             enteredAt: queueEntry.enteredAt,
             expiresAt: queueEntry.expiresAt,
