@@ -1,10 +1,12 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ChargePointEntity } from 'src/domain/points/entity/charge-point.entity';
-import { GetPointEntity } from 'src/domain/points/entity/get-point.entity';
-import { PointWalletRepository } from '../../../infrastructure/points/point-wallet.repository';
-import { ChargePointModel, GetPointModel } from '../model/point.model';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { PointWalletRepository } from '../../../infrastructure/points/repository/point-wallet.repository';
+import {
+  ChargePointModel,
+  DeductPointModel,
+  GetPointByUserIdModel,
+} from '../model/point-wallet.model';
 
 @Injectable()
 export class PointWalletService {
@@ -13,39 +15,32 @@ export class PointWalletService {
     private readonly pointWalletRepository: PointWalletRepository,
   ) {}
 
-  async chargePoints(
-    chargePointModel: ChargePointModel,
-    tx?: PrismaTransaction,
-  ) {
-    const chargePointEntity = new ChargePointEntity(
-      chargePointModel.userId,
-      chargePointModel.amount,
-    );
-    return await this.pointWalletRepository.chargePoints(chargePointEntity, tx);
+  async chargePoints(model: ChargePointModel, tx?: PrismaTransaction) {
+    return await this.pointWalletRepository.chargePoints(model, tx);
   }
 
-  async getBalance(getPointModel: GetPointModel, tx?: PrismaTransaction) {
-    const getPointEntity = new GetPointEntity(getPointModel.userId);
-    const userPoint = await this.pointWalletRepository.getBalance(
-      getPointEntity,
+  async getBalance(model: GetPointByUserIdModel, tx?: PrismaTransaction) {
+    const userPoint = await this.pointWalletRepository.getBalanceByUserId(
+      model,
       tx,
     );
-
     return userPoint?.amount ? userPoint.amount : new Decimal(0);
   }
 
-  async deductPoints(userId: string, point: Decimal, tx?: PrismaTransaction) {
-    const userPoint = await this.pointWalletRepository.getBalance(
-      GetPointEntity.create(userId),
+  async deductPoints(model: DeductPointModel, tx?: PrismaTransaction) {
+    const getModel = GetPointByUserIdModel.create(model.userId);
+    const userPoint = await this.pointWalletRepository.getBalanceByUserId(
+      getModel,
+      tx,
     );
     const getPoint = userPoint?.amount ? userPoint.amount : new Decimal(0);
 
-    if (getPoint < point) {
+    if (getPoint < model.usedPoint) {
       throw new HttpException(
         '유저의 포인트가 부족합니다.',
         HttpStatus.NOT_ACCEPTABLE,
       );
     }
-    return this.pointWalletRepository.deductPoints(userId, point, tx);
+    return this.pointWalletRepository.deductPoints(model, tx);
   }
 }

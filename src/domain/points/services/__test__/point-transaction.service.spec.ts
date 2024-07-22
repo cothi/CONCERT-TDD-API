@@ -3,7 +3,7 @@ import { Payment, PaymentType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PointTransactionRepository } from 'src/infrastructure/points/point-transaction.repository';
 import { PointTransactionService } from '../point-transaction.service';
-import { RecordPaymentModel } from '../../model/point.model';
+import { RecordPaymentModel } from '../../model/payment.model';
 
 describe('PaymentHistoryService', () => {
   let service: PointTransactionService;

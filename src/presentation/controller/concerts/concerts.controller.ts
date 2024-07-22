@@ -23,7 +23,7 @@ import { GetUserReservationsResponseDto } from 'src/presentation/dto/points/resp
 import { GetConcertSeatsUseCase } from './../../../application/concerts/use-cases/get-concert-seats.use-case';
 import { GetSeatsByConcertIdResponseDto } from 'src/presentation/dto/concerts/dto/response/get-seats-by-concertid.dto';
 import { GetConcertsResponseDto } from 'src/presentation/dto/concerts/dto/response/get-concerts.response.dto';
-import { GetSeatsByConcertIdCommand } from 'src/application/concerts/command/get-concert-by-concertId.command';
+import { GetSeatsByConcertIdCommand } from 'src/application/concerts/command/get-seats-by-concertId.command';
 /**
  * 콘서트 관련 요청을 처리하는 컨트롤러
  * 콘서트 대기열 입장 및 대기열 상태 조회 기능을 제공합니다.

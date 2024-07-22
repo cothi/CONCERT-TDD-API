@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Transaction } from '@prisma/client';
-import { TransactionRepository } from 'src/infrastructure/payment/payment.repository';
+import { TransactionRepository } from 'src/infrastructure/payment/transaction.repository';
+import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import {
   CreateTransactionModel,
+  GetTransactionByUserIdModel,
+  TransactionModel,
   UpdateTransactionStatusModel,
 } from '../model/transaction.model';
 
@@ -11,23 +13,23 @@ export class TransactionService {
   constructor(private readonly transactionRepository: TransactionRepository) {}
 
   async createTransaction(
-    createTransactionModel: CreateTransactionModel,
-    tx?: Prisma.TransactionClient,
-  ): Promise<Transaction> {
-    return this.transactionRepository.create(createTransactionModel, tx);
+    model: CreateTransactionModel,
+    tx?: PrismaTransaction,
+  ): Promise<TransactionModel> {
+    return this.transactionRepository.create(model, tx);
   }
 
-  async getTransactionsByUserId(userId: string): Promise<Transaction[]> {
-    return this.transactionRepository.findByUserId(userId);
+  async getTransactionsByUserId(
+    model: GetTransactionByUserIdModel,
+    tx?: PrismaTransaction,
+  ): Promise<TransactionModel[]> {
+    return this.transactionRepository.findByUserId(model, tx);
   }
 
   async updateTransactionStatus(
-    updateTransactionStatusModel: UpdateTransactionStatusModel,
-    tx?: Prisma.TransactionClient,
-  ): Promise<Transaction> {
-    return this.transactionRepository.updateStatus(
-      updateTransactionStatusModel,
-      tx,
-    );
+    model: UpdateTransactionStatusModel,
+    tx?: PrismaTransaction,
+  ): Promise<TransactionModel> {
+    return this.transactionRepository.updateStatus(model, tx);
   }
 }

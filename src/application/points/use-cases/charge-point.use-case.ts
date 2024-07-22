@@ -4,9 +4,10 @@ import { ChargePointCommand } from '../dto/charge-point.command.dto';
 import { PaymentType } from '../enums/payment-type.enum';
 import { PointWalletService } from 'src/domain/points/services/point-wallet.service';
 import { PointTransactionService } from 'src/domain/points/services/point-transaction.service';
-import { ChargePointModel } from 'src/domain/points/model/point.model';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { ChargePointModel } from 'src/domain/points/model/point-wallet.model';
+import { RecordPaymentModel } from 'src/domain/points/model/payment.model';
 
 @Injectable()
 export class ChargePointUseCase
@@ -18,33 +19,29 @@ export class ChargePointUseCase
     private readonly pointTransactionService: PointTransactionService,
   ) {}
 
-  async execute(
-    chargePointCommand: ChargePointCommand,
-  ): Promise<ChargePointResponseDto> {
+  async execute(cmd: ChargePointCommand): Promise<ChargePointResponseDto> {
     try {
       const response = await this.prisma.$transaction(async (prisma) => {
         // 충전
-        const chargePointDto: ChargePointModel = {
-          amount: chargePointCommand.amount,
-          userId: chargePointCommand.userId,
-        };
+        const chargeModel = ChargePointModel.create(cmd.amount, cmd.userId);
         const payment = await this.pointWalletService.chargePoints(
-          chargePointDto,
+          chargeModel,
           prisma,
         );
         // 충전 기록
+        const recordModel = RecordPaymentModel.create(
+          cmd.amount,
+          payment.userId,
+          PaymentType.CHARGE,
+        );
         await this.pointTransactionService.recordPaymentHistory(
-          {
-            userId: payment.userId,
-            type: PaymentType.CHARGE,
-            amount: chargePointCommand.amount,
-          },
+          recordModel,
           prisma,
         );
 
         const chargePointResponseDto = ChargePointResponseDto.create(
           payment.amount,
-          chargePointDto.amount,
+          chargeModel.amount,
         );
         return chargePointResponseDto;
       });
