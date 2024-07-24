@@ -1,16 +1,23 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { Payment, PaymentType } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
-import { PointTransactionRepository } from 'src/infrastructure/points/point-transaction.repository';
-import { PointTransactionService } from '../point-transaction.service';
-import { RecordPaymentModel } from '../../model/payment.model';
+// src/domain/points/services/__tests__/point-transaction.service.spec.ts
 
-describe('PaymentHistoryService', () => {
+import { Test, TestingModule } from '@nestjs/testing';
+import { PointTransactionService } from '../point-transaction.service';
+import { PointTransactionRepository } from 'src/infrastructure/points/repository/point-payment.repository';
+import {
+  GetPaymentsByUserIdModel,
+  PaymentModel,
+  RecordPaymentModel,
+} from '../../model/payment.model';
+import { PaymentType } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
+
+describe('PointTransactionService', () => {
   let service: PointTransactionService;
   let repository: jest.Mocked<PointTransactionRepository>;
 
   beforeEach(async () => {
     const mockRepository = {
+      getPointHistory: jest.fn(),
       recordPointHistory: jest.fn(),
     };
 
@@ -23,27 +30,97 @@ describe('PaymentHistoryService', () => {
         },
       ],
     }).compile();
+
     service = module.get<PointTransactionService>(PointTransactionService);
     repository = module.get(PointTransactionRepository);
   });
-  describe('recordPaymentHistory', () => {
-    it('포인트 관련 트랜잭션을 정상적으로 기록해야 한다', async () => {
-      const dto = new RecordPaymentModel();
-      dto.userId = '1';
-      dto.type = PaymentType.CHARGE;
-      dto.amount = new Decimal(111);
-      const expectedResult: Payment = {
-        id: 'payment1',
-        userId: '1',
-        paymentType: PaymentType.CHARGE,
-        amount: new Decimal(111),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
 
-      repository.recordPointHistory.mockResolvedValue(expectedResult);
-      const result = await service.recordPaymentHistory(dto);
-      expect(result).toEqual(expectedResult);
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  describe('getPaymentHistory', () => {
+    it('사용자 ID로 결제 내역을 조회해야 합니다', async () => {
+      const mockModel: GetPaymentsByUserIdModel = { userId: 'user1' };
+      const model = PaymentModel.create(
+        new Decimal(100),
+        '1',
+        PaymentType.CHARGE,
+        '1',
+      );
+      const mockResult = [model];
+      repository.getPointHistory.mockResolvedValue(mockResult);
+
+      const result = await service.getPaymentHistory(mockModel);
+
+      expect(repository.getPointHistory).toHaveBeenCalledWith(
+        mockModel,
+        undefined,
+      );
+      expect(result).toEqual(mockResult);
+    });
+
+    it('트랜잭션 객체와 함께 결제 내역을 조회해야 합니다', async () => {
+      const model = PaymentModel.create(
+        new Decimal(100),
+        '1',
+        PaymentType.CHARGE,
+        '1',
+      );
+      const mockResult = [model];
+      const mockModel = GetPaymentsByUserIdModel.create('1');
+
+      repository.getPointHistory.mockResolvedValue(mockResult);
+
+      const result = await service.getPaymentHistory(mockModel);
+
+      expect(result).toEqual(mockResult);
+    });
+  });
+
+  describe('recordPaymentHistory', () => {
+    it('새로운 결제 내역을 기록해야 합니다', async () => {
+      const mockModel = RecordPaymentModel.create(
+        new Decimal(100),
+        '1',
+        PaymentType.CHARGE,
+      );
+      const mockResult = PaymentModel.create(
+        new Decimal(100),
+        '1',
+        PaymentType.CHARGE,
+        '1',
+      );
+
+      repository.recordPointHistory.mockResolvedValue(mockResult);
+
+      const result = await service.recordPaymentHistory(mockModel);
+
+      expect(repository.recordPointHistory).toHaveBeenCalledWith(
+        mockModel,
+        undefined,
+      );
+      expect(result).toEqual(mockResult);
+    });
+
+    it('트랜잭션 객체와 함께 새로운 결제 내역을 기록해야 합니다', async () => {
+      const mockModel = RecordPaymentModel.create(
+        new Decimal(100),
+        '1',
+        PaymentType.TICKET_PURCHASE,
+      );
+      const mockResult = PaymentModel.create(
+        new Decimal(100),
+        '1',
+        PaymentType.TICKET_PURCHASE,
+        '1',
+      );
+
+      repository.recordPointHistory.mockResolvedValue(mockResult);
+
+      const result = await service.recordPaymentHistory(mockModel);
+
+      expect(result).toEqual(mockResult);
     });
   });
 });

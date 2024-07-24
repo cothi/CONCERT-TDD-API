@@ -162,12 +162,13 @@ describe('콘서트', () => {
         concertDateResponse.body.concertDateId,
         testContext.accessToken,
       );
-      const seatId = getSeatsResponse.body.seats[0].id;
+      const seatId = getSeatsResponse.body.seats[0].seatId;
 
       const reserveSeatResponse = await apiRequest.reserveSeatRequest(
         testContext.accessToken,
         seatId,
       );
+
       expect(reserveSeatResponse.status).toBe(201);
 
       const getReservationResponse = await apiRequest.getReservationRequest(

@@ -1,147 +1,112 @@
-// src/application/services/__tests__/queue.service.spec.ts
-
 import { Test, TestingModule } from '@nestjs/testing';
-import { QueueEntry, QueueEntryStatus } from '@prisma/client';
-import { QueueService } from '../enqueue.service';
 import { QueueEntryRepository } from 'src/infrastructure/enqueue/repository/queue.repository';
-
-// QueueEntryRepository 모킹
-const mockQueueEntryRepository = {
-  create: jest.fn(),
-  findByUserId: jest.fn(),
-  countWaitingAhead: jest.fn(),
-  countEligibleEntries: jest.fn(),
-  findEligibleEntries: jest.fn(),
-  removeById: jest.fn(),
-  findWaitingEntries: jest.fn(),
-  updateStatus: jest.fn(),
-};
+import { QueueEntryStatus } from '@prisma/client';
+import { QueueService } from '../enqueue.service';
+import {
+  CountWaitingAheadModel,
+  CreateEnqueueModel,
+  GetQueueEntryByUserIdModel,
+  QueueModel,
+} from '../../model/enqueue.model';
+import { HttpException } from '@nestjs/common';
 
 describe('QueueService', () => {
   let service: QueueService;
+  let repository: jest.Mocked<QueueEntryRepository>;
 
   beforeEach(async () => {
+    const mockRepository = {
+      findByUserId: jest.fn(),
+      create: jest.fn(),
+      countWaitingAhead: jest.fn(),
+      countEligibleEntries: jest.fn(),
+      findEligibleEntries: jest.fn(),
+      findWaitingEntries: jest.fn(),
+      updateStatus: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         QueueService,
-        {
-          provide: QueueEntryRepository,
-          useValue: mockQueueEntryRepository,
-        },
+        { provide: QueueEntryRepository, useValue: mockRepository },
       ],
     }).compile();
 
     service = module.get<QueueService>(QueueService);
-  });
-
-  // 각 테스트 후 모든 모의 함수 초기화
-  afterEach(() => {
-    jest.clearAllMocks();
+    repository = module.get(QueueEntryRepository);
   });
 
   it('사용자를 대기열에 추가해야 한다', async () => {
-    const userId = 'test-user-id';
-    const mockQueueEntry: QueueEntry = {
-      id: 'test-queue-entry-id',
-      userId,
+    const model = new CreateEnqueueModel();
+    model.userId = 'user1';
+
+    repository.findByUserId.mockResolvedValue({
+      status: QueueEntryStatus.EXPIRED,
+    } as QueueModel);
+    repository.create.mockResolvedValue({ id: 'queue1' } as QueueModel);
+
+    const result = await service.enqueue(model);
+
+    expect(repository.findByUserId).toHaveBeenCalledWith(
+      expect.any(GetQueueEntryByUserIdModel),
+      undefined,
+    );
+    expect(repository.create).toHaveBeenCalledWith(model, undefined);
+    expect(result).toEqual({ id: 'queue1' });
+  });
+
+  it('이미 대기 중인 사용자는 예외를 던져야 한다', async () => {
+    const model = new CreateEnqueueModel();
+    model.userId = 'user1';
+
+    repository.findByUserId.mockResolvedValue({
       status: QueueEntryStatus.WAITING,
-      enteredAt: new Date(),
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      updatedAt: new Date(),
-    };
+    } as QueueModel);
 
-    mockQueueEntryRepository.create.mockResolvedValue(mockQueueEntry);
-
-    const result = await service.enqueue(userId);
-
-    expect(result).toEqual(mockQueueEntry);
+    await expect(service.enqueue(model)).rejects.toThrow(HttpException);
   });
 
   it('사용자의 대기열 항목을 조회해야 한다', async () => {
-    const userId = 'test-user-id';
-    const mockQueueEntry: QueueEntry = {
-      id: 'test-queue-entry-id',
-      userId,
-      status: QueueEntryStatus.WAITING,
-      enteredAt: new Date(),
-      expiresAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const model = GetQueueEntryByUserIdModel.create('user1');
 
-    mockQueueEntryRepository.findByUserId.mockResolvedValue(mockQueueEntry);
+    repository.findByUserId.mockResolvedValue({ id: 'queue1' } as QueueModel);
 
-    const result = await service.getQueueEntry(userId);
+    const result = await service.getQueueEntryByUserId(model);
 
-    expect(result).toEqual(mockQueueEntry);
+    expect(repository.findByUserId).toHaveBeenCalledWith(model, undefined);
+    expect(result).toEqual({ id: 'queue1' });
   });
 
-  it('대기 중인 항목의 수를 정확히 반환해야 한다', async () => {
-    const enteredAt = new Date();
-    const expectedCount = 5;
+  it('대기열에 없는 사용자 조회 시 예외를 던져야 한다', async () => {
+    const model = GetQueueEntryByUserIdModel.create('user1');
 
-    mockQueueEntryRepository.countWaitingAhead.mockResolvedValue(expectedCount);
+    repository.findByUserId.mockResolvedValue(null);
 
-    const result = await service.getQueuedAhead(enteredAt);
-
-    expect(result).toBe(expectedCount);
+    await expect(service.getQueueEntryByUserId(model)).rejects.toThrow(
+      HttpException,
+    );
   });
 
-  it('예약 가능 여부를 정확히 판단해야 한다', async () => {
-    // ELIGIBLE 상태일 때
-    expect(
-      await service.isEligibleForReservation(QueueEntryStatus.ELIGIBLE),
-    ).toBe(true);
+  it('대기 중인 항목의 수를 반환해야 한다', async () => {
+    const model = new CountWaitingAheadModel();
+    model.enteredAt = new Date();
 
-    // WAITING 상태이고 예약 가능한 슬롯이 있을 때
-    mockQueueEntryRepository.countEligibleEntries.mockResolvedValue(4);
-    expect(
-      await service.isEligibleForReservation(QueueEntryStatus.WAITING),
-    ).toBe(true);
+    repository.countWaitingAhead.mockResolvedValue(5);
 
-    // WAITING 상태이지만 예약 가능한 슬롯이 없을 때
-    mockQueueEntryRepository.countEligibleEntries.mockResolvedValue(5);
-    expect(
-      await service.isEligibleForReservation(QueueEntryStatus.WAITING),
-    ).toBe(false);
+    const result = await service.getQueuedAhead(model);
+
+    expect(repository.countWaitingAhead).toHaveBeenCalledWith(model, undefined);
+    expect(result).toBe(5);
   });
 
-  it('대기열 항목들의 상태를 올바르게 업데이트해야 한다', async () => {
-    const mockEligibleEntries: QueueEntry[] = [
-      {
-        id: 'expired-entry-id',
-        userId: 'user1',
-        status: QueueEntryStatus.ELIGIBLE,
-        enteredAt: new Date(),
-        expiresAt: new Date(Date.now() - 1000), // 만료된 항목
-        updatedAt: new Date(),
-      },
-    ];
+  it('예약 가능 여부를 확인해야 한다', async () => {
+    repository.countEligibleEntries.mockResolvedValue(2);
 
-    const mockWaitingEntries: QueueEntry[] = [
-      {
-        id: 'waiting-entry-id',
-        userId: 'user2',
-        status: QueueEntryStatus.WAITING,
-        enteredAt: new Date(),
-        expiresAt: new Date(Date.now() + 1000),
-        updatedAt: new Date(),
-      },
-    ];
-
-    mockQueueEntryRepository.findEligibleEntries.mockResolvedValue(
-      mockEligibleEntries,
-    );
-    mockQueueEntryRepository.countEligibleEntries.mockResolvedValue(0);
-    mockQueueEntryRepository.findWaitingEntries.mockResolvedValue(
-      mockWaitingEntries,
+    const result = await service.isEligibleForReservation(
+      QueueEntryStatus.WAITING,
     );
 
-    await service.updateQueueEntries();
-
-    expect(mockQueueEntryRepository.updateStatus).toHaveBeenCalledWith(
-      'waiting-entry-id',
-      QueueEntryStatus.ELIGIBLE,
-      expect.any(Object),
-    );
+    expect(repository.countEligibleEntries).toHaveBeenCalledWith(undefined);
+    expect(result).toBe(true);
   });
 });

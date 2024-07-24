@@ -31,8 +31,9 @@ export class QueueService {
       tx,
     );
     if (
-      queueEntry.status === QueueEntryStatus.WAITING ||
-      queueEntry.status === QueueEntryStatus.ELIGIBLE
+      queueEntry &&
+      (queueEntry.status === QueueEntryStatus.WAITING ||
+        queueEntry.status === QueueEntryStatus.ELIGIBLE)
     ) {
       throw new HttpException(
         '이미 대기열 안에 존재합니다.',

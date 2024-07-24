@@ -11,6 +11,7 @@ services:
       POSTGRES_LOG_STATEMENT: 'all'
       POSTGRES_LOG_CONNECTIONS: 'on'
       POSTGRES_LOG_DISCONNECTIONS: 'on'
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

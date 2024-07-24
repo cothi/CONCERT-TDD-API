@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { QueueEntry, QueueEntryStatus } from '@prisma/client';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import {
   CountWaitingAheadModel,
   CreateEnqueueModel,
@@ -11,6 +9,8 @@ import {
   RemoveQueueByIdModel,
   UpdateQueueStatusModel,
 } from 'src/domain/enqueue/model/enqueue.model';
+import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
 import { QueueMapper } from '../mapper/queue.mapper';
 
 @Injectable()
@@ -27,16 +27,18 @@ export class QueueEntryRepository {
     tx?: PrismaTransaction,
   ): Promise<QueueModel> {
     const entity = QueueMapper.toMapCreateQueueEntiry(model);
+    const now = new Date();
+    const WAITING = QueueEntryStatus.WAITING;
     const queue = await (tx ?? this.prisma).queueEntry.upsert({
       where: { userId: entity.userId },
-      update: {
-        status: QueueEntryStatus.WAITING,
-        enteredAt: new Date(),
-      },
       create: {
         userId: entity.userId,
-        status: QueueEntryStatus.WAITING,
-        enteredAt: new Date(),
+        status: WAITING,
+        enteredAt: now,
+      },
+      update: {
+        status: WAITING,
+        enteredAt: now,
       },
     });
     return QueueMapper.toMapQueueModel(queue);
@@ -50,11 +52,12 @@ export class QueueEntryRepository {
   async findByUserId(
     model: GetQueueEntryByUserIdModel,
     tx?: PrismaTransaction,
-  ): Promise<QueueModel | null> {
+  ): Promise<QueueModel> {
     const entity = QueueMapper.toMapGetQueueByUserIdEntity(model);
     const queue = await (tx ?? this.prisma).queueEntry.findUnique({
       where: { userId: entity.userId },
     });
+
     return QueueMapper.toMapQueueModel(queue);
   }
 
@@ -121,7 +124,7 @@ export class QueueEntryRepository {
     tx?: PrismaTransaction,
   ): Promise<number> {
     const entity = QueueMapper.toMapCountWaitingAheadEntity(model);
-    const count = (tx ?? this.prisma).queueEntry.count({
+    const count = await (tx ?? this.prisma).queueEntry.count({
       where: {
         status: QueueEntryStatus.WAITING,
         enteredAt: { lt: entity.enteredAt },
@@ -135,7 +138,7 @@ export class QueueEntryRepository {
    * @returns 예약 가능한 대기열 항목 수
    */
   async countEligibleEntries(tx?: PrismaTransaction): Promise<number> {
-    return (tx ?? this.prisma).queueEntry.count({
+    return await (tx ?? this.prisma).queueEntry.count({
       where: { status: QueueEntryStatus.ELIGIBLE },
     });
   }
@@ -144,7 +147,7 @@ export class QueueEntryRepository {
    * @returns 예약 가능한 대기열 항목 배열 (최대 5개)
    */
   async findEligibleEntries(tx?: PrismaTransaction): Promise<QueueEntry[]> {
-    return (tx ?? this.prisma).queueEntry.findMany({
+    return await (tx ?? this.prisma).queueEntry.findMany({
       where: { status: QueueEntryStatus.ELIGIBLE },
       orderBy: { enteredAt: 'asc' },
       take: 5,

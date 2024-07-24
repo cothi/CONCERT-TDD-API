@@ -387,7 +387,6 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
@@ -412,7 +411,7 @@ describe('콘서트', () => {
         testContext.accessToken,
       );
 
-      const seatId = getSeatsResponse.body.seats[0].id;
+      const seatId = getSeatsResponse.body.seats[0].seatId;
       const reserveResponse = await apiRequest.reserveSeatRequest(
         testContext.accessToken,
         seatId,

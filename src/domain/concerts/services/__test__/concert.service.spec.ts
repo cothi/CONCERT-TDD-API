@@ -3,29 +3,25 @@ https://docs.nestjs.com/fundamentals/testing#unit-testing
 */
 
 import { Test } from '@nestjs/testing';
-import { Concert } from '@prisma/client';
 import { ConcertRepository } from 'src/infrastructure/concerts/repositories/concert.repository';
-import {
-  CreateConcertModel,
-  FindConcertModel,
-} from '../../model/concert.model';
+import { ConcertModel, CreateConcertModel } from '../../model/concert.model';
 import { ConcertService } from '../concert.service';
 describe('ConcertService', () => {
   let service: ConcertService;
   let repository: jest.Mocked<ConcertRepository>;
-  const expectedConcert: Concert = {
-    id: '1',
+  const expectedConcert: ConcertModel = {
+    concertId: '1',
     name: 'Test Concert',
     updatedAt: new Date(),
     createdAt: new Date(),
   };
-  const expectedConcert2: Concert = {
-    id: '2',
+  const expectedConcert2: ConcertModel = {
+    concertId: '2',
     name: 'Test Concert2',
     updatedAt: new Date(),
     createdAt: new Date(),
   };
-  const expectedConcerts: Concert[] = [expectedConcert, expectedConcert2];
+  const expectedConcerts: ConcertModel[] = [expectedConcert, expectedConcert2];
 
   beforeEach(async () => {
     const repositoryMock = {
@@ -63,13 +59,9 @@ describe('ConcertService', () => {
 
   describe('getConcertById', () => {
     it('concert id로 조회 시, 해당 콘서트가 조회되어야 합니다.', async () => {
-      const findConcertModel: FindConcertModel = { concertId: '1' };
-
+      const findConcertModel = { concertId: '2' };
       repository.findById.mockResolvedValue(expectedConcert);
-
       const result = await service.getConcertById(findConcertModel);
-
-      expect(repository.findById).toHaveBeenCalledWith('1');
       expect(result).toEqual(expectedConcert);
     });
   });

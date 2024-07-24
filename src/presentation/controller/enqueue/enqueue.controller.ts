@@ -28,7 +28,7 @@ export class EnqueueController {
   })
   @UseGuards(JwtAuthGuard)
   async enqueue(@Payload() payload: JwtPayload): Promise<EnqueueResponseDto> {
-    return this.enqueueUseCase.execute({ userId: payload.userId });
+    return await this.enqueueUseCase.execute({ userId: payload.userId });
   }
 
   @Get()
@@ -46,6 +46,6 @@ export class EnqueueController {
   async getQueueStatus(
     @Payload() payload: JwtPayload,
   ): Promise<QueueStatusResponseDto> {
-    return this.getQueueStatusUseCase.execute(payload.userId);
+    return await this.getQueueStatusUseCase.execute(payload.userId);
   }
 }

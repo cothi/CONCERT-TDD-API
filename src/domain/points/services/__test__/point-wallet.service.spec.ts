@@ -3,7 +3,7 @@ import { PointWalletService } from '../point-wallet.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Decimal } from '@prisma/client/runtime/library';
 import { UserPoint } from '@prisma/client';
-import { ChargePointModel } from '../../model/payment.model';
+import { ChargePointModel } from '../../model/point-wallet.model';
 
 describe('PointWalletService', () => {
   let service: PointWalletService;

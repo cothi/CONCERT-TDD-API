@@ -57,7 +57,6 @@ export class ConcertsController {
   async createConcert(
     @Body() createConcertDto: CreateConcertDto,
   ): Promise<ConcertResponseDto> {
-    console.log(createConcertDto);
     return this.createConcertUseCase.execute({ name: createConcertDto.name });
   }
 

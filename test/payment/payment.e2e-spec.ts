@@ -95,7 +95,7 @@ describe('Payment Test (e2e)', () => {
       // 좌석 예약
       const createReservationRes = await apiRequests.createReservationRequest(
         accessToken,
-        getConcertSeatsRes.body.seats[0].id,
+        getConcertSeatsRes.body.seats[0].seatId,
       );
 
       // 좌석 결제
@@ -145,7 +145,7 @@ describe('Payment Test (e2e)', () => {
       // 좌석 예약
       const createReservationRes = await apiRequests.createReservationRequest(
         accessToken,
-        getConcertSeatsRes.body.seats[0].id,
+        getConcertSeatsRes.body.seats[0].seatId,
       );
 
       // 좌석 결제

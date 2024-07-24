@@ -32,7 +32,6 @@ export class EnqueueUseCase
       );
       return responseDto;
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }

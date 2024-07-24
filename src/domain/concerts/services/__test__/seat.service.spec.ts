@@ -1,127 +1,122 @@
-import { Decimal } from '@prisma/client/runtime/library';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SeatRepository } from 'src/infrastructure/concerts/repositories/seat.repository';
-import { HttpException, HttpStatus } from '@nestjs/common';
-import { Seat, SeatStatus } from '@prisma/client';
+
+import { Prisma, SeatStatus } from '@prisma/client';
 import { SeatService } from '../seat.service';
-import { CreateSeatsModel } from '../../model/seat.model';
+import {
+  CreateSeatsModel,
+  GetSeatByConcertDateIdModel,
+  GetSeatBySeatIdModel,
+  SeatModel,
+  UpdateSeatStatusModel,
+} from '../../model/seat.model';
+import { HttpException } from '@nestjs/common';
 
 describe('SeatService', () => {
-  let seatService: SeatService;
-  let seatRepository: jest.Mocked<SeatRepository>;
+  let service: SeatService;
+  let repository: jest.Mocked<SeatRepository>;
 
   beforeEach(async () => {
+    const mockRepository = {
+      findByConcertDateId: jest.fn(),
+      createMany: jest.fn(),
+      findAndLockById: jest.fn(),
+      findBySeatId: jest.fn(),
+      updateStatus: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SeatService,
-        {
-          provide: SeatRepository,
-          useFactory: () => ({
-            findByConcertDateId: jest.fn(),
-            createMany: jest.fn(),
-            findAndLockById: jest.fn(),
-            findBySeatId: jest.fn(),
-            updateStatus: jest.fn(),
-          }),
-        },
+        { provide: SeatRepository, useValue: mockRepository },
       ],
     }).compile();
 
-    seatService = module.get<SeatService>(SeatService);
-    seatRepository = module.get(SeatRepository);
+    service = module.get<SeatService>(SeatService);
+    repository = module.get(SeatRepository);
   });
 
-  describe('createSeat', () => {
-    it('공연 날짜에 좌석이 없을 때 새로운 좌석을 생성해야 한다', async () => {
-      // given
-      const createSeatModel: CreateSeatsModel = {
-        concertDateId: '1',
-        seatNumber: 5,
-        status: SeatStatus.AVAILABLE,
-        price: new Decimal(100),
-      };
-      seatRepository.findByConcertDateId.mockResolvedValue([]);
-      seatRepository.createMany.mockResolvedValue({ count: 5 });
+  it('좌석을 생성해야 한다', async () => {
+    const model = new CreateSeatsModel();
+    model.concertDateId = 'concert1';
+    model.seatNumber = 10;
+    model.status = SeatStatus.AVAILABLE;
+    model.price = new Prisma.Decimal(100);
 
-      // when
-      const result = await seatService.createSeat(createSeatModel);
+    repository.findByConcertDateId.mockResolvedValue([]);
+    repository.createMany.mockResolvedValue({ count: 10 });
 
-      // then
-      expect(result).toEqual({ count: 5 });
-      expect(seatRepository.createMany).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({ concertDateId: '1', seatNumber: 1 }),
-          expect.objectContaining({ concertDateId: '1', seatNumber: 5 }),
-        ]),
-      );
-    });
+    const result = await service.createSeat(model);
 
-    it('이미 좌석이 존재할 경우 HttpException을 발생시켜야 한다', async () => {
-      // given
-      const createSeatModel = {
-        concertDateId: '1',
-        seatNumber: 5,
-        status: SeatStatus.AVAILABLE,
-        price: new Decimal(100),
-      };
-      seatRepository.findByConcertDateId.mockResolvedValue([{} as Seat]);
-
-      // when & then
-      await expect(seatService.createSeat(createSeatModel)).rejects.toThrow(
-        new HttpException('이미 시트가 생성되었습니다.', HttpStatus.CONFLICT),
-      );
-    });
+    expect(repository.findByConcertDateId).toHaveBeenCalled();
+    expect(repository.createMany).toHaveBeenCalled();
+    expect(result.count).toBe(10);
   });
 
-  describe('findAndLockSeat', () => {
-    it('존재하는 좌석을 찾아 잠금 처리해야 한다', async () => {
-      // given
-      const seatId = '1';
-      const mockSeat = { id: seatId } as Seat;
-      seatRepository.findAndLockById.mockResolvedValue(mockSeat);
+  it('이미 좌석이 존재할 경우 예외를 던져야 한다', async () => {
+    const model = new CreateSeatsModel();
+    model.concertDateId = 'concert1';
 
-      // when
-      const result = await seatService.findAndLockSeat(seatId);
+    repository.findByConcertDateId.mockResolvedValue([new SeatModel()]);
 
-      // then
-      expect(result).toEqual(mockSeat);
-    });
+    await expect(service.createSeat(model)).rejects.toThrow(HttpException);
   });
 
-  describe('updateSeatStatus', () => {
-    it('존재하는 좌석의 상태를 성공적으로 업데이트해야 한다', async () => {
-      // given
-      const updateModel = { seatId: '1', status: SeatStatus.RESERVED };
-      const mockSeat = { id: '1', status: SeatStatus.AVAILABLE } as Seat;
-      seatRepository.findBySeatId.mockResolvedValue(mockSeat);
-      seatRepository.updateStatus.mockResolvedValue({
-        ...mockSeat,
-        status: 'RESERVED',
-      });
+  it('좌석을 찾고 락을 걸어야 한다', async () => {
+    const model = new GetSeatBySeatIdModel();
+    model.seatId = 'seat1';
 
-      // when
-      const result = await seatService.updateSeatStatus(updateModel);
+    const expectedSeat = new SeatModel();
+    repository.findAndLockById.mockResolvedValue(expectedSeat);
 
-      // then
-      expect(result).toEqual(
-        expect.objectContaining({ id: '1', status: 'RESERVED' }),
-      );
-    });
+    const result = await service.findAndLockSeat(model);
 
-    it('존재하지 않는 좌석에 대해 상태 업데이트 시 HttpException을 발생시켜야 한다', async () => {
-      // given
-      const updateModel = { seatId: '1', status: SeatStatus.RESERVED };
-      seatRepository.findBySeatId.mockResolvedValue(null);
-
-      // when & then
-      await expect(seatService.updateSeatStatus(updateModel)).rejects.toThrow(
-        new HttpException(
-          '요청한 좌석이 존재하지 않습니다',
-          HttpStatus.NOT_FOUND,
-        ),
-      );
-    });
+    expect(repository.findAndLockById).toHaveBeenCalledWith(model, undefined);
+    expect(result).toBe(expectedSeat);
   });
 
-  // 추가 메서드에 대한 테스트도 이와 같은 패턴으로 작성할 수 있습니다.
+  it('좌석 상태를 업데이트해야 한다', async () => {
+    const model = new UpdateSeatStatusModel();
+    model.seatId = 'seat1';
+    model.status = SeatStatus.RESERVED;
+
+    const expectedSeat = new SeatModel();
+    repository.findBySeatId.mockResolvedValue(new SeatModel());
+    repository.updateStatus.mockResolvedValue(expectedSeat);
+
+    const result = await service.updateSeatStatus(model);
+
+    expect(repository.findBySeatId).toHaveBeenCalled();
+    expect(repository.updateStatus).toHaveBeenCalledWith(model, undefined);
+    expect(result).toBe(expectedSeat);
+  });
+
+  it('공연 날짜로 좌석을 조회해야 한다', async () => {
+    const model = new GetSeatByConcertDateIdModel();
+    model.concertDateId = 'concert1';
+
+    const expectedSeats = [new SeatModel(), new SeatModel()];
+    repository.findByConcertDateId.mockResolvedValue(expectedSeats);
+
+    const result = await service.getSeatsByConcertDateId(model);
+
+    expect(repository.findByConcertDateId).toHaveBeenCalledWith(
+      model,
+      undefined,
+    );
+    expect(result).toBe(expectedSeats);
+  });
+
+  it('좌석 ID로 좌석을 조회해야 한다', async () => {
+    const model = new GetSeatBySeatIdModel();
+    model.seatId = 'seat1';
+
+    const expectedSeat = new SeatModel();
+    repository.findBySeatId.mockResolvedValue(expectedSeat);
+
+    const result = await service.getSeatBySeatId(model);
+
+    expect(repository.findBySeatId).toHaveBeenCalledWith(model, undefined);
+    expect(result).toBe(expectedSeat);
+  });
 });

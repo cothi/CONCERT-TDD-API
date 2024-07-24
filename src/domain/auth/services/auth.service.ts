@@ -21,7 +21,7 @@ export class AuthService {
         HttpStatus.NOT_ACCEPTABLE,
       );
     }
-    return await this.authRepository.registerUser(model)
+    return await this.authRepository.registerUser(model);
   }
   async findUserByEmail(model: FindUserByEmailModel): Promise<UserModel> {
     const user = await this.authRepository.findUserByEmail(model);

@@ -18,13 +18,13 @@ export class RegisterUserUseCase
       const reigsterModel = RegisterUserModel.create(input.email);
       const userModel = await this.authService.registerUser(reigsterModel);
 
-      const accessToken = this.jwtTokenService.generateAccessToken({
+      const accessToken = await this.jwtTokenService.generateAccessToken({
         userId: userModel.id,
         email: userModel.email,
         type: 'access',
       });
 
-      const refreshToken = this.jwtTokenService.generateRefreshToken({
+      const refreshToken = await this.jwtTokenService.generateRefreshToken({
         userId: userModel.id,
         email: userModel.email,
         type: 'refresh',
