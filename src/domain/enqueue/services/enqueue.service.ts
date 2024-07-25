@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { QueueEntryStatus } from '@prisma/client';
 import { QUEUE_CONFIG } from 'src/common/config/config';
 import { QueueEntryRepository } from 'src/infrastructure/enqueue/repository/queue.repository';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
 import {
   CountWaitingAheadModel,
   CreateEnqueueModel,

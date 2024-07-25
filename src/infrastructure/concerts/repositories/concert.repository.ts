@@ -5,7 +5,7 @@ import {
   FindConcertByIdModel,
   FindConcertByNameModel,
 } from 'src/domain/concerts/model/concert.model';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../database/prisma/prisma.service';
 import { ConcertMapper } from '../mapper/concert.mapper';
 
 @Injectable()

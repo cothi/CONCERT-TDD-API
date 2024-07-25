@@ -7,8 +7,8 @@ import {
   SeatModel,
   UpdateSeatStatusModel,
 } from 'src/domain/concerts/model/seat.model';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
+import { PrismaService } from '../../database/prisma/prisma.service';
 import { SeatMapper } from '../mapper/seat.mapper';
 
 @Injectable()

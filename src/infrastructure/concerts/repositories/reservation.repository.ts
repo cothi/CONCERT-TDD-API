@@ -5,8 +5,8 @@ import {
   ReservationModel,
   UpdateReservationModel,
 } from 'src/domain/concerts/model/reservation.model';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
+import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
 import {
   GetReservationByIdModel,
   GetUserReservationsModel,

@@ -9,8 +9,8 @@ import {
   RemoveQueueByIdModel,
   UpdateQueueStatusModel,
 } from 'src/domain/enqueue/model/enqueue.model';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
+import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
 import { QueueMapper } from '../mapper/queue.mapper';
 
 @Injectable()

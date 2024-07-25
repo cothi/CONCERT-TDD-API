@@ -3,8 +3,8 @@ import {
   GetPaymentsByUserIdModel,
   RecordPaymentModel,
 } from 'src/domain/points/model/payment.model';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
+import { PrismaService } from '../../database/prisma/prisma.service';
 import { PointPaymentMapper } from '../mapper/point-payment.mapper';
 
 @Injectable()

@@ -6,8 +6,8 @@ import {
   GCDByConcertDateIdModel,
   GCDByConcertIdModel,
 } from 'src/domain/concerts/model/concert-date.model';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
+import { PrismaService } from '../../database/prisma/prisma.service';
 import { ConcertDateMapper } from '../mapper/concert-date.mapper';
 
 @Injectable()

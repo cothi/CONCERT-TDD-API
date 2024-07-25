@@ -4,10 +4,14 @@ import { ChargePointCommand } from '../dto/charge-point.command.dto';
 import { PaymentType } from '../enums/payment-type.enum';
 import { PointWalletService } from 'src/domain/points/services/point-wallet.service';
 import { PointTransactionService } from 'src/domain/points/services/point-transaction.service';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { ChargePointModel } from 'src/domain/points/model/point-wallet.model';
+import {
+  ChargePointModel,
+  GetPointByUserIdModel,
+} from 'src/domain/points/model/point-wallet.model';
 import { RecordPaymentModel } from 'src/domain/points/model/payment.model';
+import { RedisService } from 'src/infrastructure/database/redis/redis.service';
 
 @Injectable()
 export class ChargePointUseCase
@@ -17,38 +21,50 @@ export class ChargePointUseCase
     private readonly prisma: PrismaService,
     private readonly pointWalletService: PointWalletService,
     private readonly pointTransactionService: PointTransactionService,
+    private readonly redisService: RedisService,
   ) {}
 
   async execute(cmd: ChargePointCommand): Promise<ChargePointResponseDto> {
+    let lock: any;
     try {
-      const response = await this.prisma.$transaction(async (prisma) => {
-        // 충전
-        const chargeModel = ChargePointModel.create(cmd.amount, cmd.userId);
-        const payment = await this.pointWalletService.chargePoints(
-          chargeModel,
-          prisma,
-        );
-        // 충전 기록
-        const recordModel = RecordPaymentModel.create(
-          cmd.amount,
-          payment.userId,
-          PaymentType.CHARGE,
-        );
-        await this.pointTransactionService.recordPaymentHistory(
-          recordModel,
-          prisma,
-        );
-
-        const chargePointResponseDto = ChargePointResponseDto.create(
-          payment.amount,
-          chargeModel.amount,
-        );
-        return chargePointResponseDto;
-      });
-      return response;
+      lock = this.redisService.acquireLock(cmd.userId);
     } catch (error) {
-      console.log(error);
       throw error;
+    } finally {
+      try {
+        const response = await this.prisma.$transaction(async (prisma) => {
+          const getModel = GetPointByUserIdModel.create(cmd.userId);
+          await this.pointWalletService.getBalance(getModel, prisma);
+
+          // 충전
+          const chargeModel = ChargePointModel.create(cmd.amount, cmd.userId);
+          const payment = await this.pointWalletService.chargePoints(
+            chargeModel,
+            prisma,
+          );
+          // 충전 기록
+          const recordModel = RecordPaymentModel.create(
+            cmd.amount,
+            payment.userId,
+            PaymentType.CHARGE,
+          );
+          await this.pointTransactionService.recordPaymentHistory(
+            recordModel,
+            prisma,
+          );
+          const chargePointResponseDto = ChargePointResponseDto.create(
+            payment.amount,
+            chargeModel.amount,
+          );
+          return chargePointResponseDto;
+        });
+        return response;
+      } catch (error) {
+        console.log(error);
+        throw error;
+      } finally {
+        this.redisService.releaseLock(lock);
+      }
     }
   }
 }

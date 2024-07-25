@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { CreateEnqueueModel } from 'src/domain/enqueue/model/enqueue.model';
 import { QueueService } from 'src/domain/enqueue/services/enqueue.service';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { EnqueueDto } from 'src/presentation/dto/enqueue/request/enqueue.dto';
 import { EnqueueResponseDto } from 'src/presentation/dto/enqueue/response/enqueue.response.dto';
 @Injectable()

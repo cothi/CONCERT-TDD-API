@@ -16,7 +16,7 @@ import {
   UpdateStatusEntity,
 } from '../entity/queue.entity';
 import { QueueEntry } from '@prisma/client';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
 
 export class QueueMapper {
   static toMapCreateQueueEntiry(

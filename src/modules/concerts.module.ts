@@ -10,7 +10,6 @@ import { SeatService } from 'src/domain/concerts/services/seat.service';
 import { ConcertDateRepository } from 'src/infrastructure/concerts/repositories/concert-date.repository';
 import { ConcertRepository } from 'src/infrastructure/concerts/repositories/concert.repository';
 import { SeatRepository } from 'src/infrastructure/concerts/repositories/seat.repository';
-import { DatabaseModule } from 'src/infrastructure/prisma/prisma.module';
 import { ConcertsController } from 'src/presentation/controller/concerts/concerts.controller';
 import { CreateConcertUseCase } from '../application/concerts/use-cases/create-concert.use-case';
 import { EnqueueModule } from './enqueue.module';
@@ -19,6 +18,7 @@ import { GetConcertSeatsUseCase } from 'src/application/concerts/use-cases/get-c
 import { GetConcertsUseCase } from 'src/application/concerts/use-cases/get-conserts.use-case';
 import { GetConcertDatesUseCase } from 'src/application/concerts/use-cases/get-concert-dates.use-case';
 import { ReservationRepository } from 'src/infrastructure/concerts/repositories/reservation.repository';
+import { DatabaseModule } from 'src/infrastructure/database/database.module';
 
 @Module({
   imports: [DatabaseModule, JwtModule, EnqueueModule],

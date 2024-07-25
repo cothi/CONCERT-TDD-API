@@ -1,7 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomUUID } from 'crypto';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { AppModule } from 'src/modules/app.module';
 import { createApiRequests } from '../helpers/api-requests';
 import { QueueEntryStatus } from '@prisma/client';

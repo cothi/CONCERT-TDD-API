@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionRepository } from 'src/infrastructure/payment/transaction.repository';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
+import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
 
 import { TransactionType } from '@prisma/client';
 import { TransactionService } from '../transaction.service';

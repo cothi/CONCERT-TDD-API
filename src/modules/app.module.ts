@@ -20,6 +20,8 @@ import { ConcertsModule } from './concerts.module';
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION_TIME: Joi.string().default('1h'),
         DATABASE_URL: Joi.string().required(),
+        REDIS_PORT: Joi.number().default(6379),
+        REDIS_HOST: Joi.string().required(),
       }),
       validationOptions: {
         allowUnknown: true,

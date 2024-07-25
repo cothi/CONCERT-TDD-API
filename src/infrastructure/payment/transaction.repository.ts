@@ -5,9 +5,9 @@ import {
   GetTransactionByUserIdModel,
   TransactionModel,
 } from 'src/domain/payment/model/transaction.model';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { UpdateTransactionStatusModel } from '../../domain/payment/model/transaction.model';
-import { PrismaTransaction } from '../prisma/types/prisma.types';
+import { PrismaTransaction } from '../database/prisma/types/prisma.types';
 import { TransactionMapper } from './mapper/transaction.mapper';
 
 @Injectable()

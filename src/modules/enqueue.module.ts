@@ -9,8 +9,8 @@ import { EnqueueUseCase } from 'src/application/enqueue/use-cases/enqueue.use-ca
 import { GetQueueStatusUseCase } from 'src/application/enqueue/use-cases/get-queue.use-case';
 import { QueueUpdateScheduler } from 'src/common/schedulers/queue-update.scheduler';
 import { QueueService } from 'src/domain/enqueue/services/enqueue.service';
+import { DatabaseModule } from 'src/infrastructure/database/database.module';
 import { QueueEntryRepository } from 'src/infrastructure/enqueue/repository/queue.repository';
-import { DatabaseModule } from 'src/infrastructure/prisma/prisma.module';
 import { EnqueueController } from 'src/presentation/controller/enqueue/enqueue.controller';
 
 @Module({

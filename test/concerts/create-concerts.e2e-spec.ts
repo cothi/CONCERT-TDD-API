@@ -1,7 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomUUID } from 'crypto';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { AppModule } from 'src/modules/app.module';
 import { createApiRequests } from '../helpers/api-requests';
 import { QueueEntryStatus } from '@prisma/client';
@@ -57,6 +57,8 @@ describe('콘서트', () => {
         expiresAt: new Date(Date.now() + 1000 * 60 * 5), // 5분
       },
     });
+
+    // 테스트용 대기열 항목 생성
   });
 
   describe('콘서트 등록 - /concerts (POST)', () => {

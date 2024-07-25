@@ -1,17 +1,26 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
     super({
       // 여기에 풀 설정 추가
       log: ['warn', 'error', 'info'],
+      transactionOptions: {
+        maxWait: 300000,
+      },
     });
   }
   async onModuleInit() {
     await this.deleteTableData();
     await this.$connect();
+  }
+  async onModuleDestroy() {
+    await this.$disconnect();
   }
 
   async deleteTableData() {

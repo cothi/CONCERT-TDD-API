@@ -5,11 +5,12 @@ import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-use
 import { JwtTokenModule } from 'src/common/modules/jwt/jwt.module';
 import { AuthService } from 'src/domain/auth/services/auth.service';
 import { AuthRepository } from 'src/infrastructure/auth/repositories/auth.repository';
-import { DatabaseModule } from 'src/infrastructure/prisma/prisma.module';
 import { AuthController } from '../presentation/controller/auth/auth.controller';
+import { DatabaseModule } from 'src/infrastructure/database/database.module';
+import { PointsModule } from './points.module';
 
 @Module({
-  imports: [DatabaseModule, JwtTokenModule],
+  imports: [DatabaseModule, JwtTokenModule, PointsModule],
   controllers: [AuthController],
   providers: [
     RefreshTokenUseCase,

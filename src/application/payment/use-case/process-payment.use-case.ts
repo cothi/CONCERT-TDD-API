@@ -16,7 +16,7 @@ import { SeatService } from 'src/domain/concerts/services/seat.service';
 import { TransactionService } from 'src/domain/payment/services/transaction.service';
 import { PointTransactionService } from 'src/domain/points/services/point-transaction.service';
 import { PointWalletService } from 'src/domain/points/services/point-wallet.service';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { PaymentResponseDto } from 'src/presentation/dto/payment/response/payment.response.dto';
 import { ProcessPaymentCommand } from '../command/process-payment.command';
 import { UpdateReservationModel } from './../../../domain/concerts/model/reservation.model';
