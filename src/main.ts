@@ -3,10 +3,11 @@ import { AppModule } from './modules/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'fatal', 'debug', 'verbose', 'log']
+    logger: false,
   });
   app.useGlobalPipes(
     new ValidationPipe({
@@ -15,6 +16,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const config = new DocumentBuilder()

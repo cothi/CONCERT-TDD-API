@@ -38,10 +38,12 @@
     "dotenv-cli": "^7.4.2",
     "ioredis": "^5.4.1",
     "joi": "^17.13.3",
+    "nest-winston": "^1.9.7",
     "prisma": "^5.16.1",
     "redlock": "^5.0.0-beta.2",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "winston": "^3.13.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

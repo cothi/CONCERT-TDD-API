@@ -6,9 +6,12 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { AuthModule } from './auth.module';
 import { ConcertsModule } from './concerts.module';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from 'src/common/config/winston.config';
 
 @Module({
   imports: [
+    WinstonModule.forRoot(winstonConfig),
     PaymentModule,
     EnqueueModule,
     ConfigModule.forRoot({
