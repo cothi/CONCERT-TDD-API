@@ -1,6 +1,7 @@
 // src/test/helpers/api-requests.ts
 
 import { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import request from 'supertest';
 
 export const createApiRequests = (app: INestApplication) => ({
@@ -9,7 +10,7 @@ export const createApiRequests = (app: INestApplication) => ({
   tokenRefreshRequest: (refreshToken: string) =>
     request(app.getHttpServer()).post('/auth/refresh').send({ refreshToken }),
 
-  createUserRequest: (email: string = `user${Date.now()}@example.com`) =>
+  createUserRequest: (email: string = `${randomUUID()}@test.ai`) =>
     request(app.getHttpServer()).post('/auth/register').send({ email }),
 
   createEnqueueRequest: (accessToken: string) =>

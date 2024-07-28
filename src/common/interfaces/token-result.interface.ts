@@ -2,6 +2,6 @@ import { JwtPayload } from './jwt-token.interface';
 
 export interface TokenResult {
   isValid: boolean;
-  payload: JwtPayload | null;
+  payload: JwtPayload;
   error?: string;
 }

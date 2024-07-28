@@ -1,37 +1,32 @@
 // src/modules/concert/services/concert-date.service.spec.ts
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConcertDateRepository } from 'src/infrastructure/database/repositories/concerts/concert-date.repository';
-import { ConcertDateService } from '../concert-date.service';
+import { ConcertDateRepository } from 'src/infrastructure/concerts/repositories/concert-date.repository';
 import {
-  CreateConcertDateModel,
+  ConcertDateModel,
   GCDByConcertDateIdModel,
   GCDByConcertIdModel,
 } from '../../model/concert-date.model';
-import { ConcertDate } from '@prisma/client';
+import { ConcertDateService } from '../concert-date.service';
 
 describe('ConcertDateService', () => {
   let service: ConcertDateService;
   let repository: jest.Mocked<ConcertDateRepository>;
 
-  const expectedResult: ConcertDate = {
-    id: '1',
-    concertId: '2',
+  const expectedResult: ConcertDateModel = {
+    concertDateId: '1',
+    concertId: '1',
     date: new Date(),
-    totalSeat: 2,
-    availableSeatCount: 2,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    totalSeat: 50,
+    availableSeatCount: 50,
   };
-  const expectedResults: ConcertDate[] = [
+  const expectedResults: ConcertDateModel[] = [
     {
-      id: '1',
-      concertId: '2',
+      concertDateId: '1',
+      concertId: '1',
       date: new Date(),
-      totalSeat: 2,
-      availableSeatCount: 2,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      totalSeat: 50,
+      availableSeatCount: 50,
     },
   ];
 
@@ -59,10 +54,12 @@ describe('ConcertDateService', () => {
 
   describe('createConcertDate', () => {
     it('콘서트 날짜 생성해야 합니다.', async () => {
-      const createConcertDateModel: CreateConcertDateModel = {
-        concertId: '123',
+      const createConcertDateModel: ConcertDateModel = {
+        concertDateId: '1',
+        concertId: '1',
         date: new Date(),
-        totalSeat: 100,
+        totalSeat: 50,
+        availableSeatCount: 50,
       };
 
       repository.create.mockResolvedValue(expectedResult);

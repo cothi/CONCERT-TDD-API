@@ -1,14 +1,10 @@
 // src/presentation/dto/payment/payment-response.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  Payment,
-  PaymentType,
-  Reservation,
-  ReservationStatus,
-  Seat,
-  SeatStatus,
-} from '@prisma/client';
+import { PaymentType, ReservationStatus, SeatStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import { ReservationModel } from 'src/domain/concerts/model/reservation.model';
+import { SeatModel } from 'src/domain/concerts/model/seat.model';
+import { PaymentModel } from 'src/domain/points/model/payment.model';
 
 export class PaymentResponseDto {
   @ApiProperty({
@@ -92,10 +88,10 @@ export class PaymentResponseDto {
   })
   message?: string;
 
-  static fromEntity(
-    payment: Payment,
-    reservation: Reservation,
-    seat: Seat,
+  static fromModel(
+    payment: PaymentModel,
+    reservation: ReservationModel,
+    seat: SeatModel,
     success: boolean,
     message: string,
   ): PaymentResponseDto {
@@ -103,11 +99,11 @@ export class PaymentResponseDto {
     dto.paymentId = payment.id;
     dto.userId = payment.userId;
     dto.amount = payment.amount;
-    dto.paymentType = payment.paymentType;
+    dto.paymentType = payment.type;
     dto.createdAt = payment.createdAt;
-    dto.reservationId = reservation.id;
+    dto.reservationId = reservation.reservationId;
     dto.reservationStatus = reservation.status;
-    dto.seatId = seat.id;
+    dto.seatId = seat.seatId;
     dto.seatStatus = seat.status;
     dto.success = success;
     dto.message = message;

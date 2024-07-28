@@ -6,11 +6,19 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { AuthModule } from './auth.module';
 import { ConcertsModule } from './concerts.module';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from 'src/common/config/winston.config';
+import { LoggerModule } from './logger.module';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
+import { ResponseTransformInterceptor } from 'src/common/intercept/api-response.intercept';
 
 @Module({
   imports: [
+    WinstonModule.forRoot(winstonConfig),
     PaymentModule,
     EnqueueModule,
+    LoggerModule,
     ConfigModule.forRoot({
       envFilePath: '.env.dev',
       isGlobal: true,
@@ -20,6 +28,8 @@ import { ConcertsModule } from './concerts.module';
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION_TIME: Joi.string().default('1h'),
         DATABASE_URL: Joi.string().required(),
+        REDIS_PORT: Joi.number().default(6379),
+        REDIS_HOST: Joi.string().required(),
       }),
       validationOptions: {
         allowUnknown: true,
@@ -32,6 +42,15 @@ import { ConcertsModule } from './concerts.module';
     ConcertsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseTransformInterceptor,
+    },
+  ],
 })
 export class AppModule {}

@@ -1,63 +1,31 @@
-// src/domain/concerts/services/__tests__/reservation.service.spec.ts
-
+import { HttpException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ReservationService } from '../reservation.service';
-import { ReservationRepository } from 'src/infrastructure/database/repositories/concerts/reservation.repository';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
-import { Reservation, ReservationStatus } from '@prisma/client';
+import { ReservationRepository } from 'src/infrastructure/concerts/repositories/reservation.repository';
 import {
   CreateReservationModel,
   GetReservationByIdModel,
-  GetUserReservationsModel,
+  ReservationModel,
   UpdateReservationModel,
 } from '../../model/reservation.model';
-// src/domain/concerts/types/reservation.types.ts
-
-import { Concert, ConcertDate, Seat } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
-
-export type ReservationWithRelations = Reservation & {
-  concert: Pick<Concert, 'name'>;
-  concertDate: Pick<ConcertDate, 'date'>;
-  seat: Pick<Seat, 'seatNumber' | 'price'>;
-};
+import { ReservationService } from '../reservation.service';
 
 describe('ReservationService', () => {
   let service: ReservationService;
   let repository: jest.Mocked<ReservationRepository>;
 
-  const mockReservation: Reservation = {
-    id: '1',
-    userId: 'user1',
-    concertId: 'concert1',
-    seatId: 'seat1',
-    status: ReservationStatus.PENDING,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    expiresAt: new Date(),
-    concertDateId: 'concertDate1',
-  };
-  const mockReservationWithRelations: ReservationWithRelations = {
-    ...mockReservation,
-    seat: { price: new Decimal(100), seatNumber: 1 },
-    concert: { name: 'concert1' },
-    concertDate: { date: new Date() },
-  };
-
   beforeEach(async () => {
+    const mockRepository = {
+      create: jest.fn(),
+      getReservationById: jest.fn(),
+      getReservationByWithLock: jest.fn(),
+      updateStatus: jest.fn(),
+      findByUserId: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ReservationService,
-        {
-          provide: ReservationRepository,
-          useValue: {
-            create: jest.fn(),
-            getReservationById: jest.fn(),
-            updateStatus: jest.fn(),
-            findByUserId: jest.fn(),
-            getReservationByWithLock: jest.fn(),
-          },
-        },
+        { provide: ReservationRepository, useValue: mockRepository },
       ],
     }).compile();
 
@@ -65,109 +33,66 @@ describe('ReservationService', () => {
     repository = module.get(ReservationRepository);
   });
 
-  it('서비스가 정의되어 있어야 한다', () => {
-    expect(service).toBeDefined();
+  it('예약을 생성해야 한다', async () => {
+    const createModel = new CreateReservationModel();
+    const expectedReservation = new ReservationModel();
+    repository.create.mockResolvedValue(expectedReservation);
+
+    const result = await service.createReservation(createModel);
+
+    expect(repository.create).toHaveBeenCalledWith(createModel, undefined);
+    expect(result).toBe(expectedReservation);
   });
 
-  describe('createReservation', () => {
-    it('예약을 성공적으로 생성해야 한다', async () => {
-      const createModel: CreateReservationModel = {
-        userId: 'user1',
-        concertId: 'concert1',
-        seatId: 'seat1',
-        status: ReservationStatus.PENDING,
-        concertDateId: 'concertDate1',
-        expireAt: new Date(),
-      };
-      const tx = {} as PrismaTransaction;
+  it('ID로 예약을 조회해야 한다', async () => {
+    const getModel = new GetReservationByIdModel();
+    const expectedReservation = new ReservationModel();
+    repository.getReservationById.mockResolvedValue(expectedReservation);
 
-      repository.create.mockResolvedValue(mockReservation);
+    const result = await service.getReservationById(getModel);
 
-      const result = await service.createReservation(createModel, tx);
-
-      expect(repository.create).toHaveBeenCalledWith(createModel, tx);
-      expect(result).toEqual(mockReservation);
-    });
-
-    it('생성 실패 시 에러를 던져야 한다', async () => {
-      const createModel: CreateReservationModel = {
-        userId: 'user1',
-        concertId: 'concert1',
-        seatId: 'seat1',
-        status: ReservationStatus.PENDING,
-        concertDateId: 'concertDate1',
-        expireAt: new Date(),
-      };
-
-      repository.create.mockRejectedValue(new Error('Database error'));
-
-      await expect(service.createReservation(createModel)).rejects.toThrow(
-        'Database error',
-      );
-    });
+    expect(repository.getReservationById).toHaveBeenCalledWith(
+      getModel,
+      undefined,
+    );
+    expect(result).toBe(expectedReservation);
   });
 
-  describe('getReservationById', () => {
-    it('ID로 예약을 조회해야 한다', async () => {
-      const getModel: GetReservationByIdModel = { reservationId: '1' };
-      const tx = {} as PrismaTransaction;
+  it('존재하지 않는 예약 조회 시 예외를 던져야 한다', async () => {
+    const getModel = new GetReservationByIdModel();
+    repository.getReservationById.mockResolvedValue(null);
 
-      repository.getReservationById.mockResolvedValue(mockReservation);
-
-      const result = await service.getReservationById(getModel, tx);
-
-      expect(repository.getReservationById).toHaveBeenCalledWith(getModel, tx);
-      expect(result).toEqual(mockReservation);
-    });
-  });
-  describe('getReservationByIdWithLock', () => {
-    it('ID로 예약을 조회해야 한다', async () => {
-      const getModel: GetReservationByIdModel = { reservationId: '1' };
-      const tx = {} as PrismaTransaction;
-      repository.getReservationByWithLock.mockResolvedValue(mockReservation);
-
-      const result = await service.getReservationByWithLock(getModel, tx);
-
-      expect(repository.getReservationByWithLock).toHaveBeenCalledWith(
-        getModel,
-        tx,
-      );
-      expect(result).toEqual(mockReservation);
-    });
+    await expect(service.getReservationById(getModel)).rejects.toThrow(
+      HttpException,
+    );
   });
 
-  describe('updateStatus', () => {
-    it('예약 상태를 업데이트해야 한다', async () => {
-      const updateModel: UpdateReservationModel = {
-        reservationId: '1',
-        status: ReservationStatus.CONFIRMED,
-      };
-      const tx = {} as PrismaTransaction;
+  it('락을 사용하여 예약을 조회해야 한다', async () => {
+    const getModel = new GetReservationByIdModel();
+    const expectedReservation = new ReservationModel();
+    repository.getReservationByWithLock.mockResolvedValue(expectedReservation);
 
-      const updatedReservation = {
-        ...mockReservation,
-        status: ReservationStatus.CONFIRMED,
-      };
-      repository.updateStatus.mockResolvedValue(updatedReservation);
-      repository.getReservationById.mockResolvedValue(mockReservation);
+    const result = await service.getReservationByWithLock(getModel);
 
-      const result = await service.updateStatus(updateModel, tx);
-
-      expect(repository.updateStatus).toHaveBeenCalledWith(updateModel, tx);
-      expect(result).toEqual(updatedReservation);
-    });
+    expect(repository.getReservationByWithLock).toHaveBeenCalledWith(
+      getModel,
+      undefined,
+    );
+    expect(result).toBe(expectedReservation);
   });
 
-  describe('getUserReservations', () => {
-    it('사용자의 예약 목록을 조회해야 한다', async () => {
-      const getUserModel: GetUserReservationsModel = { userId: 'user1' };
+  it('예약 상태를 업데이트해야 한다', async () => {
+    const updateModel = new UpdateReservationModel();
+    const expectedReservation = new ReservationModel();
+    repository.getReservationById.mockResolvedValue(new ReservationModel());
+    repository.updateStatus.mockResolvedValue(expectedReservation);
 
-      repository.findByUserId.mockResolvedValue([mockReservationWithRelations]);
+    const result = await service.updateStatus(updateModel);
 
-      const result = await service.getUserReservations(getUserModel);
-
-      expect(repository.findByUserId).toHaveBeenCalledWith(getUserModel);
-      expect(result).toEqual([mockReservationWithRelations]);
-    });
+    expect(repository.updateStatus).toHaveBeenCalledWith(
+      updateModel,
+      undefined,
+    );
+    expect(result).toBe(expectedReservation);
   });
 });

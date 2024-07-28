@@ -1,7 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ConcertDateRepository } from 'src/infrastructure/database/repositories/concerts/concert-date.repository';
-import { PrismaTransaction } from 'src/infrastructure/prisma/types/prisma.types';
-import { CreateConcertDateModel } from '../model/concert-date.model';
+import { Injectable } from '@nestjs/common';
+import { ErrorCode } from 'src/common/enums/error-code.enum';
+import { ErrorFactory } from 'src/common/errors/error-factory.error';
+import { ConcertDateRepository } from 'src/infrastructure/concerts/repositories/concert-date.repository';
+import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
+import {
+  ConcertDateModel,
+  CreateConcertDateModel,
+} from '../model/concert-date.model';
 import {
   GCDByConcertDateIdModel,
   GCDByConcertIdModel,
@@ -14,16 +19,12 @@ export class ConcertDateService {
   async createConcertDate(
     createConcertDateModel: CreateConcertDateModel,
     tx?: PrismaTransaction,
-  ) {
+  ): Promise<ConcertDateModel> {
     const concertDate = await this.concertDateRepository.findByDate(
       createConcertDateModel,
     );
-
     if (concertDate) {
-      throw new HttpException(
-        '이미 요청한 날짜에 콘서트가 생성이 되었습니다.',
-        HttpStatus.CONFLICT,
-      );
+      throw ErrorFactory.createException(ErrorCode.CONCERT_DATE_SAME_EXIST);
     }
     return await this.concertDateRepository.create(createConcertDateModel, tx);
   }
@@ -36,10 +37,7 @@ export class ConcertDateService {
       tx,
     );
     if (!concertDate) {
-      throw new HttpException(
-        '조회한 콘서트 날짜가 없습니다.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.CONCERT_DATE_NOT_FOUNT);
     }
     return concertDate;
   }
@@ -52,10 +50,7 @@ export class ConcertDateService {
       tx,
     );
     if (!concertDate) {
-      throw new HttpException(
-        '조회한 콘서트 날짜가 없습니다.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.CONCERT_DATE_NOT_FOUNT);
     }
     return concertDate;
   }

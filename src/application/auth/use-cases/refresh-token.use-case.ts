@@ -1,9 +1,12 @@
+import { Injectable } from '@nestjs/common';
+import { TokenResult } from 'src/common/interfaces/token-result.interface';
+import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
+import { FindUserByIdModel } from 'src/domain/auth/model/find-use-by-id.model';
 import { RefreshTokenModel } from 'src/domain/auth/model/refresh-token.model';
 import { AuthService } from 'src/domain/auth/services/auth.service';
 import { RefreshTokenResponseDto } from 'src/presentation/dto/auth/response/refresh-token.response.dto';
-import { IUseCase } from '../../../common/interfaces/use-case.interface';
-
+@Injectable()
 export class RefreshTokenUseCase
   implements IUseCase<RefreshTokenModel, RefreshTokenResponseDto>
 {
@@ -13,11 +16,12 @@ export class RefreshTokenUseCase
   ) {}
   async execute(input: RefreshTokenModel): Promise<RefreshTokenResponseDto> {
     try {
-      const tokenResult = this.jwtTokenService.verifyToken(input.accessToken);
-
-      const user = await this.authService.findUserById(
-        tokenResult.payload.userId,
+      const tokenResult: TokenResult = this.jwtTokenService.verifyToken(
+        input.accessToken,
       );
+
+      const findModel = FindUserByIdModel.create(tokenResult.payload.userId);
+      const user = await this.authService.findUserById(findModel);
 
       const accessToken = this.jwtTokenService.generateAccessToken({
         userId: user.id,

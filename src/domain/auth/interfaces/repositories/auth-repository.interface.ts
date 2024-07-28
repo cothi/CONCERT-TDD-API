@@ -1,9 +1,10 @@
-import { RegisterUserEntity } from 'src/domain/auth/entity/register-user.entity';
 import { UserModel } from '../../model/user.model';
-import { LoginUserEntity } from '../../entity/login-user.entity';
+import { RegisterUserModel } from '../../model/register-user.model';
+import { FindUserByIdModel } from '../../model/find-use-by-id.model';
+import { FindUserByEmailModel } from '../../model/find-user-by-email.model';
 
 export interface IAuthRepository {
-  registerUser(user: RegisterUserEntity): Promise<UserModel>;
-  findUserByEmail(user: LoginUserEntity): Promise<UserModel | null>;
-  findUserById(userId: string): Promise<UserModel | null>;
+  registerUser(model: RegisterUserModel): Promise<UserModel>;
+  findUserByEmail(model: FindUserByEmailModel): Promise<UserModel | null>;
+  findUserById(model: FindUserByIdModel): Promise<UserModel | null>;
 }

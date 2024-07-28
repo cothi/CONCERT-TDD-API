@@ -1,5 +1,6 @@
-import { Reservation, ReservationStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { ReservationStatus } from '@prisma/client';
+import { ReservationModel } from 'src/domain/concerts/model/reservation.model';
 
 export class ReserveSeatResponseDto {
   @ApiProperty({
@@ -39,14 +40,14 @@ export class ReserveSeatResponseDto {
   })
   expiresAt: Date;
 
-  static fromReservation(model: Reservation): ReserveSeatResponseDto {
+  static fromReservation(model: ReservationModel): ReserveSeatResponseDto {
     const dto = new ReserveSeatResponseDto();
-    dto.id = model.id;
+    dto.id = model.reservationId;
     dto.userId = model.userId;
     dto.seatId = model.seatId;
     dto.status = model.status;
     dto.createdAt = model.createdAt;
-    dto.expiresAt = model.expiresAt;
+    dto.expiresAt = model.expireAt;
     return dto;
   }
 }

@@ -10,11 +10,9 @@ export class CreateConcertUseCase
 {
   constructor(private readonly concertService: ConcertService) {}
 
-  async execute(input: CreateConcertCommand): Promise<ConcertResponseDto> {
+  async execute(cmd: CreateConcertCommand): Promise<ConcertResponseDto> {
     try {
-      const createConcertModel: CreateConcertModel = {
-        name: input.name,
-      };
+      const createConcertModel = CreateConcertModel.create(cmd.name);
       const concert =
         await this.concertService.createConcert(createConcertModel);
       return ConcertResponseDto.fromConcert(concert);

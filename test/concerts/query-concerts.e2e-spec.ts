@@ -1,7 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomUUID } from 'crypto';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { AppModule } from 'src/modules/app.module';
 import { createApiRequests } from '../helpers/api-requests';
 import { QueueEntryStatus } from '@prisma/client';
@@ -162,12 +162,13 @@ describe('콘서트', () => {
         concertDateResponse.body.concertDateId,
         testContext.accessToken,
       );
-      const seatId = getSeatsResponse.body.seats[0].id;
+      const seatId = getSeatsResponse.body.seats[0].seatId;
 
       const reserveSeatResponse = await apiRequest.reserveSeatRequest(
         testContext.accessToken,
         seatId,
       );
+
       expect(reserveSeatResponse.status).toBe(201);
 
       const getReservationResponse = await apiRequest.getReservationRequest(

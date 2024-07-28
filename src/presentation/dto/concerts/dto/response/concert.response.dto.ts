@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Concert } from '@prisma/client';
+import { ConcertModel } from 'src/domain/concerts/model/concert.model';
 
 export class ConcertResponseDto {
   @ApiProperty({
@@ -25,9 +25,9 @@ export class ConcertResponseDto {
     description: '콘서트 정보 마지막 수정 일시',
   })
   updatedAt: Date;
-  static fromConcert(model: Concert) {
+  static fromConcert(model: ConcertModel) {
     const dto = new ConcertResponseDto();
-    dto.concertId = model.id;
+    dto.concertId = model.concertId;
     dto.name = model.name;
     dto.createdAt = model.createdAt;
     dto.updatedAt = model.updatedAt;

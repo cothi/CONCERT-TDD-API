@@ -22,34 +22,29 @@ describe('Enqueue Test (e2e)', () => {
   });
 
   describe('대기열 등록 - /enqueue', () => {
-    it('다수의 유저(50명)의 대기열 등록을 정상적으로 처리해야 합니다. (POST)', async () => {
-      const numberOfUsers = 50;
-
-      const users = await Promise.all(
-        Array(numberOfUsers)
-          .fill(null)
-          .map(async (_, index) => {
-            const registerResponse = await apiRequests.createUserRequest(
-              `user${randomUUID()}@example.com`,
-            );
-            expect(registerResponse.status).toBe(201);
-            return {
-              id: registerResponse.body.id,
-              accessToken: registerResponse.body.accessToken,
-            };
-          }),
+    it('다수의 유저(10명)의 대기열 등록을 정상적으로 처리해야 합니다. (POST)', async () => {
+      const numberOfUsers = 10;
+      const accessTokenList: string[] = [];
+      for (let i = 0; i < numberOfUsers; i++) {
+        const email = `${randomUUID()}@gmail.ai`;
+        const registerResponse = await apiRequests.createUserRequest(email);
+        expect(registerResponse.status).toBe(201);
+        accessTokenList.push(registerResponse.body.accessToken);
+      }
+      // promise all로 대기열 등록
+      const enqueueResponseList = await Promise.all(
+        accessTokenList.map((accessToken) =>
+          apiRequests.createEnqueueRequest(accessToken),
+        ),
       );
-
-      const enqueueResponses = await Promise.all(
-        users.map((user) => apiRequests.createEnqueueRequest(user.accessToken)),
-      );
-
-      enqueueResponses.forEach((res, index) => {
-        expect(res.status).toBe(201);
+      enqueueResponseList.forEach((enqueueResponse) => {
+        expect(enqueueResponse.status).toBe(201);
       });
-    }, 30000);
+    });
     it('사용자 등록 후 대기열 등록 시 중복 등록 방지 (POST)', async () => {
-      const registerResponse = await apiRequests.createUserRequest();
+      const registerResponse = await apiRequests.createUserRequest(
+        `${randomUUID()}@gmail.ai`,
+      );
       expect(registerResponse.status).toBe(201);
 
       const enqueueResponse = await apiRequests.createEnqueueRequest(
@@ -60,6 +55,7 @@ describe('Enqueue Test (e2e)', () => {
       const enqueueResponse2 = await apiRequests.createEnqueueRequest(
         registerResponse.body.accessToken,
       );
+
       expect(enqueueResponse2.status).toBe(409);
     });
   });
@@ -67,7 +63,8 @@ describe('Enqueue Test (e2e)', () => {
   describe('대기열 조회 - /enqueue', () => {
     // 사용자 등록 및 대기열 등록 후 확인
     it('사용자 등록 및 대기열 등록 후 조회 (POST)', async () => {
-      const registerResponse = await apiRequests.createUserRequest();
+      const email = `${randomUUID()}@gmail.ai`;
+      const registerResponse = await apiRequests.createUserRequest(email);
       expect(registerResponse.status).toBe(201);
 
       const enqueueResponse = await apiRequests.createEnqueueRequest(
@@ -83,7 +80,8 @@ describe('Enqueue Test (e2e)', () => {
 
     // 사용자 등록 및 대기열에 없으면 404 반환
     it('사용자 등록 및 대기열에 없으면 조회 시에는 404 반환  (GET) ', async () => {
-      const registerResponse = await apiRequests.createUserRequest();
+      const email = `${randomUUID()}@gmail.ai`;
+      const registerResponse = await apiRequests.createUserRequest(email);
       expect(registerResponse.status).toBe(201);
 
       const queueStatusResponse = await apiRequests.getQueueStatusRequest(

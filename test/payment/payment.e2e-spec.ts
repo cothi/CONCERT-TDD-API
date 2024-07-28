@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { QueueEntryStatus } from '@prisma/client';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { AppModule } from 'src/modules/app.module';
 import { createApiRequests } from '../helpers/api-requests';
 import { randomUUID } from 'crypto';
@@ -27,11 +27,11 @@ describe('Payment Test (e2e)', () => {
     apiRequests = createApiRequests(app);
 
     // 테스트 사용자 생성
-    const testUser = await prismaService.user.create({
-      data: {
-        // 랜덤 이메일
-        email: `user${randomUUID()}@example.com`,
-      },
+    const email = `user${randomUUID()}@example.com`;
+    const res = await apiRequests.createUserRequest(email);
+
+    const testUser = await prismaService.user.findUnique({
+      where: { email: email },
     });
     testContext.testUserId = testUser.id;
     testContext.email = testUser.email;
@@ -44,13 +44,9 @@ describe('Payment Test (e2e)', () => {
         expiresAt: new Date(Date.now() + 1000 * 60 * 5), // 5분
       },
     });
-    const loginResponse = await apiRequests.loginRequest(testContext.email);
-    testContext.accessToken = loginResponse.body.accessToken;
+    testContext.accessToken = res.body.accessToken;
   });
 
-  afterAll(async () => {
-    await app.close();
-  });
   describe('결제', () => {
     it('결제가 정상적으로 이루어져야 합니다. - /payment (POST)', async () => {
       // 테스트 코드 작성
@@ -95,7 +91,7 @@ describe('Payment Test (e2e)', () => {
       // 좌석 예약
       const createReservationRes = await apiRequests.createReservationRequest(
         accessToken,
-        getConcertSeatsRes.body.seats[0].id,
+        getConcertSeatsRes.body.seats[0].seatId,
       );
 
       // 좌석 결제
@@ -145,7 +141,7 @@ describe('Payment Test (e2e)', () => {
       // 좌석 예약
       const createReservationRes = await apiRequests.createReservationRequest(
         accessToken,
-        getConcertSeatsRes.body.seats[0].id,
+        getConcertSeatsRes.body.seats[0].seatId,
       );
 
       // 좌석 결제
@@ -155,5 +151,8 @@ describe('Payment Test (e2e)', () => {
       );
       expect(createPaymentRes.status).toBe(406);
     });
+  });
+  afterAll(async () => {
+    await app.close();
   });
 });

@@ -34,7 +34,7 @@ describe('Point Test (e2e)', () => {
     await app.init();
     apiRequest = createApiRequests(app);
 
-    const loginResponse = await apiRequest.createUserRequest(testContext.email);
+    const loginResponse = await apiRequest.createUserRequest();
     testContext.accessToken = loginResponse.body.accessToken;
   });
 
@@ -68,10 +68,24 @@ describe('Point Test (e2e)', () => {
       });
       expect(response.status).toBe(200);
     });
+    it('포인트 충전이 30회 이상 시도 시 정상적으로 이루어져야 합니다.', async () => {
+      const res = [];
+      for (let i = 0; i < 30; i++) {
+        res.push(apiRequest.chargePointRequest(testContext.accessToken, 1));
+      }
+      const responses = await Promise.all(res);
+
+      responses.forEach((response) => {
+        expect(response.status).toBe(200);
+      });
+    }, 30000);
 
     it('가입되지 않은 이메일로 포인트 충전 시도 시 에러 ', async () => {
       const response = await apiRequest.chargePointRequest('', 100);
       expect(response.status).toBe(401);
     });
+  });
+  afterAll(async () => {
+    await app.close();
   });
 });

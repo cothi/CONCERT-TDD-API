@@ -2,8 +2,10 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ErrorCode } from 'src/common/enums/error-code.enum';
+import { ErrorFactory } from 'src/common/errors/error-factory.error';
 import { JwtPayload } from 'src/common/interfaces/jwt-token.interface';
 import { TokenResult } from 'src/common/interfaces/token-result.interface';
 import { IJwtTokenService } from '../../interfaces/token-service.interface';
@@ -23,12 +25,13 @@ export class JwtTokenService implements IJwtTokenService {
   verifyToken(token: string): TokenResult {
     try {
       const payload: JwtPayload = this.jwtService.verify(token);
+
       return {
         isValid: true,
         payload,
       };
     } catch (error) {
-      throw new HttpException('유효한 토큰이 아닙니다.', 410);
+      throw ErrorFactory.createException(ErrorCode.INVALID_TOKEN);
     }
   }
 }

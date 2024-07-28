@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LoginUserModel } from 'src/domain/auth/model/login-user.model';
 import { RegisterUserModel } from 'src/domain/auth/model/register-user.model';
 import { UserModel } from 'src/domain/auth/model/user.model';
-import { AuthRepository } from 'src/infrastructure/database/repositories/auth/auth.repository';
+import { AuthRepository } from 'src/infrastructure/auth/repositories/auth.repository';
+import { FindUserByEmailModel } from '../../model/find-user-by-email.model';
 import { AuthService } from '../auth.service';
+import { FindUserByIdModel } from '../../model/find-use-by-id.model';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -38,7 +39,7 @@ describe('AuthService', () => {
 
   describe('findUserByEmail', () => {
     it('유저가 성공적으로 조회되어야 합니다.', async () => {
-      const loginUserModel = LoginUserModel.create('test@test.ai');
+      const loginUserModel = FindUserByEmailModel.create('test@test.ai');
       const expectedUserModel = UserModel.create('1', 'test@test.ai');
       repository.findUserByEmail.mockResolvedValue(expectedUserModel);
       const result = await authService.findUserByEmail(loginUserModel);
@@ -50,7 +51,8 @@ describe('AuthService', () => {
     it('유저가 성공적으로 조회되어야 합니다.', async () => {
       const expectedUserModel = UserModel.create('1', 'test@test.ai');
       repository.findUserById.mockResolvedValue(expectedUserModel);
-      const result = await authService.findUserById('1');
+      const findUserModel = FindUserByIdModel.create('1');
+      const result = await authService.findUserById(findUserModel);
       expect(result).toEqual(expectedUserModel);
     });
   });

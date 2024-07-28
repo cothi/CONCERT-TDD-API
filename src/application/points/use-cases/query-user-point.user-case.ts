@@ -3,6 +3,7 @@ import { QueryUserPointResponseDto } from 'src/presentation/dto/points/response/
 import { GetUserPointQuery } from '../dto/get-user-point.query.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { PointWalletService } from 'src/domain/points/services/point-wallet.service';
+import { GetPointByUserIdModel } from 'src/domain/points/model/point-wallet.model';
 
 @Injectable()
 export class QueryUserPointUseCase
@@ -12,12 +13,10 @@ export class QueryUserPointUseCase
     @Inject(PointWalletService)
     private readonly pointWalletService: PointWalletService,
   ) {}
-  async execute(input: GetUserPointQuery): Promise<QueryUserPointResponseDto> {
+  async execute(query: GetUserPointQuery): Promise<QueryUserPointResponseDto> {
     try {
-      const userPoint = await this.pointWalletService.getBalance({
-        userId: input.userId,
-      });
-
+      const getModel = GetPointByUserIdModel.create(query.userId);
+      const userPoint = await this.pointWalletService.getBalance(getModel);
       const queryUserPointResponseDto =
         QueryUserPointResponseDto.create(userPoint);
       return queryUserPointResponseDto;

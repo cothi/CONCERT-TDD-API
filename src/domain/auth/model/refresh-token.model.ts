@@ -1,11 +1,11 @@
 export class RefreshTokenModel {
-  constructor(private readonly _accessToken: string) {}
+  constructor(private readonly _refreshToken: string) {}
 
-  public static create(accessToken: string) {
-    return new RefreshTokenModel(accessToken);
+  public static create(refreshToken: string) {
+    return new RefreshTokenModel(refreshToken);
   }
 
   get accessToken(): string {
-    return this._accessToken;
+    return this._refreshToken;
   }
 }
