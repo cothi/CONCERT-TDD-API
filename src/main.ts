@@ -1,14 +1,10 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './modules/app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './modules/app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: false,
-  });
+  const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -16,8 +12,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
-  app.useGlobalFilters(new HttpExceptionFilter());
 
   const config = new DocumentBuilder()
     .setTitle('Ticketing API')

@@ -1,8 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { QueueEntryStatus } from '@prisma/client';
 import { QUEUE_CONFIG } from 'src/common/config/config';
-import { QueueEntryRepository } from 'src/infrastructure/enqueue/repository/queue.repository';
+import { ErrorCode } from 'src/common/enums/error-code.enum';
+import { ErrorFactory } from 'src/common/errors/error-factory.error';
 import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
+import { QueueEntryRepository } from 'src/infrastructure/enqueue/repository/queue.repository';
 import {
   CountWaitingAheadModel,
   CreateEnqueueModel,
@@ -35,10 +37,7 @@ export class QueueService {
       (queueEntry.status === QueueEntryStatus.WAITING ||
         queueEntry.status === QueueEntryStatus.ELIGIBLE)
     ) {
-      throw new HttpException(
-        '이미 대기열 안에 존재합니다.',
-        HttpStatus.CONFLICT,
-      );
+      throw ErrorFactory.createException(ErrorCode.QUEUE_ALREADY_EXISTS);
     }
     return await this.queueEntryRepository.create(model, tx);
   }
@@ -54,10 +53,7 @@ export class QueueService {
   ): Promise<QueueModel> {
     const queueEntry = await this.queueEntryRepository.findByUserId(model, tx);
     if (!queueEntry) {
-      throw new HttpException(
-        '대기열안에 존재하지 않습니다.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.QUEUE_NOT_FOUND);
     }
     return queueEntry;
   }
@@ -103,6 +99,7 @@ export class QueueService {
 
     // 만료된 항목들을 제거합니다.
     for (const entry of eligibleEntries) {
+      if (!entry.expiresAt) continue;
       if (entry.expiresAt < new Date()) {
         const updateModel = UpdateQueueStatusModel.create(
           entry.id,

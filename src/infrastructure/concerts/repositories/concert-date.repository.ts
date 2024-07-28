@@ -17,7 +17,7 @@ export class ConcertDateRepository {
   async create(
     model: CreateConcertDateModel,
     tx?: PrismaTransaction,
-  ): Promise<ConcertDateModel | null> {
+  ): Promise<ConcertDateModel> {
     const entity = ConcertDateMapper.toMapCreateConcertEntity(model);
     const concertDate: ConcertDate = await (
       tx ?? this.prisma
@@ -42,6 +42,9 @@ export class ConcertDateRepository {
         id: entity.concertDateId,
       },
     });
+    if (!concertDate) {
+      return null;
+    }
 
     return ConcertDateMapper.toMapConcertDateModel(concertDate);
   }
@@ -54,6 +57,9 @@ export class ConcertDateRepository {
     const concerts = await (tx ?? this.prisma).concertDate.findMany({
       where: { concertId: entity.concertId },
     });
+    if (!concerts) {
+      return [];
+    }
     return ConcertDateMapper.toMapConcertDatesModel(concerts);
   }
 
@@ -68,6 +74,9 @@ export class ConcertDateRepository {
         concertId: entity.concertId,
       },
     });
+    if (!concertDate) {
+      return null;
+    }
     return ConcertDateMapper.toMapConcertDateModel(concertDate);
   }
 }

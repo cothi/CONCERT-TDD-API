@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
-import Redlock from 'redlock';
+import Redlock, { ExecutionResult } from 'redlock';
 import { Lock } from 'redlock';
 
 export const RedisServiceToken = Symbol('RedisService');
@@ -29,11 +29,11 @@ export class RedisService {
     });
   }
 
-  async acquireLock(key: string) {
+  async acquireLock(key: string): Promise<Lock> {
     return await this.redlock.acquire([`lock:${key}`], this.lockDuration);
   }
 
-  async releaseLock(lock: Lock) {
+  async releaseLock(lock: Lock): Promise<ExecutionResult> {
     return await this.redlock.release(lock);
   }
 
@@ -44,7 +44,7 @@ export class RedisService {
     return await this.redisClient.del(key);
   }
 
-  async getClient() {
+  async getClient(): Promise<Redis> {
     return this.redisClient;
   }
 

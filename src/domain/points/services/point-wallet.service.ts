@@ -1,5 +1,7 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/library';
+import { ErrorCode } from 'src/common/enums/error-code.enum';
+import { ErrorFactory } from 'src/common/errors/error-factory.error';
 import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
 import { PointWalletRepository } from '../../../infrastructure/points/repository/point-wallet.repository';
 import {
@@ -33,10 +35,7 @@ export class PointWalletService {
     const userPoint =
       await this.pointWalletRepository.getBalanceByUserIdWithLock(model, tx);
     if (!userPoint) {
-      throw new HttpException(
-        '포인트 정보를 찾을 수 없습니다.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.NOT_FOUND);
     }
     return userPoint?.amount ? userPoint.amount : new Decimal(0);
   }
@@ -52,10 +51,7 @@ export class PointWalletService {
     const getPoint = userPoint?.amount ? userPoint.amount : new Decimal(0);
 
     if (getPoint < model.usedPoint) {
-      throw new HttpException(
-        '유저의 포인트가 부족합니다.',
-        HttpStatus.NOT_ACCEPTABLE,
-      );
+      throw ErrorFactory.createException(ErrorCode.INSUFFICIENT_FUNDS);
     }
     return this.pointWalletRepository.deductPoints(model, tx);
   }

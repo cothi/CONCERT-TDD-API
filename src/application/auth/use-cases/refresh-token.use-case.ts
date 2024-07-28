@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { TokenResult } from 'src/common/interfaces/token-result.interface';
 import { IUseCase } from 'src/common/interfaces/use-case.interface';
 import { JwtTokenService } from 'src/common/modules/jwt/jwt.service';
 import { FindUserByIdModel } from 'src/domain/auth/model/find-use-by-id.model';
@@ -15,7 +16,9 @@ export class RefreshTokenUseCase
   ) {}
   async execute(input: RefreshTokenModel): Promise<RefreshTokenResponseDto> {
     try {
-      const tokenResult = this.jwtTokenService.verifyToken(input.accessToken);
+      const tokenResult: TokenResult = this.jwtTokenService.verifyToken(
+        input.accessToken,
+      );
 
       const findModel = FindUserByIdModel.create(tokenResult.payload.userId);
       const user = await this.authService.findUserById(findModel);

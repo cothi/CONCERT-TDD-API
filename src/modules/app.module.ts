@@ -8,12 +8,16 @@ import { AuthModule } from './auth.module';
 import { ConcertsModule } from './concerts.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from 'src/common/config/winston.config';
+import { LoggerModule } from './logger.module';
+import { APP_FILTER } from '@nestjs/core';
+import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 
 @Module({
   imports: [
     WinstonModule.forRoot(winstonConfig),
     PaymentModule,
     EnqueueModule,
+    LoggerModule,
     ConfigModule.forRoot({
       envFilePath: '.env.dev',
       isGlobal: true,
@@ -37,6 +41,11 @@ import { winstonConfig } from 'src/common/config/winston.config';
     ConcertsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}

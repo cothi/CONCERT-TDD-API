@@ -1,4 +1,6 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ErrorCode } from 'src/common/enums/error-code.enum';
+import { ErrorFactory } from 'src/common/errors/error-factory.error';
 import { ReservationRepository } from 'src/infrastructure/concerts/repositories/reservation.repository';
 import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
 import {
@@ -31,10 +33,7 @@ export class ReservationService {
       tx,
     );
     if (!reservation) {
-      throw new HttpException(
-        '요청한 예약이 존재하지 않습니다.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.BOOKING_NOT_FOUND);
     }
     return reservation;
   }
@@ -48,11 +47,30 @@ export class ReservationService {
         tx,
       );
     if (!reservation) {
-      throw new HttpException(
-        '요청한 예약이 존재하지 않습니다.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.BOOKING_NOT_FOUND);
     }
+    return reservation;
+  }
+  async catReservationWithLock(
+    getReservationByIdModel: GetReservationByIdModel,
+    userId: string,
+    tx?: PrismaTransaction,
+  ): Promise<ReservationModel> {
+    const reservation =
+      await this.reservationRepository.getReservationByWithLock(
+        getReservationByIdModel,
+        tx,
+      );
+    if (!reservation) {
+      throw ErrorFactory.createException(ErrorCode.BOOKING_NOT_FOUND);
+    }
+    if (reservation.status !== 'PENDING') {
+      throw ErrorFactory.createException(ErrorCode.BOOKING_NOT_ALLOWED);
+    }
+    if (reservation.expireAt < new Date()) {
+      throw ErrorFactory.createException(ErrorCode.BOOKING_NOT_ALLOWED);
+    }
+
     return reservation;
   }
   async updateStatus(
@@ -65,10 +83,7 @@ export class ReservationService {
       await this.reservationRepository.getReservationById(model);
 
     if (!reservation) {
-      throw new HttpException(
-        '요청한 예약이 존재하지 않습니다.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.BOOKING_NOT_FOUND);
     }
     return await this.reservationRepository.updateStatus(
       updateReservationModel,

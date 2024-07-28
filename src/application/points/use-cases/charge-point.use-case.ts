@@ -12,6 +12,8 @@ import {
 } from 'src/domain/points/model/point-wallet.model';
 import { RecordPaymentModel } from 'src/domain/points/model/payment.model';
 import { RedisService } from 'src/infrastructure/database/redis/redis.service';
+import { ErrorFactory } from 'src/common/errors/error-factory.error';
+import { ErrorCode } from 'src/common/enums/error-code.enum';
 
 @Injectable()
 export class ChargePointUseCase
@@ -25,46 +27,43 @@ export class ChargePointUseCase
   ) {}
 
   async execute(cmd: ChargePointCommand): Promise<ChargePointResponseDto> {
-    let lock: any;
+    const lock = await this.redisService.acquireLock(cmd.userId);
+    if (!lock) {
+      throw ErrorFactory.createException(ErrorCode.DISTRIBUTED_LOCK_FAILED);
+    }
+
     try {
-      lock = this.redisService.acquireLock(cmd.userId);
+      const response = await this.prisma.$transaction(async (prisma) => {
+        const getModel = GetPointByUserIdModel.create(cmd.userId);
+        await this.pointWalletService.getBalance(getModel, prisma);
+
+        // 충전
+        const chargeModel = ChargePointModel.create(cmd.amount, cmd.userId);
+        const payment = await this.pointWalletService.chargePoints(
+          chargeModel,
+          prisma,
+        );
+        // 충전 기록
+        const recordModel = RecordPaymentModel.create(
+          cmd.amount,
+          payment.userId,
+          PaymentType.CHARGE,
+        );
+        await this.pointTransactionService.recordPaymentHistory(
+          recordModel,
+          prisma,
+        );
+        const chargePointResponseDto = ChargePointResponseDto.create(
+          payment.amount,
+          chargeModel.amount,
+        );
+        return chargePointResponseDto;
+      });
+      return response;
     } catch (error) {
       throw error;
     } finally {
-      try {
-        const response = await this.prisma.$transaction(async (prisma) => {
-          const getModel = GetPointByUserIdModel.create(cmd.userId);
-          await this.pointWalletService.getBalance(getModel, prisma);
-
-          // 충전
-          const chargeModel = ChargePointModel.create(cmd.amount, cmd.userId);
-          const payment = await this.pointWalletService.chargePoints(
-            chargeModel,
-            prisma,
-          );
-          // 충전 기록
-          const recordModel = RecordPaymentModel.create(
-            cmd.amount,
-            payment.userId,
-            PaymentType.CHARGE,
-          );
-          await this.pointTransactionService.recordPaymentHistory(
-            recordModel,
-            prisma,
-          );
-          const chargePointResponseDto = ChargePointResponseDto.create(
-            payment.amount,
-            chargeModel.amount,
-          );
-          return chargePointResponseDto;
-        });
-        return response;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      } finally {
-        this.redisService.releaseLock(lock);
-      }
+      await this.redisService.releaseLock(lock);
     }
   }
 }

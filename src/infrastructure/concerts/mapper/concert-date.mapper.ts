@@ -44,7 +44,6 @@ export class ConcertDateMapper {
   }
 
   static toMapConcertDateModel(entity: ConcertDate): ConcertDateModel {
-    if (!entity) return null;
     const model = ConcertDateModel.create(
       entity.id,
       entity.concertId,

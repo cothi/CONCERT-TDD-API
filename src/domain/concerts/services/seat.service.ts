@@ -1,5 +1,7 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { Prisma, SeatStatus } from '@prisma/client';
+import { ErrorCode } from 'src/common/enums/error-code.enum';
+import { ErrorFactory } from 'src/common/errors/error-factory.error';
 import { SeatRepository } from 'src/infrastructure/concerts/repositories/seat.repository';
 import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
 import {
@@ -26,10 +28,7 @@ export class SeatService {
       tx,
     );
     if (getSeats.length > 0) {
-      throw new HttpException(
-        '이미 시트가 생성되었습니다.',
-        HttpStatus.CONFLICT,
-      );
+      throw ErrorFactory.createException(ErrorCode.SEAT_ALREADY_CREATED);
     }
     const seats = this.generateSeatNumber(model);
     return await this.seatRepository.createMany(seats);
@@ -41,10 +40,21 @@ export class SeatService {
   ): Promise<SeatModel> {
     const seat = await this.seatRepository.findAndLockById(model, tx);
     if (!seat) {
-      throw new HttpException(
-        '조회한 좌석이 존재하지 않습니다',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.SEAT_NOT_FOUND);
+    }
+    return seat;
+  }
+
+  async canReserveSeatWithLock(
+    model: GetSeatBySeatIdModel,
+    tx?: PrismaTransaction,
+  ): Promise<SeatModel> {
+    const seat = await this.seatRepository.findAndLockById(model, tx);
+    if (!seat) {
+      throw ErrorFactory.createException(ErrorCode.SEAT_NOT_FOUND);
+    }
+    if (seat.status === SeatStatus.AVAILABLE) {
+      throw ErrorFactory.createException(ErrorCode.SEAT_NOT_AVAILABLE);
     }
     return seat;
   }
@@ -55,10 +65,7 @@ export class SeatService {
     const findSeatModel = GetSeatBySeatIdModel.create(model.seatId);
     const seat = await this.seatRepository.findBySeatId(findSeatModel, tx);
     if (!seat) {
-      throw new HttpException(
-        '요청한 좌석이 존재하지 않습니다',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.SEAT_NOT_FOUND);
     }
     return this.seatRepository.updateStatus(model, tx);
   }
@@ -70,10 +77,7 @@ export class SeatService {
     const seats = await this.seatRepository.findByConcertDateId(model, tx);
 
     if (seats.length === 0) {
-      throw new HttpException(
-        '해당 공연일에 생성된 좌석이 없습니다',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.SEAT_NOT_FOUND);
     }
     return seats;
   }
@@ -84,10 +88,7 @@ export class SeatService {
   ): Promise<SeatModel> {
     const seat = await this.seatRepository.findBySeatId(model, tx);
     if (!seat) {
-      throw new HttpException(
-        '요청한 시트가 존재하지 않습니다',
-        HttpStatus.NOT_FOUND,
-      );
+      throw ErrorFactory.createException(ErrorCode.SEAT_NOT_FOUND);
     }
     return seat;
   }

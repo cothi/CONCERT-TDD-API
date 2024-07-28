@@ -1,40 +1,47 @@
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { LoggerService } from '../logger/logger.serivce';
+import { ErrorFactory } from '../errors/error-factory.error';
+import { ErrorCode } from '../enums/error-code.enum';
+import { ExceptionResDto } from '../dto/response/base.response.dto';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+  constructor(private readonly logger: LoggerService) {}
 
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = '서버 내부 에러';
+  catch(exception: any, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
+    let httpStatusCode: HttpStatus;
 
     if (exception instanceof HttpException) {
-      const exceptionResponse = exception.getResponse();
-      status = exception.getStatus();
+      this.logger.warn(`Error: ${exception.message} `, {
+        status: exception.getStatus(),
+        path: request.url,
+        method: request.method,
+      });
+      httpStatusCode = HttpStatus.OK;
+    } else {
+      const unhandle = ErrorFactory.createException(
+        ErrorCode.INTERNAL_SERVER_ERROR,
+      );
 
-      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
-        ({ message = message } = exceptionResponse as any);
-      } else if (typeof exceptionResponse === 'string') {
-        message = exceptionResponse;
-      }
+      this.logger.warn(`Error: ${exception} `, {
+        stausCode: unhandle.getStatus(),
+        path: request.url,
+        method: request.method,
+      });
+      exception = unhandle;
+      httpStatusCode = unhandle.getStatus();
     }
 
-    const errorResponse = {
-      statusCode: status,
-      timestamp: new Date().toISOString(),
-      path: request.url,
-      message,
-    };
-
-    response.status(status).json(errorResponse);
+    const res = ExceptionResDto.create(false, exception.getStatus());
+    response.status(httpStatusCode).json(res);
   }
 }
