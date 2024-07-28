@@ -41,7 +41,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
       httpStatusCode = unhandle.getStatus();
     }
 
-    const res = ExceptionResDto.create(false, exception.getStatus());
-    response.status(httpStatusCode).json(res);
+    const res = ExceptionResDto.create(
+      false,
+      exception.getStatus(),
+      exception.message,
+    );
+    response.status(httpStatusCode).json(res.toResponse());
   }
 }

@@ -9,8 +9,9 @@ import { ConcertsModule } from './concerts.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from 'src/common/config/winston.config';
 import { LoggerModule } from './logger.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
+import { ResponseTransformInterceptor } from 'src/common/intercept/api-response.intercept';
 
 @Module({
   imports: [
@@ -45,6 +46,10 @@ import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseTransformInterceptor,
     },
   ],
 })

@@ -19,5 +19,6 @@ import { PointsModule } from './points.module';
     AuthService,
     AuthRepository,
   ],
+  exports: [AuthService, AuthRepository],
 })
 export class AuthModule {}
