@@ -4,15 +4,14 @@ import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { AppModule } from 'src/modules/app.module';
 import { createApiRequests } from '../helpers/api-requests';
-import { QueueEntryStatus } from '@prisma/client';
+import { RedisService } from 'src/infrastructure/database/redis/redis.service';
 
 describe('콘서트', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
+  let redisService: RedisService;
   let apiRequest: ReturnType<typeof createApiRequests>;
   const seatTotal = 100;
-  // const seatPrice = 1;
-  // const chargePoint = 1;
   const date = new Date();
   const testContext: {
     testUserId?: string;
@@ -33,8 +32,8 @@ describe('콘서트', () => {
         forbidNonWhitelisted: true,
       }),
     );
-
     prismaService = app.get<PrismaService>(PrismaService);
+    redisService = app.get<RedisService>(RedisService);
     await app.init();
     apiRequest = createApiRequests(app);
 
@@ -43,20 +42,13 @@ describe('콘서트', () => {
         email: `user${randomUUID()}@example.com`,
       },
     });
-
     testContext.testUserId = testUser.id;
     testContext.email = testUser.email;
     const loginResponse = await apiRequest.loginRequest(testContext.email);
-    testContext.accessToken = loginResponse.body.accessToken;
 
-    await prismaService.queueEntry.create({
-      data: {
-        userId: testContext.testUserId,
-        status: QueueEntryStatus.ELIGIBLE,
-        enteredAt: new Date(),
-        expiresAt: new Date(Date.now() + 1000 * 60 * 5), // 5분
-      },
-    });
+    redisService.grantReservationPermissions([testUser.id]);
+
+    testContext.accessToken = loginResponse.body.data.accessToken;
   });
 
   describe('콘서트 날짜 좌석 조회 - /concerts/dates/:concertDateId/seats (GET)', () => {
@@ -66,38 +58,39 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      expect(concertResponse.body.statusCode).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      expect(concertDateResponse.body.statusCode).toBe(201);
       const concertDateSeatResponse =
         await apiRequest.createConcertDateSeatRequest(
           testContext.accessToken,
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           1,
           1,
         );
-      expect(concertDateSeatResponse.status).toBe(201);
+
+      expect(concertDateSeatResponse.body.statusCode).toBe(201);
 
       const getConcertDateSeatResponse =
         await apiRequest.getConcertSeatsRequest(
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           testContext.accessToken,
         );
-      expect(getConcertDateSeatResponse.status).toBe(200);
+      expect(getConcertDateSeatResponse.body.statusCode).toBe(200);
     });
 
     it('콘서트 날짜 좌석 조회 시 콘서트 날짜 아이디가 없으면 에러가 발생해야 합니다.', async () => {
       const concertDateSeatResponse = await apiRequest.getConcertSeatsRequest(
-        '',
+        '1',
         testContext.accessToken,
       );
-      expect(concertDateSeatResponse.status).toBe(404);
+      expect(concertDateSeatResponse.body.statusCode).toBe(404);
     });
 
     it('콘서트 날짜 좌석 조회 시 토큰이 없으면 에러가 발생해야 합니다.', async () => {
@@ -106,21 +99,21 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      expect(concertResponse.body.statusCode).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      expect(concertDateResponse.body.statusCode).toBe(201);
 
       const concertDateSeatResponse = await apiRequest.getConcertSeatsRequest(
-        concertDateResponse.body.concertDateId,
+        concertDateResponse.body.data.concertDateId,
         '',
       );
-      expect(concertDateSeatResponse.status).toBe(401);
+      expect(concertDateSeatResponse.body.statusCode).toBe(401);
     });
 
     it('콘서트 날짜 좌석 조회 시 콘서트 날짜가 없으면 에러가 발생해야 합니다.', async () => {
@@ -128,7 +121,7 @@ describe('콘서트', () => {
         randomUUID(),
         testContext.accessToken,
       );
-      expect(concertDateSeatResponse.status).toBe(404);
+      expect(concertDateSeatResponse.body.statusCode).toBe(404);
     });
   });
 
@@ -139,50 +132,49 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      expect(concertResponse.body.statusCode).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      expect(concertDateResponse.body.statusCode).toBe(201);
 
       const concertDateSeatResponse =
         await apiRequest.createConcertDateSeatRequest(
           testContext.accessToken,
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           1,
           1,
         );
-      expect(concertDateSeatResponse.status).toBe(201);
+      expect(concertDateSeatResponse.body.statusCode).toBe(201);
 
       const getSeatsResponse = await apiRequest.getConcertSeatsRequest(
-        concertDateResponse.body.concertDateId,
+        concertDateResponse.body.data.concertDateId,
         testContext.accessToken,
       );
-      const seatId = getSeatsResponse.body.seats[0].seatId;
-
+      const seatId = getSeatsResponse.body.data.seats[0].seatId;
       const reserveSeatResponse = await apiRequest.reserveSeatRequest(
         testContext.accessToken,
         seatId,
       );
-
-      expect(reserveSeatResponse.status).toBe(201);
+      expect(reserveSeatResponse.body.statusCode).toBe(201);
 
       const getReservationResponse = await apiRequest.getReservationRequest(
         testContext.accessToken,
       );
-      expect(getReservationResponse.status).toBe(200);
+      expect(getReservationResponse.body.statusCode).toBe(200);
     });
     it('콘서트 예약 조회 시 토큰이 없으면 에러가 발생해야 합니다.', async () => {
       const getReservationResponse = await apiRequest.getReservationRequest('');
-      expect(getReservationResponse.status).toBe(401);
+      expect(getReservationResponse.body.statusCode).toBe(401);
     });
   });
 
   afterAll(async () => {
     await app.close();
+    await prismaService.deleteTableData();
   });
 });

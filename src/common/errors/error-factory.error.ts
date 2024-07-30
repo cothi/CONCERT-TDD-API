@@ -67,8 +67,8 @@ export class ErrorFactory {
       statusCode: HttpStatus.NOT_FOUND,
     },
     [ErrorCode.SEAT_ALREADY_CREATED]: {
-      message: '좌석이 이미 생성되었습니다..',
-      statusCode: HttpStatus.NOT_FOUND,
+      message: '좌석이 이미 생성되었습니다.',
+      statusCode: HttpStatus.CONFLICT,
     },
     [ErrorCode.CONCERT_NOT_FOUND]: {
       message: '콘서트를 찾을 수 없습니다.',

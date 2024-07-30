@@ -32,7 +32,6 @@ export class AuthController {
     private readonly loginUserUseCase: LoginUserUseCase,
     private readonly refreshTokenUseCase: RefreshTokenUseCase,
   ) {}
-
   /**
    * 사용자 로그인을 처리합니다.
    * @param loginDto 로그인 정보를 담은 DTO

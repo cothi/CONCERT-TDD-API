@@ -2,32 +2,30 @@ import { PickType } from '@nestjs/swagger';
 import { QueueEntryStatus } from '@prisma/client';
 
 export class QueueModel {
-  id: string;
   userId: string;
+  position: number;
   status: QueueEntryStatus;
-  enteredAt: Date;
-  expiresAt: Date;
 
   static create(
-    id: string,
     userId: string,
     status: QueueEntryStatus,
-    enteredAt: Date,
-    expiresAt: Date,
+    position: number,
   ): QueueModel {
     const model = new QueueModel();
-    model.enteredAt = enteredAt;
-    model.id = id;
     model.status = status;
     model.userId = userId;
-    model.expiresAt = expiresAt;
+    model.position = position;
     return model;
   }
 }
-export class CreateEnqueueModel extends PickType(QueueModel, ['userId']) {
-  static create(userId: string): CreateEnqueueModel {
+export class CreateEnqueueModel extends PickType(QueueModel, [
+  'userId',
+  'position',
+]) {
+  static create(userId: string, position: number): CreateEnqueueModel {
     const model = new CreateEnqueueModel();
     model.userId = userId;
+    model.position = position;
     return model;
   }
 }
@@ -42,32 +40,16 @@ export class GetQueueEntryByUserIdModel extends PickType(QueueModel, [
   }
 }
 
-export class UpdateQueueStatusModel extends PickType(QueueModel, [
-  'id',
-  'status',
-]) {
-  static create(id: string, status: QueueEntryStatus): UpdateQueueStatusModel {
-    const model = new UpdateQueueStatusModel();
-    model.id = id;
-    model.status = status;
-    return model;
-  }
-}
-
-export class RemoveQueueByIdModel extends PickType(QueueModel, ['id']) {
+export class RemoveQueueByIdModel extends PickType(QueueModel, []) {
   static create(id: string): RemoveQueueByIdModel {
     const model = new RemoveQueueByIdModel();
-    model.id = id;
     return model;
   }
 }
 
-export class CountWaitingAheadModel extends PickType(QueueModel, [
-  'enteredAt',
-]) {
+export class CountWaitingAheadModel extends PickType(QueueModel, []) {
   static create(enteredAt: Date): CountWaitingAheadModel {
     const model = new CountWaitingAheadModel();
-    model.enteredAt = enteredAt;
     return model;
   }
 }

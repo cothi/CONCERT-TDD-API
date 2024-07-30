@@ -10,27 +10,18 @@ export class QueueStatusResponseDto {
   status: QueueEntryStatus;
 
   @ApiProperty({
-    description: '현재 예약 가능 여부',
-    example: false,
-  })
-  isEligibleForReservation: boolean;
-
-  @ApiProperty({
-    description: '사용자 앞에 대기 중인 사람 수',
+    description: '현재 대기열 위치',
     example: 10,
   })
-  queuedAhead: number;
+  position: number;
 
-  @ApiProperty({
-    description: '대기열 진입 시간',
-    example: '2023-07-12T09:00:00Z',
-  })
-  enteredAt: Date;
-
-  @ApiProperty({
-    description: '대기열 만료 시간 (해당되는 경우)',
-    example: '2023-07-12T09:05:00Z',
-    required: false,
-  })
-  expiresAt?: Date;
+  static create(
+    status: QueueEntryStatus,
+    position: number,
+  ): QueueStatusResponseDto {
+    const model = new QueueStatusResponseDto();
+    model.status = status;
+    model.position = position;
+    return model;
+  }
 }

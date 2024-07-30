@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { IUseCase } from 'src/common/interfaces/use-case.interface';
-import {
-  CountWaitingAheadModel,
-  GetQueueEntryByUserIdModel,
-} from 'src/domain/enqueue/model/enqueue.model';
+import { FindUserByIdModel } from 'src/domain/auth/model/find-use-by-id.model';
+import { AuthService } from 'src/domain/auth/services/auth.service';
 import { QueueService } from 'src/domain/enqueue/services/enqueue.service';
-import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { QueueStatusResponseDto } from 'src/presentation/dto/enqueue/response/enqueue-status.reponse.dto';
 
 @Injectable()
@@ -14,44 +11,15 @@ export class GetQueueStatusUseCase
 {
   constructor(
     private readonly queueService: QueueService,
-    private readonly prismaService: PrismaService,
+    private readonly authService: AuthService,
   ) {}
 
   async execute(userId: string): Promise<QueueStatusResponseDto> {
     try {
-      const responseDto = await this.prismaService.$transaction(
-        async (prisma) => {
-          const model = GetQueueEntryByUserIdModel.create(userId);
-          const queueEntry = await this.queueService.getQueueEntryByUserId(
-            model,
-            prisma,
-          );
-
-          const getQueueAheadModel = CountWaitingAheadModel.create(
-            queueEntry.enteredAt,
-          );
-          const queuedAhead = await this.queueService.getQueuedAhead(
-            getQueueAheadModel,
-            prisma,
-          );
-
-          const isEligibleForReservation =
-            await this.queueService.isEligibleForReservation(
-              queueEntry.status,
-              prisma,
-            );
-
-          return {
-            status: queueEntry.status,
-            isEligibleForReservation: isEligibleForReservation,
-            queuedAhead,
-            enteredAt: queueEntry.enteredAt,
-            expiresAt: queueEntry.expiresAt,
-          };
-        },
-      );
-
-      return responseDto;
+      const findModel = FindUserByIdModel.create(userId);
+      const user = await this.authService.findUserById(findModel);
+      const position = await this.queueService.getQueuePosition(user.id);
+      return QueueStatusResponseDto.create(position.status, position.position);
     } catch (error) {
       throw error;
     }

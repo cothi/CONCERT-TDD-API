@@ -1,12 +1,7 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
-import { GetQueueEntryByUserIdModel } from 'src/domain/enqueue/model/enqueue.model';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { QueueEntryRepository } from 'src/infrastructure/enqueue/repository/queue.repository';
+import { ErrorCode } from '../enums/error-code.enum';
+import { ErrorFactory } from '../errors/error-factory.error';
 
 @Injectable()
 export class EligibleForReservationGuard implements CanActivate {
@@ -18,10 +13,7 @@ export class EligibleForReservationGuard implements CanActivate {
       const payload = request['payload']; // JwtAuthGuard에서 설정한 payload
 
       if (!payload || !payload.userId) {
-        throw new HttpException(
-          '사용자 정보가 없습니다.',
-          HttpStatus.UNAUTHORIZED,
-        );
+        throw ErrorFactory.createException(ErrorCode.UNAUTHORIZED);
       }
 
       await this.checkEligibility(payload.userId);
@@ -32,19 +24,11 @@ export class EligibleForReservationGuard implements CanActivate {
   }
 
   private async checkEligibility(userId: string): Promise<boolean> {
-    const getModel = GetQueueEntryByUserIdModel.create(userId);
-    const queueEntry = await this.queueEntryRepository.findByUserId(getModel);
+    // const getModel = GetQueueEntryByUserIdModel.create(userId);
+    const queueEntry =
+      await this.queueEntryRepository.getReservationPermission(userId);
     if (!queueEntry) {
-      throw new HttpException(
-        '유저가 대기열 안에 존재하지 않습니다.',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-    if (queueEntry.status !== 'ELIGIBLE') {
-      throw new HttpException(
-        '유저가 대기열 안에 있으나, 예약 대기열에서 예약할 수 있는 상태가 아닙니다',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw ErrorFactory.createException(ErrorCode.UNAUTHORIZED);
     }
     return true;
   }
