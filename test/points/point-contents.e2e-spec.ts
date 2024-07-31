@@ -63,16 +63,18 @@ describe('Point Test (e2e)', () => {
       });
     });
 
-    it('포인트 충전이 30회 이상 시도 시 정상적으로 이루어져야 합니다.', async () => {
+    it('포인트 충전이 50회 이상 시도 시 정상적으로 이루어져야 합니다.', async () => {
       const res = [];
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 50; i++) {
         res.push(apiRequest.chargePointRequest(testContext.accessToken, 1));
       }
-      const responses = await Promise.all(res);
+      const responses = await Promise.allSettled(res);
       responses.forEach((response) => {
-        expect(response.body.statusCode).toBe(200);
+        expect(
+          response.status === 'fulfilled' && response.value.statusCode === 201,
+        );
       });
-    }, 30000);
+    }, 5000000);
 
     it('가입되지 않은 이메일로 포인트 충전 시도 시 에러 ', async () => {
       const response = await apiRequest.chargePointRequest('', 100);

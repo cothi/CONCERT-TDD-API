@@ -22,8 +22,8 @@ describe('Enqueue Test (e2e)', () => {
   });
 
   describe('대기열 등록 - /enqueue', () => {
-    it('다수의 유저(10명)의 대기열 등록을 정상적으로 처리해야 합니다. (POST)', async () => {
-      const numberOfUsers = 10;
+    it('다수의 유저(500명)의 대기열 등록을 정상적으로 처리해야 합니다. (POST)', async () => {
+      const numberOfUsers = 500;
       const accessTokenList: string[] = [];
       for (let i = 0; i < numberOfUsers; i++) {
         const email = `${randomUUID()}@gmail.ai`;
@@ -40,7 +40,7 @@ describe('Enqueue Test (e2e)', () => {
       enqueueResponseList.forEach((enqueueResponse) => {
         expect(enqueueResponse.status).toBe(201);
       });
-    });
+    }, 50000);
     it('사용자 등록 후 대기열 등록 시 중복 등록 방지 (POST)', async () => {
       const registerResponse = await apiRequests.createUserRequest(
         `${randomUUID()}@gmail.ai`,

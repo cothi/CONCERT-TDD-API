@@ -12,7 +12,7 @@ export const RedisServiceToken = Symbol('RedisService');
 export class RedisService {
   private redisClient: Redis;
   private readonly redlock: Redlock;
-  private readonly lockDuration = 5_000;
+  private readonly lockDuration = 2000;
   private readonly queueKey = 'concert:queue';
   private readonly tokenPrefix = 'concert:token:';
   private readonly maxQueueSize = 3000;
@@ -29,18 +29,26 @@ export class RedisService {
 
     this.redlock = new Redlock([this.redisClient], {
       driftFactor: 0.01,
-      retryCount: 20,
-      retryDelay: 2000,
-      retryJitter: 500,
+      retryCount: 50,
+      retryDelay: 500,
+      retryJitter: 300,
     });
   }
 
   async acquireLock(key: string): Promise<Lock> {
-    return await this.redlock.acquire([`lock:${key}`], this.lockDuration);
+    try {
+      return await this.redlock.acquire([`lock:${key}`], this.lockDuration);
+    } catch (error) {
+      throw error;
+    }
   }
 
   async releaseLock(lock: Lock): Promise<ExecutionResult> {
-    return await this.redlock.release(lock);
+    try {
+      return await this.redlock.release(lock);
+    } catch (error) {
+      throw error;
+    }
   }
 
   async addToQueue(userId: string): Promise<number> {
