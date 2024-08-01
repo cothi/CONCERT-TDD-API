@@ -6,8 +6,8 @@ export let errorRate = new Rate('errors');
 
 export let options = {
   vus: 1,
-  duration: '100s',
-  iterations: 10000,
+  duration: '300s',
+  iterations: 50000,
 };
 
 function generateRandomEmail() {
@@ -19,7 +19,6 @@ export function setup() {
   const registerUrl = 'http://localhost:3000/auth/register';
   const email = generateRandomEmail();
   console.log(`Test will run with email: ${email}`);
-  console.log(email);
 
   const registerPayload = JSON.stringify({ email: email });
   const registerHeaders = { 'Content-Type': 'application/json' };
@@ -27,7 +26,6 @@ export function setup() {
   const registerRes = http.post(registerUrl, registerPayload, {
     headers: registerHeaders,
   });
-  console.log(registerRes.body);
 
   if (registerRes.status !== 201) {
     console.error(
@@ -39,6 +37,7 @@ export function setup() {
   return JSON.parse(registerRes.body).data.accessToken;
 }
 
+// 메인
 export default function (accessToken) {
   if (!accessToken) {
     console.error('No access token available');

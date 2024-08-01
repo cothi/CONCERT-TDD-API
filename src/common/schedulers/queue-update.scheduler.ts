@@ -8,12 +8,20 @@ import { ErrorCode } from '../enums/error-code.enum';
 export class QueueUpdateScheduler {
   constructor(private queueService: QueueService) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
-  async handleCron() {
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async handleWatingQueue() {
     try {
       const userIds = await this.queueService.dequeueWaitingUserId(100);
-      console.log(userIds);
       await this.queueService.grantReservationPermissions(userIds);
+      await this.queueService.cleanExpiredToken();
+    } catch (error) {
+      throw ErrorFactory.createException(ErrorCode.BAD_REQUEST);
+    }
+  }
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async handleCleanExpiredToken() {
+    try {
+      await this.queueService.cleanExpiredToken();
     } catch (error) {
       throw ErrorFactory.createException(ErrorCode.BAD_REQUEST);
     }

@@ -10,7 +10,7 @@ export class QueueEntryRepository {
   }
 
   async dequeueWaitingUserId(count: number): Promise<string[]> {
-    return await this.redisService.dequeueWatingUserId(count);
+    return await this.redisService.dequeueWaitingUserId(count);
   }
 
   async grantReservationPermissions(userIds: string[]): Promise<string[]> {
@@ -23,5 +23,9 @@ export class QueueEntryRepository {
 
   async getQueuePosition(userId: string): Promise<number | null> {
     return await this.redisService.getQueuePosition(userId);
+  }
+
+  async cleanExpiredToken(): Promise<void> {
+    return await this.redisService.cleanupExpiredTokens();
   }
 }

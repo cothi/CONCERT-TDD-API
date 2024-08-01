@@ -38,7 +38,6 @@ export class QueueService {
       // check if the user is in the queue
       const status =
         await this.queueEntryRepository.getReservationPermission(userId);
-      console.log(status);
       if (!status) {
         throw ErrorFactory.createException(ErrorCode.QUEUE_NOT_FOUND);
       }
@@ -46,5 +45,12 @@ export class QueueService {
     }
 
     return QueueModel.create(userId, QueueEntryStatus.WAITING, position);
+  }
+  async cleanExpiredToken(): Promise<void> {
+    try {
+      await this.queueEntryRepository.cleanExpiredToken();
+    } catch (error) {
+      throw error;
+    }
   }
 }

@@ -13,9 +13,9 @@ export class RedisService {
   private redisClient: Redis;
   private readonly redlock: Redlock;
   private readonly lockDuration = 2000;
-  private readonly queueKey = 'concert:queue';
-  private readonly tokenPrefix = 'concert:token:';
-  private readonly maxQueueSize = 3000;
+  private readonly queueKey = 'concert:wating';
+  private readonly activeTokenKey = 'concert:active';
+  private readonly maxQueueSize = 50000;
   private readonly tokenDuration = 600;
 
   constructor(private readonly configService: ConfigService) {
@@ -51,42 +51,63 @@ export class RedisService {
     }
   }
 
-  async addToQueue(userId: string): Promise<number> {
-    const queueSize = await this.redisClient.llen(this.queueKey);
-    if (queueSize >= this.maxQueueSize) {
-      throw ErrorFactory.createException(ErrorCode.QUEUE_NOT_FOUND);
-    }
-    return this.redisClient.rpush(this.queueKey, userId);
-  }
-
   async getReservationPermission(userId: string): Promise<boolean> {
-    const script = `
-      local tokenKey = KEYS[1]
-      local exists = redis.call('EXISTS', tokenKey)
-      return exists == 1
-    `;
+    const score = await this.redisClient.zscore(this.activeTokenKey, userId);
+    if (score === null) return false;
 
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (parseInt(score) <= currentTime) {
+      await this.redisClient.zrem(this.activeTokenKey, userId);
+      return false;
+    }
+
+    return true;
+  }
+  async addToQueue(userId: string): Promise<number> {
+    const script = `
+    local queueKey = KEYS[1]
+    local maxSize = tonumber(ARGV[1])
+    local userId = ARGV[2]
+    local score = tonumber(ARGV[3])
+    
+    local queueSize = redis.call('ZCARD', queueKey)
+    if queueSize >= maxSize then
+      return -1  -- Queue is full
+    end
+    
+    return redis.call('ZADD', queueKey, score, userId)
+  `;
+
+    const score = Date.now(); // 현재 시간을 점수로 사용
     const result = (await this.redisClient.eval(
       script,
       1,
-      `${this.tokenPrefix}${userId}`,
+      this.queueKey,
+      this.maxQueueSize,
+      userId,
+      score,
     )) as number;
 
-    return result === 1;
+    if (result === -1) {
+      throw ErrorFactory.createException(ErrorCode.QUEUE_NOT_FOUND);
+    }
+
+    return result;
   }
 
-  async dequeueWatingUserId(count: number): Promise<string[]> {
+  async dequeueWaitingUserId(count: number): Promise<string[]> {
     const script = `
-      local queueKey = KEYS[1]
-      local count = tonumber(ARGV[1])
-      
-      local users = redis.call('lrange', queueKey, 0, count - 1)
-      if #users >= 0 then
-        redis.call('LTRIM', queueKey, #users, -1)
-      end
+    local queueKey = KEYS[1]
+    local count = tonumber(ARGV[1])
+    
+    local users = redis.call('ZRANGE', queueKey, 0, count - 1)
+    if #users > 0 then
+      redis.call('ZREMRANGEBYRANK', queueKey, 0, count - 1)
+    end
+    
+    return users
+  `;
 
-      return users
-    `;
     return (await this.redisClient.eval(
       script,
       1,
@@ -97,55 +118,41 @@ export class RedisService {
 
   async grantReservationPermissions(userIds: string[]): Promise<string[]> {
     const script = `
-      local activeTokenKey = KEYS[1]
-      local tokenPrefix = ARGV[1]
-      local tokenDuration = tonumber(ARGV[2])
-      local userIds = cjson.decode(ARGV[3])
+      local activeTokensKey = KEYS[1]
+      local tokenDuration = tonumber(ARGV[1])
+      local userIds = cjson.decode(ARGV[2])
+      local currentTime = redis.call('TIME')[1]
+      local grantedUsers = {}
+
       for i, userId in ipairs(userIds) do
-        local tokenKey = tokenPrefix .. userId
-        local tokenExists = redis.call('exists', tokenKey)
-        if tokenExists == 0 then
-          redis.call('SET', tokenKey, '1', 'EX', tokenDuration)
+        local added = redis.call('ZADD', activeTokensKey, 'NX', currentTime + tokenDuration, userId)
+        if added == 1 then
+          table.insert(grantedUsers, userId)
         end
       end
 
-      return #userIds
-      `;
-    const grantedCnt = await this.redisClient.eval(
-      script,
-      1,
-      this.queueKey,
-      this.tokenPrefix,
-      this.tokenDuration,
-      JSON.stringify(userIds),
-    );
-
-    return grantedCnt as string[];
-  }
-
-  async getQueuePosition(userId: string): Promise<number | null> {
-    const script = `
-      local queueKey = KEYS[1]
-      local userId = ARGV[1]
-      local position = redis.call('LPOS', queueKey, userId)
-
-      if position then
-        return position + 1 -- Redis 0-based index to 1-based index
-      else
-        return nil
-      end
+      return grantedUsers
     `;
 
-    const result = (await this.redisClient.eval(
+    return (await this.redisClient.eval(
       script,
       1,
-      this.queueKey,
-      userId,
-    )) as number;
+      this.activeTokenKey,
+      this.tokenDuration,
+      JSON.stringify(userIds),
+    )) as string[];
+  }
+  async getQueuePosition(userId: string): Promise<number | null> {
+    const rank = await this.redisClient.zrank(this.queueKey, userId);
+    return rank !== null ? rank + 1 : null;
+  }
 
-    if (result === -1) {
-      return null;
-    }
-    return result;
+  async cleanupExpiredTokens(): Promise<void> {
+    const currentTime = Math.floor(Date.now() / 1000);
+    await this.redisClient.zremrangebyscore(
+      this.activeTokenKey,
+      '-inf',
+      currentTime,
+    );
   }
 }

@@ -19,7 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest ",
     "test:e2e": "cross-env NODE_ENV=dev jest --config ./test/jest-e2e.json --detectOpenHandles --forceExit",
-    "test:per": "k6 run test/performance/charge.js"
+    "test:per": "k6 run test/performance/first-point-query-charge.js"
   },
   "dependencies": {
     "@nestjs/cache-manager": "^2.2.2",

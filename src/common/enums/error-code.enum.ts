@@ -67,6 +67,7 @@ export enum ErrorCode {
   // 큐 관련 에러
   QUEUE_ALREADY_EXISTS = 'QUEUE_ALREADY_EXISTS',
   QUEUE_NOT_FOUND = 'QUEUE_NOT_FOUND',
+  
 
   // 분산 락 획득 실패
   DISTRIBUTED_LOCK_FAILED = 'DISTRIBUTED_LOCK_FAILED',
