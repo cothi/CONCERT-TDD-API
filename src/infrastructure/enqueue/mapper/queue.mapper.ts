@@ -1,3 +1,4 @@
+import { QueueEntry } from '@prisma/client';
 import {
   CountWaitingAheadModel,
   CreateEnqueueModel,
@@ -5,18 +6,15 @@ import {
   GetWaitingEntriesModel,
   QueueModel,
   RemoveQueueByIdModel,
-  UpdateQueueStatusModel,
 } from 'src/domain/enqueue/model/enqueue.model';
+import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
 import {
   CountWaitingAheadEntity,
   CreateQueueEntity,
   GetQueueByUserIdEntity,
   GetWaitingQueueByLimitEntity,
   RemoveQueueByIdEntity,
-  UpdateStatusEntity,
 } from '../entity/queue.entity';
-import { QueueEntry } from '@prisma/client';
-import { PrismaTransaction } from 'src/infrastructure/database/prisma/types/prisma.types';
 
 export class QueueMapper {
   static toMapCreateQueueEntiry(
@@ -42,14 +40,7 @@ export class QueueMapper {
     entity.id = model.id;
     return entity;
   }
-  static toMapUpdateStatusEntity(
-    model: UpdateQueueStatusModel,
-  ): UpdateStatusEntity {
-    const entity = new UpdateStatusEntity();
-    entity.id = model.id;
-    entity.status = model.status;
-    return entity;
-  }
+
   static toMapCountWaitingAheadEntity(
     model: CountWaitingAheadModel,
   ): CountWaitingAheadEntity {
@@ -67,11 +58,8 @@ export class QueueMapper {
   static toMapQueueModel(entity: QueueEntry): QueueModel {
     if (!entity) return null;
     const model = new QueueModel();
-    model.enteredAt = entity.enteredAt;
-    model.id = entity.id;
     model.status = entity.status;
     model.userId = entity.userId;
-    model.expiresAt = entity.expiresAt;
     return model;
   }
 

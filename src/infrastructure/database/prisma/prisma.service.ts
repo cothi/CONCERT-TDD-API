@@ -16,7 +16,6 @@ export class PrismaService
     });
   }
   async onModuleInit() {
-    await this.deleteTableData();
     await this.$connect();
   }
   async onModuleDestroy() {

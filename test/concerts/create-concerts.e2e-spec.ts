@@ -4,15 +4,15 @@ import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { AppModule } from 'src/modules/app.module';
 import { createApiRequests } from '../helpers/api-requests';
-import { QueueEntryStatus } from '@prisma/client';
+import { RedisService } from 'src/infrastructure/database/redis/redis.service';
 
 describe('콘서트', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
+  let redisService: RedisService;
   let apiRequest: ReturnType<typeof createApiRequests>;
+
   const seatTotal = 100;
-  // const seatPrice = 1;
-  // const chargePoint = 1;
   const date = new Date();
   const testContext: {
     testUserId?: string;
@@ -35,6 +35,7 @@ describe('콘서트', () => {
     );
 
     prismaService = app.get<PrismaService>(PrismaService);
+    redisService = app.get<RedisService>(RedisService);
     await app.init();
     apiRequest = createApiRequests(app);
 
@@ -46,19 +47,14 @@ describe('콘서트', () => {
 
     testContext.testUserId = testUser.id;
     testContext.email = testUser.email;
+    await redisService.grantReservationPermissions([testUser.id]);
     const loginResponse = await apiRequest.loginRequest(testContext.email);
-    testContext.accessToken = loginResponse.body.accessToken;
-    // 테스트용 대기열 항목 생성
-    await prismaService.queueEntry.create({
-      data: {
-        userId: testContext.testUserId,
-        status: QueueEntryStatus.ELIGIBLE,
-        enteredAt: new Date(),
-        expiresAt: new Date(Date.now() + 1000 * 60 * 5), // 5분
-      },
-    });
+    testContext.accessToken = loginResponse.body.data.accessToken;
+  });
 
-    // 테스트용 대기열 항목 생성
+  afterAll(async () => {
+    await prismaService.deleteTableData();
+    await app.close();
   });
 
   describe('콘서트 등록 - /concerts (POST)', () => {
@@ -69,7 +65,8 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      const status = concertResponse.body.statusCode;
+      expect(status).toBe(201);
     });
 
     it('콘서트 등록 시 콘서트 이름이 없으면 에러가 발생해야 합니다.', async () => {
@@ -77,7 +74,8 @@ describe('콘서트', () => {
         testContext.accessToken,
         '',
       );
-      expect(concertResponse.status).toBe(400);
+      const status = concertResponse.body.statusCode;
+      expect(status).toBe(400);
     });
 
     it('콘서트 등록 시 토큰이 없으면 에러가 발생해야 합니다.', async () => {
@@ -85,7 +83,8 @@ describe('콘서트', () => {
         '',
         'test concert',
       );
-      expect(concertResponse.status).toBe(401);
+      const status = concertResponse.body.statusCode;
+      expect(status).toBe(401);
     });
   });
 
@@ -96,15 +95,15 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      expect(concertResponse.body.statusCode).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      expect(concertDateResponse.body.statusCode).toBe(201);
     });
 
     it('콘서트 날짜 등록 시 콘서트 아이디가 없으면 에러가 발생해야 합니다.', async () => {
@@ -114,7 +113,7 @@ describe('콘서트', () => {
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(404);
+      expect(concertDateResponse.body.statusCode).toBe(404);
     });
 
     it('콘서트 날짜 등록 시 토큰이 없으면 에러가 발생해야 합니다.', async () => {
@@ -127,11 +126,11 @@ describe('콘서트', () => {
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         '',
       );
-      expect(concertDateResponse.status).toBe(401);
+      expect(concertDateResponse.body.statusCode).toBe(401);
     });
 
     it('콘서트가 존재하지 않으면 에러가 발생해야 합니다.', async () => {
@@ -141,7 +140,7 @@ describe('콘서트', () => {
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(404);
+      expect(concertDateResponse.body.statusCode).toBe(404);
     });
 
     it('콘서트 날짜 등록 시 총 좌석이 없으면 에러가 발생해야 합니다.', async () => {
@@ -154,11 +153,11 @@ describe('콘서트', () => {
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         0,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(400);
+      expect(concertDateResponse.body.statusCode).toBe(400);
     });
 
     it('콘서트 날짜 등록 시 날짜가 없으면 에러가 발생해야 합니다.', async () => {
@@ -167,15 +166,16 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      expect(concertResponse.body.statusCode).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         null,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(400);
+      const status = concertDateResponse.body.statusCode;
+      expect(status).toBe(400);
     });
   });
 
@@ -190,20 +190,22 @@ describe('콘서트', () => {
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      const status = concertDateResponse.body.statusCode;
+      expect(status).toBe(201);
 
       const concertDateSeatResponse =
         await apiRequest.createConcertDateSeatRequest(
           testContext.accessToken,
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           1,
           1,
         );
-      expect(concertDateSeatResponse.status).toBe(201);
+      const status2 = concertDateSeatResponse.body.statusCode;
+      expect(status2).toBe(201);
     });
 
     it('콘서트 날짜 좌석 등록 시 콘서트 날짜 아이디가 없으면 에러가 발생해야 합니다.', async () => {
@@ -214,7 +216,8 @@ describe('콘서트', () => {
           1,
           1,
         );
-      expect(concertDateSeatResponse.status).toBe(404);
+      const status = concertDateSeatResponse.body.statusCode;
+      expect(status).toBe(404);
     });
 
     it('콘서트 날짜 좌석 등록 시 토큰이 없으면 에러가 발생해야 합니다.', async () => {
@@ -223,24 +226,27 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      const status = concertResponse.body.statusCode;
+      expect(status).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      const status2 = concertDateResponse.body.statusCode;
+      expect(status2).toBe(201);
 
       const concertDateSeatResponse =
         await apiRequest.createConcertDateSeatRequest(
           '',
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           1,
           1,
         );
-      expect(concertDateSeatResponse.status).toBe(401);
+      const status3 = concertDateSeatResponse.body.statusCode;
+      expect(status3).toBe(401);
     });
 
     it('콘서트 날짜 좌석 등록 시 좌석 번호가 없으면 에러가 발생해야 합니다.', async () => {
@@ -249,24 +255,27 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      const status = concertResponse.body.statusCode;
+      expect(status).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      const status2 = concertDateResponse.body.statusCode;
+      expect(status2).toBe(201);
 
       const concertDateSeatResponse =
         await apiRequest.createConcertDateSeatRequest(
           testContext.accessToken,
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           null,
           1,
         );
-      expect(concertDateSeatResponse.status).toBe(400);
+      const status3 = concertDateSeatResponse.body.statusCode;
+      expect(status3).toBe(400);
     });
     it('콘서트 날짜 좌석 등록 시 가격이 없으면 에러가 발생해야 합니다.', async () => {
       const concertName = 'test concert9';
@@ -274,24 +283,27 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      const status = concertResponse.body.statusCode;
+      expect(status).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      const status2 = concertDateResponse.body.statusCode;
+      expect(status2).toBe(201);
 
       const concertDateSeatResponse =
         await apiRequest.createConcertDateSeatRequest(
           testContext.accessToken,
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           1,
           null,
         );
-      expect(concertDateSeatResponse.status).toBe(400);
+      const status3 = concertDateSeatResponse.body.statusCode;
+      expect(status3).toBe(400);
     });
 
     it('콘서트 날짜 좌석 등록 시 좌석 번호가 중복되면 에러가 발생해야 합니다.', async () => {
@@ -300,59 +312,66 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      const status = concertResponse.body.statusCode;
+      expect(status).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      const status2 = concertDateResponse.body.statusCode;
+      expect(status2).toBe(201);
 
       const concertDateSeatResponse =
         await apiRequest.createConcertDateSeatRequest(
           testContext.accessToken,
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           1,
           1,
         );
-      expect(concertDateSeatResponse.status).toBe(201);
+      const status3 = concertDateSeatResponse.body.statusCode;
+      expect(status3).toBe(201);
 
       const concertDateSeatResponse2 =
         await apiRequest.createConcertDateSeatRequest(
           testContext.accessToken,
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           1,
           1,
         );
-      expect(concertDateSeatResponse2.status).toBe(409);
+      const status4 = concertDateSeatResponse2.body.statusCode;
+      expect(status4).toBe(409);
     });
-
     it('콘서트 날짜 좌석 등록 시 좌석 번호가 0보다 작으면 에러가 발생해야 합니다.', async () => {
       const concertName = 'test concert11';
       const concertResponse = await apiRequest.createConcertRequest(
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+
+      const status = concertResponse.body.statusCode;
+      expect(status).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      const status2 = concertDateResponse.body.statusCode;
+      expect(status2).toBe(201);
 
       const concertDateSeatResponse =
         await apiRequest.createConcertDateSeatRequest(
           testContext.accessToken,
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           -1,
           1,
         );
-      expect(concertDateSeatResponse.status).toBe(400);
+      const status3 = concertDateSeatResponse.body.statusCode;
+      expect(status3).toBe(400);
     });
 
     it('콘서트 날짜 좌석 등록 시 가격이 0보다 작으면 에러가 발생해야 합니다.', async () => {
@@ -361,24 +380,27 @@ describe('콘서트', () => {
         testContext.accessToken,
         concertName,
       );
-      expect(concertResponse.status).toBe(201);
+      const status = concertResponse.body.statusCode;
+      expect(status).toBe(201);
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      const status2 = concertDateResponse.body.statusCode;
+      expect(status2).toBe(201);
 
       const concertDateSeatResponse =
         await apiRequest.createConcertDateSeatRequest(
           testContext.accessToken,
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           1,
           -1,
         );
-      expect(concertDateSeatResponse.status).toBe(400);
+      const status3 = concertDateSeatResponse.body.statusCode;
+      expect(status3).toBe(400);
     });
   });
 
@@ -392,37 +414,36 @@ describe('콘서트', () => {
 
       const concertDateResponse = await apiRequest.createConcertDateRequest(
         date,
-        concertResponse.body.concertId,
+        concertResponse.body.data.concertId,
         seatTotal,
         testContext.accessToken,
       );
-      expect(concertDateResponse.status).toBe(201);
+      const status = concertDateResponse.body.statusCode;
+      expect(status).toBe(201);
 
       const concertDateSeatResponse =
         await apiRequest.createConcertDateSeatRequest(
           testContext.accessToken,
-          concertDateResponse.body.concertDateId,
+          concertDateResponse.body.data.concertDateId,
           1,
           1,
         );
 
-      expect(concertDateSeatResponse.status).toBe(201);
+      const status2 = concertDateSeatResponse.body.statusCode;
+      expect(status2).toBe(201);
 
       const getSeatsResponse = await apiRequest.getConcertSeatsRequest(
-        concertDateResponse.body.concertDateId,
+        concertDateResponse.body.data.concertDateId,
         testContext.accessToken,
       );
 
-      const seatId = getSeatsResponse.body.seats[0].seatId;
+      const seatId = getSeatsResponse.body.data.seats[0].seatId;
       const reserveResponse = await apiRequest.reserveSeatRequest(
         testContext.accessToken,
         seatId,
       );
-      expect(reserveResponse.status).toBe(201);
+      const status3 = reserveResponse.body.statusCode;
+      expect(status3).toBe(201);
     });
-  });
-
-  afterAll(async () => {
-    await app.close();
   });
 });

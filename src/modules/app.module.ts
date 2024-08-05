@@ -1,21 +1,23 @@
-import { PaymentModule } from './payment.module';
-import { EnqueueModule } from './enqueue.module';
-import { PointsModule } from './points.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import * as Joi from 'joi';
-import { AuthModule } from './auth.module';
-import { ConcertsModule } from './concerts.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from 'src/common/config/winston.config';
-import { LoggerModule } from './logger.module';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 import { ResponseTransformInterceptor } from 'src/common/intercept/api-response.intercept';
+import { AuthModule } from './auth.module';
+import { ConcertsModule } from './concerts.module';
+import { EnqueueModule } from './enqueue.module';
+import { LoggerModule } from './logger.module';
+import { PaymentModule } from './payment.module';
+import { PointsModule } from './points.module';
+import { CacheModule } from 'src/common/cache/cache.module';
 
 @Module({
   imports: [
     WinstonModule.forRoot(winstonConfig),
+    CacheModule,
     PaymentModule,
     EnqueueModule,
     LoggerModule,

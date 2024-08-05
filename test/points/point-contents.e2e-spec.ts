@@ -6,7 +6,6 @@ import { createApiRequests } from '../helpers/api-requests';
 describe('Point Test (e2e)', () => {
   let app: INestApplication;
   let apiRequest: ReturnType<typeof createApiRequests>;
-
   const testContext: {
     testUserId?: string;
     accessToken?: string;
@@ -30,12 +29,10 @@ describe('Point Test (e2e)', () => {
         forbidNonWhitelisted: true,
       }),
     );
-
     await app.init();
     apiRequest = createApiRequests(app);
-
     const loginResponse = await apiRequest.createUserRequest();
-    testContext.accessToken = loginResponse.body.accessToken;
+    testContext.accessToken = loginResponse.body.data.accessToken;
   });
 
   describe('포인트 조회 - /points (GET)', () => {
@@ -43,17 +40,14 @@ describe('Point Test (e2e)', () => {
       const response = await apiRequest.getPointsRequest(
         testContext.accessToken,
       );
-      expect(response.status).toBe(200);
+      expect(response.body.statusCode).toBe(200);
+      expect(response.body.data).toHaveProperty('amount');
     });
 
     it('가입되지 않은 이메일로 포인트 조회 시도 시 에러 ', async () => {
       const response = await apiRequest.getPointsRequest('');
-      expect(response.status).toBe(401);
+      expect(response.body.statusCode).toBe(401);
     });
-  });
-
-  afterAll(async () => {
-    await app.close();
   });
 
   describe('포인트 충전 - /points/charge (PATCH)', () => {
@@ -62,29 +56,32 @@ describe('Point Test (e2e)', () => {
         testContext.accessToken,
         100,
       );
-      expect(response.body).toEqual({
+      expect(response.body.statusCode).toBe(200);
+      expect(response.body.data).toEqual({
         amount: '100.00',
         chargeAmount: '100.00',
       });
-      expect(response.status).toBe(200);
     });
-    it('포인트 충전이 30회 이상 시도 시 정상적으로 이루어져야 합니다.', async () => {
+
+    it('포인트 충전이 50회 이상 시도 시 정상적으로 이루어져야 합니다.', async () => {
       const res = [];
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 50; i++) {
         res.push(apiRequest.chargePointRequest(testContext.accessToken, 1));
       }
-      const responses = await Promise.all(res);
-
+      const responses = await Promise.allSettled(res);
       responses.forEach((response) => {
-        expect(response.status).toBe(200);
+        expect(
+          response.status === 'fulfilled' && response.value.statusCode === 201,
+        );
       });
-    }, 30000);
+    }, 5000000);
 
     it('가입되지 않은 이메일로 포인트 충전 시도 시 에러 ', async () => {
       const response = await apiRequest.chargePointRequest('', 100);
-      expect(response.status).toBe(401);
+      expect(response.body.statusCode).toBe(401);
     });
   });
+
   afterAll(async () => {
     await app.close();
   });

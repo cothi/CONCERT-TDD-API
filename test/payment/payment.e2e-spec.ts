@@ -1,14 +1,15 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { QueueEntryStatus } from '@prisma/client';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { AppModule } from 'src/modules/app.module';
 import { createApiRequests } from '../helpers/api-requests';
 import { randomUUID } from 'crypto';
+import { RedisService } from 'src/infrastructure/database/redis/redis.service';
 
 describe('Payment Test (e2e)', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
+  let redisService: RedisService;
   const testContext: {
     testUserId?: string;
     accessToken?: string;
@@ -23,6 +24,7 @@ describe('Payment Test (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     prismaService = app.get<PrismaService>(PrismaService);
+    redisService = app.get<RedisService>(RedisService);
     await app.init();
     apiRequests = createApiRequests(app);
 
@@ -35,21 +37,14 @@ describe('Payment Test (e2e)', () => {
     });
     testContext.testUserId = testUser.id;
     testContext.email = testUser.email;
-    // 테스트용 대기열 항목 생성
-    await prismaService.queueEntry.create({
-      data: {
-        userId: testContext.testUserId,
-        status: QueueEntryStatus.ELIGIBLE,
-        enteredAt: new Date(),
-        expiresAt: new Date(Date.now() + 1000 * 60 * 5), // 5분
-      },
-    });
-    testContext.accessToken = res.body.accessToken;
+    testContext.accessToken = res.body.data.accessToken;
+
+    // 대기열 추가
+    await redisService.grantReservationPermissions([testUser.id]);
   });
 
   describe('결제', () => {
     it('결제가 정상적으로 이루어져야 합니다. - /payment (POST)', async () => {
-      // 테스트 코드 작성
       const concertName = `test concert ${randomUUID()}`;
       const seatTotal = 100;
       const seatPrice = 1;
@@ -58,52 +53,60 @@ describe('Payment Test (e2e)', () => {
       const accessToken = testContext.accessToken;
 
       // 포인트 충전
-      await apiRequests.chargePointRequest(accessToken, chargePoint);
+      const chargePointRes = await apiRequests.chargePointRequest(
+        accessToken,
+        chargePoint,
+      );
+      expect(chargePointRes.body.statusCode).toBe(200);
 
       // 콘서트 생성
       const createConcertRes = await apiRequests.createConcertRequest(
         accessToken,
         concertName,
       );
-      expect(createConcertRes.status).toBe(201);
+      expect(createConcertRes.body.statusCode).toBe(201);
 
       // 콘서트 날짜 생성
       const createConcertDateRes = await apiRequests.createConcertDateRequest(
         concertDate,
-        createConcertRes.body.concertId,
+        createConcertRes.body.data.concertId,
         seatTotal,
         accessToken,
       );
+      expect(createConcertDateRes.body.statusCode).toBe(201);
 
       // 콘서트 좌석 생성
-      await apiRequests.createConcertDateSeatRequest(
+      const createSeatRes = await apiRequests.createConcertDateSeatRequest(
         accessToken,
-        createConcertDateRes.body.concertDateId,
+        createConcertDateRes.body.data.concertDateId,
         seatTotal,
         seatPrice,
       );
+      expect(createSeatRes.body.statusCode).toBe(201);
 
       // 좌석 조회
       const getConcertSeatsRes = await apiRequests.getConcertSeatsRequest(
-        createConcertDateRes.body.concertDateId,
+        createConcertDateRes.body.data.concertDateId,
         accessToken,
       );
+      expect(getConcertSeatsRes.body.statusCode).toBe(200);
+
       // 좌석 예약
       const createReservationRes = await apiRequests.createReservationRequest(
         accessToken,
-        getConcertSeatsRes.body.seats[0].seatId,
+        getConcertSeatsRes.body.data.seats[0].seatId,
       );
+      expect(createReservationRes.body.statusCode).toBe(201);
 
       // 좌석 결제
       const createPaymentRes = await apiRequests.createPaymentRequest(
         accessToken,
-        createReservationRes.body.id,
+        createReservationRes.body.data.id,
       );
-      expect(createPaymentRes.status).toBe(201);
+      expect(createPaymentRes.body.statusCode).toBe(201);
     });
 
     it('유저가 돈이 없으면 결제가 실패해야 합니다. - /payment (POST)', async () => {
-      // 테스트 코드 작성
       const concertName = `test concert ${randomUUID()}`;
       const seatTotal = 100;
       const seatPrice = 1;
@@ -115,44 +118,51 @@ describe('Payment Test (e2e)', () => {
         accessToken,
         concertName,
       );
-      expect(createConcertRes.status).toBe(201);
+      expect(createConcertRes.body.statusCode).toBe(201);
 
       // 콘서트 날짜 생성
       const createConcertDateRes = await apiRequests.createConcertDateRequest(
         concertDate,
-        createConcertRes.body.concertId,
+        createConcertRes.body.data.concertId,
         seatTotal,
         accessToken,
       );
+      expect(createConcertDateRes.body.statusCode).toBe(201);
 
       // 콘서트 좌석 생성
-      await apiRequests.createConcertDateSeatRequest(
+      const createSeatRes = await apiRequests.createConcertDateSeatRequest(
         accessToken,
-        createConcertDateRes.body.concertDateId,
+        createConcertDateRes.body.data.concertDateId,
         seatTotal,
         seatPrice,
       );
+      expect(createSeatRes.body.statusCode).toBe(201);
 
       // 좌석 조회
       const getConcertSeatsRes = await apiRequests.getConcertSeatsRequest(
-        createConcertDateRes.body.concertDateId,
+        createConcertDateRes.body.data.concertDateId,
         accessToken,
       );
+      expect(getConcertSeatsRes.body.statusCode).toBe(200);
+
       // 좌석 예약
       const createReservationRes = await apiRequests.createReservationRequest(
         accessToken,
-        getConcertSeatsRes.body.seats[0].seatId,
+        getConcertSeatsRes.body.data.seats[0].seatId,
       );
+      expect(createReservationRes.body.statusCode).toBe(201);
 
       // 좌석 결제
       const createPaymentRes = await apiRequests.createPaymentRequest(
         accessToken,
-        createReservationRes.body.id,
+        createReservationRes.body.data.id,
       );
-      expect(createPaymentRes.status).toBe(406);
+      expect(createPaymentRes.body.statusCode).toBe(400);
     });
   });
+
   afterAll(async () => {
+    await prismaService.deleteTableData();
     await app.close();
   });
 });
